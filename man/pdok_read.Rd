@@ -8,6 +8,8 @@ pdok_read(
   dataset,
   layer,
   bbox = NULL,
+  filter_by = NULL,
+  predicate = "intersects",
   datetime = NULL,
   crs = NULL,
   max_features = NULL
@@ -23,8 +25,17 @@ pdok_read(
 \code{c(xmin, ymin, xmax, ymax)} (assumed CRS84) or an \code{sf}/\code{sfc}/\code{bbox} object
 whose extent is used.}
 
-\item{datetime}{Optional temporal filter: a single year (e.g. \code{2026}), an OGC
-datetime string, or an interval such as \code{"2020-01-01/2025-12-31"}.}
+\item{filter_by}{Optional \code{sf}/\code{sfc} polygon to clip the result to. Its
+bounding box is used as a cheap server-side pre-filter, and the result is
+then clipped exactly with \code{\link[=pdok_filter_by]{pdok_filter_by()}}. This is the one-call form of
+the load-then-filter workflow.}
+
+\item{predicate}{Spatial predicate for \code{filter_by}, passed to
+\code{\link[=pdok_filter_by]{pdok_filter_by()}} (default \code{"intersects"}).}
+
+\item{datetime}{Optional temporal filter: a single year (e.g. \code{2026}, mapped
+to a mid-year instant), an OGC datetime string, or an interval such as
+\code{"2020-01-01/2025-12-31"}.}
 
 \item{crs}{Optional output CRS as an EPSG code (e.g. \code{28992} for RD New).
 \code{NULL} keeps the source CRS.}
@@ -49,10 +60,23 @@ data in another CRS; the transformation is done client-side with
 }
 \examples{
 \donttest{
-# Municipalities for 2024, in RD New
+# A whole layer: the Dutch national parks
+parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")
+
+# Municipalities for 2024, in RD New (EPSG:28992)
 pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
   datetime = 2024, crs = 28992, max_features = 5
+)
+
+# One-call area filter: national parks within the province of Utrecht
+provinces <- pdok_read(
+  "cbs/gebiedsindelingen", "provincie_gegeneraliseerd", datetime = 2024
+)
+utrecht <- provinces[provinces$statnaam == "Utrecht", ]
+parks_utrecht <- pdok_read(
+  "rvo/nationale-parken-geharmoniseerd", "protectedsite",
+  filter_by = utrecht
 )
 }
 }
