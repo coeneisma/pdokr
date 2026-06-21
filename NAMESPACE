@@ -2,5 +2,7 @@
 
 export(pdok_clear_cache)
 export(pdok_list_datasets)
+export(pdok_list_layers)
 export(pdok_search_datasets)
+export(pdok_search_layers)
 importFrom(rlang,"%||%")
