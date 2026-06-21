@@ -122,3 +122,43 @@ parse_index <- function(parsed) {
 
   do.call(rbind, rows)
 }
+
+#' Fetch the PDOK dataset registry (live, session-cached)
+#'
+#' Retrieves and parses `https://api.pdok.nl/index.json`, caching the result for
+#' the session. On a network or parse failure it warns and falls back to the
+#' snapshot bundled with the package.
+#'
+#' @param force If `TRUE`, bypass the session cache and fetch afresh.
+#' @param call Calling environment, for messages.
+#'
+#' @return A registry tibble (see `parse_index()`).
+#' @noRd
+fetch_index <- function(force = FALSE, call = rlang::caller_env()) {
+  key <- "index"
+  if (!force) {
+    cached <- cache_get(key)
+    if (!is.null(cached)) {
+      return(cached)
+    }
+  }
+
+  reg <- tryCatch(
+    {
+      resp <- pdok_perform(pdok_request(pdok_base_urls$index), call = call)
+      parse_index(httr2::resp_body_json(resp))
+    },
+    error = function(cnd) {
+      cli::cli_warn(
+        c(
+          "Could not fetch the live PDOK dataset index; using the bundled snapshot.",
+          "i" = "The snapshot may be out of date; retry later for the current list."
+        )
+      )
+      pdok_datasets_snapshot
+    }
+  )
+
+  cache_set(key, reg)
+  reg
+}
