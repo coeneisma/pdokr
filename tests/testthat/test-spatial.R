@@ -27,6 +27,14 @@ test_that("as_bbox_crs84 transforms an sf extent from RD New to CRS84", {
   expect_true(res[["ymin"]] < res[["ymax"]])
 })
 
+test_that("as_bbox_crs84 handles an already lon/lat input without lwgeom", {
+  poly <- sf::st_as_sfc(
+    sf::st_bbox(c(xmin = 4.9, ymin = 51.9, xmax = 5.3, ymax = 52.2), crs = 4326)
+  )
+  res <- as_bbox_crs84(poly)
+  expect_equal(unname(res), c(4.9, 51.9, 5.3, 52.2))
+})
+
 test_that("as_bbox_crs84 accepts sfc and bbox inputs equivalently", {
   sq <- rd_square()
   from_sf  <- as_bbox_crs84(sq)

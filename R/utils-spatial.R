@@ -45,11 +45,15 @@ as_bbox_crs84 <- function(x, call = rlang::caller_env()) {
     }
 
     poly <- sf::st_as_sfc(bb)
-    # Densify the rectangle so the reprojected box fully covers the area
-    # (a box that is slightly too large is harmless; too small would drop data).
-    span <- max(bb[["xmax"]] - bb[["xmin"]], bb[["ymax"]] - bb[["ymin"]])
-    if (is.finite(span) && span > 0) {
-      poly <- sf::st_segmentize(poly, dfMaxLength = span / 20)
+    if (!isTRUE(sf::st_is_longlat(bb))) {
+      # Projected input: densify in (planar) map units so the reprojected box
+      # fully covers the area. A slightly larger box is harmless; too small
+      # would drop data. Segmentising geographic coordinates would need lwgeom,
+      # which we avoid by only doing it for projected CRSs.
+      span <- max(bb[["xmax"]] - bb[["xmin"]], bb[["ymax"]] - bb[["ymin"]])
+      if (is.finite(span) && span > 0) {
+        poly <- sf::st_segmentize(poly, dfMaxLength = span / 20)
+      }
     }
     bb84 <- sf::st_bbox(sf::st_transform(poly, 4326))
     return(stats::setNames(as.numeric(bb84), c("xmin", "ymin", "xmax", "ymax")))

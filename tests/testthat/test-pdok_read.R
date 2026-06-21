@@ -58,6 +58,24 @@ test_that("pdok_read warns and returns 0 rows for an empty result", {
   expect_equal(nrow(out), 0L)
 })
 
+test_that("pdok_read clips the result to filter_by", {
+  body <- make_items_body(list(c(5.0, 52.0), c(5.2, 52.1), c(6.0, 53.0)))
+  httr2::local_mocked_responses(list(items_resp(body)))
+
+  poly <- sf::st_as_sfc(
+    sf::st_bbox(c(xmin = 4.9, ymin = 51.9, xmax = 5.3, ymax = 52.2), crs = 4326)
+  )
+  out <- pdok_read("cbs/gebiedsindelingen", "x", filter_by = poly)
+  expect_equal(nrow(out), 2L)
+})
+
+test_that("pdok_read rejects a non-spatial filter_by", {
+  expect_error(
+    pdok_read("cbs/gebiedsindelingen", "x", filter_by = "nope"),
+    "must be an"
+  )
+})
+
 test_that("pdok_read validates layer and max_features", {
   expect_error(pdok_read("cbs/gebiedsindelingen", 1), "single non-empty string")
   expect_error(pdok_read("cbs/gebiedsindelingen", ""), "single non-empty string")
