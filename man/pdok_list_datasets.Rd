@@ -12,7 +12,7 @@ from PDOK again.}
 }
 \value{
 A \link[tibble:tibble]{tibble} with one row per dataset and the columns
-\code{id} (the identifier passed to \code{pdok_list_layers()} and \code{pdok_read()}),
+\code{id} (the identifier passed to \code{\link[=pdok_list_layers]{pdok_list_layers()}} and \code{pdok_read()}),
 \code{name}, \code{description}, \code{keywords} (a list-column of character vectors),
 \code{services}, \code{owner}, and \code{ogc_url}.
 }
