@@ -1,0 +1,36 @@
+Package: pdokr
+Title: Access Open Geodata from the Dutch 'PDOK' Platform
+Version: 0.0.0.9000
+Authors@R:
+    person("Coen", "Eisma", , "coeneisma@gmail.com", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0009-0007-9001-2572"))
+Description: Tools to discover, download, and spatially filter open
+    geographic data from 'PDOK' (Publieke Dienstverlening Op de Kaart), the
+    national geodata platform of the Netherlands. Datasets and their layers
+    are searched and loaded as simple feature ('sf') objects through 'OGC'
+    API Features endpoints, with a transparent fallback to the Web Feature
+    Service ('WFS'), automatic pagination, and explicit coordinate reference
+    system handling. Loaded layers can be filtered by any polygon area, and
+    addresses or place names can be geocoded through the 'PDOK' location
+    server. See <https://www.pdok.nl/> for more information about the
+    platform and its services.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0
+Imports:
+    cli,
+    httr2,
+    rlang,
+    sf,
+    tibble
+Suggests:
+    httptest2,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+URL: https://github.com/coeneisma/pdokr, https://coeneisma.github.io/pdokr/
+BugReports: https://github.com/coeneisma/pdokr/issues
+Language: en-US

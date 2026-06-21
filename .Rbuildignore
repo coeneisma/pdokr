@@ -1,0 +1,7 @@
+^LICENSE\.md$
+^data-raw$
+^_pkgdown\.yml$
+^pkgdown$
+^cran-comments\.md$
+^pdokr\.Rproj$
+^\.Rproj\.user$
