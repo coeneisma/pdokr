@@ -10,7 +10,7 @@
 #'   from PDOK again.
 #'
 #' @return A [tibble][tibble::tibble] with one row per dataset and the columns
-#'   `id` (the identifier passed to [pdok_list_layers()] and `pdok_read()`),
+#'   `id` (the identifier passed to [pdok_list_layers()] and [pdok_read()]),
 #'   `name`, `description`, `keywords` (a list-column of character vectors),
 #'   `services`, `owner`, and `ogc_url`.
 #' @seealso [pdok_search_datasets()] to filter this list.

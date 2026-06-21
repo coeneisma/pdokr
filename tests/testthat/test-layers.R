@@ -59,6 +59,9 @@ test_that("pdok_list_layers returns and caches the layer tibble", {
   expect_equal(first, second)
   expect_equal(n, 1L)
   expect_true("gemeente_gegeneraliseerd" %in% first$layer)
+  # Each row echoes its dataset, so it works directly with pdok_read().
+  expect_equal(names(first)[1], "dataset")
+  expect_true(all(first$dataset == "cbs/gebiedsindelingen"))
 })
 
 test_that("pdok_search_layers filters case-insensitively", {

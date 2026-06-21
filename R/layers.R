@@ -69,10 +69,11 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 #' @param refresh If `TRUE`, ignore the session cache and fetch again.
 #'
 #' @return A [tibble][tibble::tibble] with one row per layer and the columns
-#'   `layer` (the identifier passed to `pdok_read()`), `title`, `description`,
-#'   `crs` (a list-column of available EPSG codes), `storage_crs` (the EPSG code
-#'   the data is stored in), and `bbox` (a list-column of named numeric extents
-#'   `c(xmin, ymin, xmax, ymax)` in CRS84).
+#'   `dataset` (the dataset id, echoing the input so each row works directly
+#'   with [pdok_read()]), `layer` (the layer identifier), `title`,
+#'   `description`, `crs` (a list-column of available EPSG codes), `storage_crs`
+#'   (the EPSG code the data is stored in), and `bbox` (a list-column of named
+#'   numeric extents `c(xmin, ymin, xmax, ymax)` in CRS84).
 #' @seealso [pdok_search_layers()] to filter this list,
 #'   [pdok_list_datasets()] for the datasets.
 #' @examples
@@ -102,6 +103,12 @@ pdok_list_layers <- function(dataset, refresh = FALSE) {
     pdok_request(paste0(ogc, "/collections"), query = list(f = "json"))
   )
   layers <- parse_collections(httr2::resp_body_json(resp))
+  # Echo the dataset so each row is self-contained for pdok_read(dataset, layer).
+  layers <- tibble::add_column(
+    layers,
+    dataset = rep(resolved$id, nrow(layers)),
+    .before = 1L
+  )
   cache_set(key, layers)
   layers
 }

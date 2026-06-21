@@ -92,6 +92,14 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
   next_url <- url
   next_query <- query
 
+  # Total is unknown (the API does not return numberMatched), so this is a
+  # spinner that reports the running feature count. cli keeps it quiet in
+  # non-interactive sessions.
+  cli::cli_progress_bar(
+    format = "{cli::pb_spin} Downloading PDOK features: {n_features} fetched",
+    clear = TRUE
+  )
+
   repeat {
     resp <- pdok_perform(pdok_request(next_url, query = next_query), call = call)
 
@@ -102,6 +110,7 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
     parsed <- httr2::resp_body_json(resp)
     pages <- c(pages, httr2::resp_body_string(resp))
     n_features <- n_features + length(parsed$features %||% list())
+    cli::cli_progress_update()
 
     next_href <- NULL
     for (lnk in parsed$links %||% list()) {
@@ -117,6 +126,7 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
     next_url <- next_href
     next_query <- NULL
   }
+  cli::cli_progress_done()
 
   list(pages = pages, content_crs = content_crs, n_features = n_features)
 }
@@ -137,7 +147,7 @@ parse_features <- function(pages, content_crs = NULL, call = rlang::caller_env()
   sfs <- Filter(function(s) !is.null(s) && nrow(s) > 0L, sfs)
 
   if (length(sfs) == 0L) {
-    return(sf::st_sf(geometry = sf::st_sfc()))
+    return(sf::st_sf(geometry = sf::st_sfc(crs = content_crs %||% NA_integer_)))
   }
 
   out <- if (length(sfs) == 1L) sfs[[1]] else do.call(rbind, sfs)

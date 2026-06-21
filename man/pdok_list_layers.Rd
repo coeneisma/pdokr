@@ -14,10 +14,11 @@ pdok_list_layers(dataset, refresh = FALSE)
 }
 \value{
 A \link[tibble:tibble]{tibble} with one row per layer and the columns
-\code{layer} (the identifier passed to \code{pdok_read()}), \code{title}, \code{description},
-\code{crs} (a list-column of available EPSG codes), \code{storage_crs} (the EPSG code
-the data is stored in), and \code{bbox} (a list-column of named numeric extents
-\code{c(xmin, ymin, xmax, ymax)} in CRS84).
+\code{dataset} (the dataset id, echoing the input so each row works directly
+with \code{\link[=pdok_read]{pdok_read()}}), \code{layer} (the layer identifier), \code{title},
+\code{description}, \code{crs} (a list-column of available EPSG codes), \code{storage_crs}
+(the EPSG code the data is stored in), and \code{bbox} (a list-column of named
+numeric extents \code{c(xmin, ymin, xmax, ymax)} in CRS84).
 }
 \description{
 Lists the layers (OGC API Features collections) offered by a dataset. The
