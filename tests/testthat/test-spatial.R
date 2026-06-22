@@ -27,6 +27,13 @@ test_that("as_bbox_crs84 transforms an sf extent from RD New to CRS84", {
   expect_true(res[["ymin"]] < res[["ymax"]])
 })
 
+test_that("as_bbox_crs84 pads a degenerate (point) bbox", {
+  pt <- sf::st_sfc(sf::st_point(c(5.171, 52.106)), crs = 4326)
+  res <- as_bbox_crs84(pt)
+  expect_gt(res[["xmax"]], res[["xmin"]])
+  expect_gt(res[["ymax"]], res[["ymin"]])
+})
+
 test_that("as_bbox_crs84 handles an already lon/lat input without lwgeom", {
   poly <- sf::st_as_sfc(
     sf::st_bbox(c(xmin = 4.9, ymin = 51.9, xmax = 5.3, ymax = 52.2), crs = 4326)

@@ -13,6 +13,21 @@
 #' @return A named numeric vector `c(xmin, ymin, xmax, ymax)` in CRS84
 #'   (lon/lat), suitable for the OGC `bbox` query parameter.
 #' @noRd
+# Internal: expand a zero-width or zero-height bbox by a small margin, so a
+# point or line still yields a usable, non-empty OGC bbox query (a degenerate
+# bbox is rejected by the server with HTTP 400).
+pad_degenerate_bbox <- function(b, pad = 1e-3) {
+  if (b[["xmax"]] - b[["xmin"]] == 0) {
+    b[["xmin"]] <- b[["xmin"]] - pad
+    b[["xmax"]] <- b[["xmax"]] + pad
+  }
+  if (b[["ymax"]] - b[["ymin"]] == 0) {
+    b[["ymin"]] <- b[["ymin"]] - pad
+    b[["ymax"]] <- b[["ymax"]] + pad
+  }
+  b
+}
+
 as_bbox_crs84 <- function(x, call = rlang::caller_env()) {
   # Bare numeric vector: assume it is already CRS84 and pass through.
   if (is.numeric(x) && !inherits(x, "bbox")) {
@@ -28,7 +43,8 @@ as_bbox_crs84 <- function(x, call = rlang::caller_env()) {
         call = call
       )
     }
-    return(stats::setNames(as.numeric(x), c("xmin", "ymin", "xmax", "ymax")))
+    out <- stats::setNames(as.numeric(x), c("xmin", "ymin", "xmax", "ymax"))
+    return(pad_degenerate_bbox(out))
   }
 
   # CRS-aware objects: take the extent and transform to CRS84.
@@ -56,7 +72,8 @@ as_bbox_crs84 <- function(x, call = rlang::caller_env()) {
       }
     }
     bb84 <- sf::st_bbox(sf::st_transform(poly, 4326))
-    return(stats::setNames(as.numeric(bb84), c("xmin", "ymin", "xmax", "ymax")))
+    out <- stats::setNames(as.numeric(bb84), c("xmin", "ymin", "xmax", "ymax"))
+    return(pad_degenerate_bbox(out))
   }
 
   cli::cli_abort(

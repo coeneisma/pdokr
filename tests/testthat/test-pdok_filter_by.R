@@ -28,6 +28,20 @@ test_that("pdok_filter_by reconciles differing CRS", {
   expect_equal(sf::st_crs(res), sf::st_crs(data))
 })
 
+test_that("pdok_filter_by accepts a point and keeps the containing polygon", {
+  polys <- sf::st_sf(
+    name = c("A", "B"),
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(rbind(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)))),
+      sf::st_polygon(list(rbind(c(1, 0), c(2, 0), c(2, 1), c(1, 1), c(1, 0)))),
+      crs = 4326
+    )
+  )
+  pt <- sf::st_sfc(sf::st_point(c(0.5, 0.5)), crs = 4326)
+  res <- pdok_filter_by(polys, pt)
+  expect_equal(res$name, "A")
+})
+
 test_that("pdok_filter_by returns 0 rows for empty input", {
   empty <- three_points_4326()[0, ]
   res <- pdok_filter_by(empty, box_4326())

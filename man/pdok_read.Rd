@@ -25,10 +25,13 @@ pdok_read(
 \code{c(xmin, ymin, xmax, ymax)} (assumed CRS84) or an \code{sf}/\code{sfc}/\code{bbox} object
 whose extent is used.}
 
-\item{filter_by}{Optional \code{sf}/\code{sfc} polygon to clip the result to. Its
+\item{filter_by}{Optional \code{sf}/\code{sfc} geometry to filter the result by. Its
 bounding box is used as a cheap server-side pre-filter, and the result is
-then clipped exactly with \code{\link[=pdok_filter_by]{pdok_filter_by()}}. This is the one-call form of
-the load-then-filter workflow.}
+then filtered exactly with \code{\link[=pdok_filter_by]{pdok_filter_by()}}. This is the one-call form of
+the load-then-filter workflow. It is usually a polygon (e.g. a
+municipality), but a point works too: filtering an area layer by a point
+returns the feature that contains it (for example the municipality an
+address falls in).}
 
 \item{predicate}{Spatial predicate for \code{filter_by}, passed to
 \code{\link[=pdok_filter_by]{pdok_filter_by()}} (default \code{"intersects"}).}
