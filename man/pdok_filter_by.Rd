@@ -23,9 +23,9 @@ An \link[sf:st_sf]{sf} object: the subset of \code{data} whose features satisfy
 }
 \description{
 Keeps the features of \code{data} that relate to \code{filter_geometry} under a spatial
-predicate. This is a thin, convenient wrapper around \code{\link[sf:st_filter]{sf::st_filter()}} that
-also reconciles coordinate reference systems for you: \code{filter_geometry} is
-transformed to the CRS of \code{data} before filtering.
+predicate. It does what \code{\link[sf:st_filter]{sf::st_filter()}} does, and additionally reconciles
+coordinate reference systems for you: \code{filter_geometry} is transformed to the
+CRS of \code{data} before filtering.
 }
 \details{
 \code{filter_geometry} can be \emph{any} polygon: a municipality from

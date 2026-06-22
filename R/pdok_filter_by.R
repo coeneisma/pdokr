@@ -19,9 +19,9 @@ filter_predicate <- function(predicate, call = rlang::caller_env()) {
 #' Spatially filter an sf layer by any polygon
 #'
 #' Keeps the features of `data` that relate to `filter_geometry` under a spatial
-#' predicate. This is a thin, convenient wrapper around [sf::st_filter()] that
-#' also reconciles coordinate reference systems for you: `filter_geometry` is
-#' transformed to the CRS of `data` before filtering.
+#' predicate. It does what [sf::st_filter()] does, and additionally reconciles
+#' coordinate reference systems for you: `filter_geometry` is transformed to the
+#' CRS of `data` before filtering.
 #'
 #' `filter_geometry` can be *any* polygon: a municipality from
 #' [pdok_read()] on the CBS administrative boundaries, a nature reserve, a
@@ -70,5 +70,9 @@ pdok_filter_by <- function(data, filter_geometry, predicate = "intersects") {
 
   op <- filter_predicate(predicate)
   geom <- sf::st_transform(sf::st_geometry(filter_geometry), sf::st_crs(data))
-  sf::st_filter(data, geom, .predicate = op)
+
+  # Equivalent to sf::st_filter(), but without sf's dplyr dependency: keep the
+  # features of `data` that relate to any part of `filter_geometry`.
+  hits <- op(sf::st_geometry(data), geom)
+  data[lengths(hits) > 0L, , drop = FALSE]
 }
