@@ -1,3 +1,11 @@
+# Internal: the date part of an ISO datetime string, or NA.
+as_extent_date <- function(x) {
+  if (is.null(x) || !is.character(x) || length(x) != 1L || !nzchar(x)) {
+    return(as.Date(NA))
+  }
+  as.Date(substr(x, 1L, 10L))
+}
+
 #' Parse an OGC collections body into a layer registry
 #'
 #' @param parsed The parsed `{ogc}/collections?f=json` body: a list with a
@@ -33,10 +41,17 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
     }
     storage <- parse_content_crs(co$storageCrs)
 
+    ivl <- co$extent$temporal$interval
+    pair <- if (length(ivl) >= 1L) ivl[[1]] else list()
+    start_date <- as_extent_date(if (length(pair) >= 1L) pair[[1]] else NULL)
+    end_date <- as_extent_date(if (length(pair) >= 2L) pair[[2]] else NULL)
+
     tibble::tibble(
       layer       = id,
       title       = co$title %||% NA_character_,
       description = co$description %||% NA_character_,
+      start_date  = start_date,
+      end_date    = end_date,
       crs         = list(crs_codes),
       storage_crs = storage %||% NA_integer_,
       bbox        = list(stats::setNames(bb, c("xmin", "ymin", "xmax", "ymax")))
@@ -50,6 +65,8 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
       layer       = character(),
       title       = character(),
       description = character(),
+      start_date  = as.Date(character()),
+      end_date    = as.Date(character()),
       crs         = list(),
       storage_crs = integer(),
       bbox        = list()
@@ -71,9 +88,11 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 #' @return A [tibble][tibble::tibble] with one row per layer and the columns
 #'   `dataset` (the dataset id, echoing the input so each row works directly
 #'   with [pdok_read()]), `layer` (the layer identifier), `title`,
-#'   `description`, `crs` (a list-column of available EPSG codes), `storage_crs`
-#'   (the EPSG code the data is stored in), and `bbox` (a list-column of named
-#'   numeric extents `c(xmin, ymin, xmax, ymax)` in CRS84).
+#'   `description`, `start_date` and `end_date` (the temporal extent the layer
+#'   covers, as `Date`s; `end_date` is `NA` when the layer is ongoing), `crs` (a
+#'   list-column of available EPSG codes), `storage_crs` (the EPSG code the data
+#'   is stored in), and `bbox` (a list-column of named numeric extents
+#'   `c(xmin, ymin, xmax, ymax)` in CRS84).
 #' @seealso [pdok_search_layers()] to filter this list,
 #'   [pdok_list_datasets()] for the datasets.
 #' @examples
