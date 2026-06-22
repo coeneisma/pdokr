@@ -65,10 +65,13 @@ read_wfs <- function(wfs, layer, max_features, call = rlang::caller_env()) {
 #' @param bbox Optional server-side bounding-box pre-filter: a numeric vector
 #'   `c(xmin, ymin, xmax, ymax)` (assumed CRS84) or an `sf`/`sfc`/`bbox` object
 #'   whose extent is used.
-#' @param filter_by Optional `sf`/`sfc` polygon to clip the result to. Its
+#' @param filter_by Optional `sf`/`sfc` geometry to filter the result by. Its
 #'   bounding box is used as a cheap server-side pre-filter, and the result is
-#'   then clipped exactly with [pdok_filter_by()]. This is the one-call form of
-#'   the load-then-filter workflow.
+#'   then filtered exactly with [pdok_filter_by()]. This is the one-call form of
+#'   the load-then-filter workflow. It is usually a polygon (e.g. a
+#'   municipality), but a point works too: filtering an area layer by a point
+#'   returns the feature that contains it (for example the municipality an
+#'   address falls in).
 #' @param predicate Spatial predicate for `filter_by`, passed to
 #'   [pdok_filter_by()] (default `"intersects"`).
 #' @param datetime Optional temporal filter: a single year (e.g. `2026`, mapped
