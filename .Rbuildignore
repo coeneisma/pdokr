@@ -5,3 +5,5 @@
 ^cran-comments\.md$
 ^pdokr\.Rproj$
 ^\.Rproj\.user$
+^docs$
+^README\.Rmd$

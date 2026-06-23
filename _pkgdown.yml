@@ -1,0 +1,28 @@
+url: https://coeneisma.github.io/pdokr/
+
+template:
+  bootstrap: 5
+
+reference:
+- title: Search & discovery
+  desc: Find datasets and the layers within them.
+  contents:
+  - pdok_list_datasets
+  - pdok_search_datasets
+  - pdok_list_layers
+  - pdok_search_layers
+- title: Loading data
+  desc: Read a layer as an sf object.
+  contents:
+  - pdok_read
+- title: Spatial filtering
+  desc: Filter a layer by any polygon area.
+  contents:
+  - pdok_filter_by
+- title: Geocoding
+  desc: Look up addresses and place names.
+  contents:
+  - pdok_geocode
+- title: Utilities
+  contents:
+  - pdok_clear_cache

@@ -1,0 +1,61 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# pdokr
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN status](https://www.r-pkg.org/badges/version/pdokr)](https://CRAN.R-project.org/package=pdokr)
+[![R-CMD-check](https://github.com/coeneisma/pdokr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/coeneisma/pdokr/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+`pdokr` makes it easy to work with open geographic data from
+[PDOK](https://www.pdok.nl/) (Publieke Dienstverlening Op de Kaart), the
+national geodata platform of the Netherlands. It helps you discover datasets and
+their layers, load a layer as an [`sf`](https://r-spatial.github.io/sf/) object
+(with automatic pagination and explicit coordinate reference system handling),
+filter data by any polygon area, and geocode addresses and place names.
+
+## Installation
+
+You can install the development version of `pdokr` from
+[GitHub](https://github.com/coeneisma/pdokr) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("coeneisma/pdokr")
+```
+
+## Example
+
+```{r example}
+library(pdokr)
+
+# Search for a dataset
+pdok_search_datasets("nationale parken")
+
+# Load a layer as an sf object
+parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")
+
+# Filter to an area: the province of Utrecht, found by geocoding
+utrecht <- pdok_geocode("Utrecht", type = "provincie")
+pdok_filter_by(parks, utrecht)
+```
+
+## Learn more
+
+See the [package website](https://coeneisma.github.io/pdokr/) for the reference
+documentation and articles on getting started, filtering data by area, working
+with coordinate reference systems, and querying PDOK by hand.
