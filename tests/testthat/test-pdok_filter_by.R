@@ -42,6 +42,18 @@ test_that("pdok_filter_by accepts a point and keeps the containing polygon", {
   expect_equal(res$name, "A")
 })
 
+test_that("pdok_filter_by tolerates an s2-invalid filter polygon", {
+  pts <- three_points_4326()
+  # A self-intersecting "bowtie" polygon: invalid under s2.
+  bowtie <- sf::st_sfc(
+    sf::st_polygon(list(rbind(
+      c(4.9, 51.9), c(5.3, 52.2), c(5.3, 51.9), c(4.9, 52.2), c(4.9, 51.9)
+    ))),
+    crs = 4326
+  )
+  expect_no_error(pdok_filter_by(pts, bowtie))
+})
+
 test_that("pdok_filter_by returns 0 rows for empty input", {
   empty <- three_points_4326()[0, ]
   res <- pdok_filter_by(empty, box_4326())
