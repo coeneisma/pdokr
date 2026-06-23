@@ -71,8 +71,16 @@ pdok_filter_by <- function(data, filter_geometry, predicate = "intersects") {
   op <- filter_predicate(predicate)
   geom <- sf::st_transform(sf::st_geometry(filter_geometry), sf::st_crs(data))
 
+  # PDOK and geocoded polygons are digitised in a planar CRS and are sometimes
+  # invalid under s2's spherical model (which `st_make_valid()` does not fix).
+  # Run the predicate with GEOS (planar) instead: tolerant, and correct at the
+  # scale of the Netherlands. Restore the s2 setting afterwards.
+  old_s2 <- sf::sf_use_s2()
+  on.exit(suppressMessages(sf::sf_use_s2(old_s2)), add = TRUE)
+  suppressMessages(sf::sf_use_s2(FALSE))
+
   # Equivalent to sf::st_filter(), but without sf's dplyr dependency: keep the
   # features of `data` that relate to any part of `filter_geometry`.
-  hits <- op(sf::st_geometry(data), geom)
+  hits <- suppressMessages(suppressWarnings(op(sf::st_geometry(data), geom)))
   data[lengths(hits) > 0L, , drop = FALSE]
 }
