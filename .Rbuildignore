@@ -7,3 +7,6 @@
 ^\.Rproj\.user$
 ^docs$
 ^README\.Rmd$
+^doc$
+^Meta$
+^vignettes/articles$
