@@ -4,13 +4,11 @@
 \alias{pdok_list_layers}
 \title{List the layers within a PDOK dataset}
 \usage{
-pdok_list_layers(dataset, refresh = FALSE)
+pdok_list_layers(dataset)
 }
 \arguments{
 \item{dataset}{A dataset id from \code{\link[=pdok_list_datasets]{pdok_list_datasets()}} (e.g.
 \code{"cbs/gebiedsindelingen"}), or a raw OGC API base URL.}
-
-\item{refresh}{If \code{TRUE}, ignore the session cache and fetch again.}
 }
 \value{
 A \link[tibble:tibble]{tibble} with one row per layer and the columns
@@ -23,8 +21,7 @@ is stored in), and \code{bbox} (a list-column of named numeric extents
 \code{c(xmin, ymin, xmax, ymax)} in CRS84).
 }
 \description{
-Lists the layers (OGC API Features collections) offered by a dataset. The
-result is cached for the session.
+Lists the layers (OGC API Features collections) offered by a dataset.
 }
 \examples{
 \donttest{

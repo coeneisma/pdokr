@@ -4,15 +4,13 @@
 \alias{pdok_search_layers}
 \title{Search the layers within a PDOK dataset}
 \usage{
-pdok_search_layers(dataset, query, refresh = FALSE)
+pdok_search_layers(dataset, query)
 }
 \arguments{
 \item{dataset}{A dataset id from \code{\link[=pdok_list_datasets]{pdok_list_datasets()}} (e.g.
 \code{"cbs/gebiedsindelingen"}), or a raw OGC API base URL.}
 
 \item{query}{A single non-empty string to search for, e.g. \code{"gemeente"}.}
-
-\item{refresh}{If \code{TRUE}, ignore the session cache and fetch again.}
 }
 \value{
 A \link[tibble:tibble]{tibble} with the same columns as
