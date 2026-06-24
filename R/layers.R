@@ -100,13 +100,6 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 #' @export
 pdok_list_layers <- function(dataset) {
   resolved <- resolve_dataset(dataset)
-  if (is.null(resolved$ogc)) {
-    cli::cli_abort(c(
-      "{.arg dataset} has no OGC API Features endpoint.",
-      "i" = "Listing layers of WFS-only datasets is not supported; pass an OGC dataset id or base URL."
-    ))
-  }
-
   ogc <- resolved$ogc
   resp <- pdok_perform(
     pdok_request(paste0(ogc, "/collections"), query = list(f = "json"))

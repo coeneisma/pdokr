@@ -7,31 +7,23 @@
 # Internal: base URLs for the PDOK services the package talks to.
 #
 # - index: the JSON index of all OGC API datasets at api.pdok.nl
-# - ogc_host: host for OGC API Features datasets (id is inserted as
-#   `{ogc_host}/{owner}/{dataset}/ogc/v1`)
-# - wfs_host: host for WFS services (fallback path)
 # - locatieserver: base for the PDOK Locatieserver (geocoding)
 pdok_base_urls <- list(
   index         = "https://api.pdok.nl/index.json",
-  ogc_host      = "https://api.pdok.nl",
-  wfs_host      = "https://service.pdok.nl",
   locatieserver = "https://api.pdok.nl/bzk/locatieserver/search/v3_1"
 )
 
-#' Resolve a dataset reference to its service endpoints
+#' Resolve a dataset reference to its OGC API endpoint
 #'
 #' Accepts either a registry id of the form `"owner/dataset"` (as returned by
-#' `pdok_search_datasets()`) or a raw service URL, and returns the OGC API
-#' Features and/or WFS endpoints it maps to. A registry id is looked up in the
-#' live index so the correct OGC API version (`v1`, `v2`, ...) is used.
+#' `pdok_search_datasets()`) or a raw OGC API base URL. A registry id is looked
+#' up in the live index so the correct OGC API version (`v1`, `v2`, ...) is used.
 #'
 #' @param dataset A single string: a registry id (e.g.
-#'   `"cbs/gebiedsindelingen"`) or a full service URL.
+#'   `"cbs/gebiedsindelingen"`) or a full OGC API base URL.
 #' @param call The calling environment, for error messages.
 #'
-#' @return A list with elements `id`, `ogc` (OGC API base URL or `NULL`),
-#'   `wfs` (WFS base URL or `NULL`), and `services` (a character vector of the
-#'   available service types).
+#' @return A list with elements `id` and `ogc` (the OGC API base URL).
 #' @noRd
 resolve_dataset <- function(dataset, call = rlang::caller_env()) {
   if (!rlang::is_string(dataset) || !nzchar(dataset)) {
@@ -41,17 +33,18 @@ resolve_dataset <- function(dataset, call = rlang::caller_env()) {
     )
   }
 
-  # Raw URL: classify by shape (any OGC version, or WFS).
+  # Raw URL: accept OGC; reject WFS (pdokr is an OGC API Features client).
   if (grepl("^https?://", dataset, ignore.case = TRUE)) {
-    is_wfs <- grepl("service\\.pdok\\.nl|[?&]service=wfs|/wfs", dataset,
-                    ignore.case = TRUE)
-    if (is_wfs) {
-      return(list(
-        id = dataset, ogc = NULL, wfs = dataset, services = "wfs"
-      ))
+    if (grepl("service\\.pdok\\.nl|[?&]service=wfs|/wfs", dataset, ignore.case = TRUE)) {
+      cli::cli_abort(
+        c(
+          "{.arg dataset} looks like a WFS URL, which {.pkg pdokr} does not read.",
+          "i" = "Use the dataset's OGC API Features service instead, or read WFS directly with {.fn sf::read_sf}."
+        ),
+        call = call
+      )
     }
-    ogc <- sub("/+$", "", dataset)
-    return(list(id = dataset, ogc = ogc, wfs = NULL, services = "ogc"))
+    return(list(id = dataset, ogc = sub("/+$", "", dataset)))
   }
 
   # Registry id: look up its OGC URL in the live index, so the right version
@@ -60,7 +53,7 @@ resolve_dataset <- function(dataset, call = rlang::caller_env()) {
   reg <- fetch_index(call = call)
   hit <- reg[reg$id == id, ]
   if (nrow(hit) >= 1L) {
-    return(list(id = id, ogc = hit$ogc_url[[1]], wfs = NULL, services = "ogc"))
+    return(list(id = id, ogc = hit$ogc_url[[1]]))
   }
 
   cli::cli_abort(

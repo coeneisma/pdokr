@@ -88,20 +88,3 @@ test_that("pdok_read validates layer and max_features", {
     "positive whole number"
   )
 })
-
-test_that("pdok_read works over WFS (integration)", {
-  skip_on_cran()
-  skip_if_offline()
-  # Opt-in: hits the live BAG WFS, whose GetCapabilities is large and slow.
-  skip_if_not(
-    nzchar(Sys.getenv("PDOKR_TEST_WFS")),
-    "set PDOKR_TEST_WFS to run the WFS integration test"
-  )
-  out <- pdok_read(
-    "https://service.pdok.nl/lv/bag/wfs/v2_0",
-    layer = "bag:pand",
-    max_features = 1
-  )
-  expect_s3_class(out, "sf")
-  expect_lte(nrow(out), 1L)
-})

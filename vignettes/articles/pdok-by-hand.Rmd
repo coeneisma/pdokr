@@ -104,13 +104,19 @@ length(next_link) # 0 here: all 12 provinces fit on one page
 
 ## WFS, the older service
 
-Some datasets are only available over WFS. GDAL can read those directly, and
-`pdok_read()` falls back to this automatically:
+PDOK also offers an older Web Feature Service (WFS) for some datasets. `pdokr`
+is an OGC API Features client and does not read WFS — almost all vector data
+(including BAG) is now available over the OGC API. On the rare occasion you need
+a WFS-only layer, GDAL can read it directly, optionally with a server-side
+spatial filter:
 
 ```{r wfs, eval = FALSE}
-# Not run here (the BAG capabilities document is large):
-buildings <- read_sf("WFS:https://service.pdok.nl/lv/bag/wfs/v2_0",
-                     layer = "bag:pand")
+# Read a WFS layer by hand (the layer's CRS is RD New / EPSG:28992):
+buildings <- read_sf(
+  "WFS:https://service.pdok.nl/some/dataset/wfs/v1_0",
+  layer = "namespace:layer",
+  wkt_filter = sf::st_as_text(area_in_rd_new)
+)
 ```
 
 ## Putting it together

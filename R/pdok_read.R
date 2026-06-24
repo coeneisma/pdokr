@@ -39,20 +39,10 @@ read_ogc <- function(ogc, layer, bbox, datetime, max_features,
   out
 }
 
-# Internal: read a layer over WFS via the GDAL driver (fallback path).
-read_wfs <- function(wfs, layer, max_features, call = rlang::caller_env()) {
-  out <- sf::read_sf(paste0("WFS:", wfs), layer = layer)
-  if (!is.null(max_features) && nrow(out) > max_features) {
-    out <- out[seq_len(max_features), , drop = FALSE]
-  }
-  out
-}
-
 #' Read a PDOK layer as an sf object
 #'
-#' Loads a layer from PDOK as a simple feature collection. The OGC API Features
-#' service is used when available, with a transparent fallback to the Web
-#' Feature Service ('WFS'). Pagination is handled automatically.
+#' Loads a layer from PDOK as a simple feature collection over the OGC API
+#' Features service, handling pagination automatically.
 #'
 #' By default the data is returned in the coordinate reference system the
 #' service provides (lon/lat, CRS84, for the OGC path). Set `crs` to receive the
@@ -60,7 +50,7 @@ read_wfs <- function(wfs, layer, max_features, call = rlang::caller_env()) {
 #' [sf::st_transform()].
 #'
 #' @param dataset A dataset id from [pdok_list_datasets()] (e.g.
-#'   `"cbs/gebiedsindelingen"`), or a raw OGC API or WFS base URL.
+#'   `"cbs/gebiedsindelingen"`), or a raw OGC API base URL.
 #' @param layer A layer id from [pdok_list_layers()].
 #' @param bbox Optional server-side bounding-box pre-filter: a numeric vector
 #'   `c(xmin, ymin, xmax, ymax)` (assumed CRS84) or an `sf`/`sfc`/`bbox` object
@@ -126,13 +116,7 @@ pdok_read <- function(dataset, layer, bbox = NULL, filter_by = NULL,
   server_bbox <- bbox %||% filter_by
 
   resolved <- resolve_dataset(dataset)
-  out <- if (!is.null(resolved$ogc)) {
-    read_ogc(resolved$ogc, layer, server_bbox, datetime, max_features)
-  } else if (!is.null(resolved$wfs)) {
-    read_wfs(resolved$wfs, layer, max_features)
-  } else {
-    cli::cli_abort("{.arg dataset} could not be resolved to an OGC or WFS endpoint.")
-  }
+  out <- read_ogc(resolved$ogc, layer, server_bbox, datetime, max_features)
 
   if (nrow(out) == 0L) {
     cli::cli_warn(c(
