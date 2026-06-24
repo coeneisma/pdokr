@@ -22,7 +22,8 @@ pdok_base_urls <- list(
 #'
 #' Accepts either a registry id of the form `"owner/dataset"` (as returned by
 #' `pdok_search_datasets()`) or a raw service URL, and returns the OGC API
-#' Features and/or WFS endpoints it maps to.
+#' Features and/or WFS endpoints it maps to. A registry id is looked up in the
+#' live index so the correct OGC API version (`v1`, `v2`, ...) is used.
 #'
 #' @param dataset A single string: a registry id (e.g.
 #'   `"cbs/gebiedsindelingen"`) or a full service URL.
@@ -40,7 +41,7 @@ resolve_dataset <- function(dataset, call = rlang::caller_env()) {
     )
   }
 
-  # Raw URL: classify by shape.
+  # Raw URL: classify by shape (any OGC version, or WFS).
   if (grepl("^https?://", dataset, ignore.case = TRUE)) {
     is_wfs <- grepl("service\\.pdok\\.nl|[?&]service=wfs|/wfs", dataset,
                     ignore.case = TRUE)
@@ -53,10 +54,22 @@ resolve_dataset <- function(dataset, call = rlang::caller_env()) {
     return(list(id = dataset, ogc = ogc, wfs = NULL, services = "ogc"))
   }
 
-  # Registry id like "owner/dataset": always an OGC API dataset.
+  # Registry id: look up its OGC URL in the live index, so the right version
+  # (v1, v2, ...) is used rather than an assumed one.
   id <- gsub("^/+|/+$", "", dataset)
-  ogc <- paste0(pdok_base_urls$ogc_host, "/", id, "/ogc/v1")
-  list(id = id, ogc = ogc, wfs = NULL, services = "ogc")
+  reg <- fetch_index(call = call)
+  hit <- reg[reg$id == id, ]
+  if (nrow(hit) >= 1L) {
+    return(list(id = id, ogc = hit$ogc_url[[1]], wfs = NULL, services = "ogc"))
+  }
+
+  cli::cli_abort(
+    c(
+      "Unknown dataset {.val {id}}.",
+      "i" = "See {.fn pdok_search_datasets} for available ids, or pass a full OGC API base URL."
+    ),
+    call = call
+  )
 }
 
 #' Parse the PDOK API index into a dataset registry
@@ -76,11 +89,11 @@ parse_index <- function(parsed) {
   apis <- parsed$apis %||% list()
 
   rows <- lapply(apis, function(api) {
-    # Find the OGC API Features root link.
+    # Find the OGC API Features root link (any version: v1, v2, ...).
     href <- NULL
     for (lnk in api$links %||% list()) {
       h <- lnk$href %||% ""
-      if (grepl("/ogc/v1/?$", h)) {
+      if (grepl("/ogc/v\\d+/?$", h)) {
         href <- h
         break
       }
@@ -89,7 +102,7 @@ parse_index <- function(parsed) {
       return(NULL)
     }
 
-    id <- sub("/ogc/v1/?$", "", sub("^https?://api\\.pdok\\.nl/", "", href))
+    id <- sub("/ogc/v\\d+/?$", "", sub("^https?://api\\.pdok\\.nl/", "", href))
     owner <- sub("/.*$", "", id)
 
     kw <- api$keywords %||% character()

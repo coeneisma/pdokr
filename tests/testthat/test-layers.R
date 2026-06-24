@@ -51,7 +51,9 @@ test_that("parse_collections builds a layer registry", {
 })
 
 test_that("pdok_list_layers returns the layer tibble", {
-  httr2::local_mocked_responses(function(req) mock_collections_resp())
+  httr2::local_mocked_responses(
+    mock_pdok_dispatcher(collections = mock_collections_resp())
+  )
 
   layers <- pdok_list_layers("cbs/gebiedsindelingen")
   expect_s3_class(layers, "tbl_df")
@@ -62,7 +64,9 @@ test_that("pdok_list_layers returns the layer tibble", {
 })
 
 test_that("pdok_search_layers filters case-insensitively", {
-  httr2::local_mocked_responses(function(req) mock_collections_resp())
+  httr2::local_mocked_responses(
+    mock_pdok_dispatcher(collections = mock_collections_resp())
+  )
 
   res <- pdok_search_layers("cbs/gebiedsindelingen", "provincie")
   expect_equal(res$layer, "provincie_gegeneraliseerd")

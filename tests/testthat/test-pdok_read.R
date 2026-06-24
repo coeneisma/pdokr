@@ -29,7 +29,7 @@ test_that("format_datetime handles years, strings and bad input", {
 })
 
 test_that("pdok_read returns an sf object from the OGC path", {
-  httr2::local_mocked_responses(list(items_resp(make_items_body(list(c(5, 52), c(5.1, 52.1))))))
+  httr2::local_mocked_responses(mock_pdok_dispatcher(items = items_resp(make_items_body(list(c(5, 52), c(5.1, 52.1))))))
   out <- pdok_read("cbs/gebiedsindelingen", "gemeente_gegeneraliseerd")
   expect_s3_class(out, "sf")
   expect_equal(nrow(out), 2L)
@@ -37,20 +37,20 @@ test_that("pdok_read returns an sf object from the OGC path", {
 })
 
 test_that("pdok_read transforms to the requested crs", {
-  httr2::local_mocked_responses(list(items_resp(make_items_body(list(c(5.17, 52.1))))))
+  httr2::local_mocked_responses(mock_pdok_dispatcher(items = items_resp(make_items_body(list(c(5.17, 52.1))))))
   out <- pdok_read("cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", crs = 28992)
   expect_equal(sf::st_crs(out)$epsg, 28992L)
 })
 
 test_that("pdok_read trims to max_features", {
   body <- make_items_body(list(c(5, 52), c(5.1, 52.1), c(5.2, 52.2)))
-  httr2::local_mocked_responses(list(items_resp(body)))
+  httr2::local_mocked_responses(mock_pdok_dispatcher(items = items_resp(body)))
   out <- pdok_read("cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", max_features = 1)
   expect_equal(nrow(out), 1L)
 })
 
 test_that("pdok_read warns and returns 0 rows for an empty result", {
-  httr2::local_mocked_responses(list(items_resp(make_items_body(list()))))
+  httr2::local_mocked_responses(mock_pdok_dispatcher(items = items_resp(make_items_body(list()))))
   expect_warning(
     out <- pdok_read("cbs/gebiedsindelingen", "gemeente_gegeneraliseerd"),
     "No features"
@@ -60,7 +60,7 @@ test_that("pdok_read warns and returns 0 rows for an empty result", {
 
 test_that("pdok_read clips the result to filter_by", {
   body <- make_items_body(list(c(5.0, 52.0), c(5.2, 52.1), c(6.0, 53.0)))
-  httr2::local_mocked_responses(list(items_resp(body)))
+  httr2::local_mocked_responses(mock_pdok_dispatcher(items = items_resp(body)))
 
   poly <- sf::st_as_sfc(
     sf::st_bbox(c(xmin = 4.9, ymin = 51.9, xmax = 5.3, ymax = 52.2), crs = 4326)
