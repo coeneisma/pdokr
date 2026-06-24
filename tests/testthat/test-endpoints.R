@@ -4,8 +4,6 @@ test_that("resolve_dataset looks a registry id up in the index (any version)", {
   res <- resolve_dataset("cbs/gebiedsindelingen")
   expect_equal(res$id, "cbs/gebiedsindelingen")
   expect_equal(res$ogc, "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1")
-  expect_null(res$wfs)
-  expect_equal(res$services, "ogc")
 
   # BAG is an ogc/v2 dataset; the resolved URL must use v2, not an assumed v1.
   res2 <- resolve_dataset("kadaster/bag")
@@ -27,15 +25,13 @@ test_that("resolve_dataset errors on an unknown registry id", {
 test_that("resolve_dataset passes through a raw OGC URL", {
   res <- resolve_dataset("https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/")
   expect_equal(res$ogc, "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1")
-  expect_null(res$wfs)
-  expect_equal(res$services, "ogc")
 })
 
-test_that("resolve_dataset detects a WFS URL", {
-  res <- resolve_dataset("https://service.pdok.nl/lv/bag/wfs/v2_0")
-  expect_equal(res$wfs, "https://service.pdok.nl/lv/bag/wfs/v2_0")
-  expect_null(res$ogc)
-  expect_equal(res$services, "wfs")
+test_that("resolve_dataset rejects a WFS URL", {
+  expect_error(
+    resolve_dataset("https://service.pdok.nl/lv/bag/wfs/v2_0"),
+    "WFS"
+  )
 })
 
 test_that("resolve_dataset rejects invalid input", {

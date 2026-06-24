@@ -79,9 +79,9 @@ test_that("pdok_search_layers validates its query", {
   expect_error(pdok_search_layers("cbs/gebiedsindelingen", ""), "single non-empty string")
 })
 
-test_that("pdok_list_layers rejects a WFS-only dataset", {
+test_that("pdok_list_layers rejects a WFS URL", {
   expect_error(
     pdok_list_layers("https://service.pdok.nl/lv/bag/wfs/v2_0"),
-    "no OGC API Features endpoint"
+    "WFS"
   )
 })

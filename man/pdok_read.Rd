@@ -17,7 +17,7 @@ pdok_read(
 }
 \arguments{
 \item{dataset}{A dataset id from \code{\link[=pdok_list_datasets]{pdok_list_datasets()}} (e.g.
-\code{"cbs/gebiedsindelingen"}), or a raw OGC API or WFS base URL.}
+\code{"cbs/gebiedsindelingen"}), or a raw OGC API base URL.}
 
 \item{layer}{A layer id from \code{\link[=pdok_list_layers]{pdok_list_layers()}}.}
 
@@ -51,9 +51,8 @@ attribute columns, and a geometry column. A zero-row \code{sf} is returned (with
 a warning) when nothing matches.
 }
 \description{
-Loads a layer from PDOK as a simple feature collection. The OGC API Features
-service is used when available, with a transparent fallback to the Web
-Feature Service ('WFS'). Pagination is handled automatically.
+Loads a layer from PDOK as a simple feature collection over the OGC API
+Features service, handling pagination automatically.
 }
 \details{
 By default the data is returned in the coordinate reference system the
