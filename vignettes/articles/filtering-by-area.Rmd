@@ -1,0 +1,126 @@
+---
+title: "Filtering data by area"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+A very common task is *"give me this layer, but only within that area"* — all
+national parks in a province, all wells in a water-authority district, every
+building in a municipality. PDOK cannot do this directly: its services can
+pre-filter by a rectangle (a bounding box), but not by an arbitrary polygon.
+`pdokr` bridges that gap, and `pdok_read()` makes it a one-liner.
+
+```{r setup}
+library(pdokr)
+library(tmap)
+```
+
+## 1. Get a filter geometry
+
+The area you filter by is just an `sf` polygon. The most common source is the
+CBS administrative boundaries (`"cbs/gebiedsindelingen"`). Here we take the
+province of Fryslân.
+
+```{r geometry}
+provinces <- pdok_read(
+  "cbs/gebiedsindelingen", "provincie_gegeneraliseerd",
+  datetime = 2024
+)
+fryslan <- provinces[provinces$statnaam == "Fryslân", ]
+```
+
+Any polygon works, though: a nature reserve, a water-authority area, a polygon
+you drew yourself, or a result from `pdok_geocode()` (see the last section).
+
+## 2. Filter another layer to that area
+
+Pass the filter geometry to `pdok_read()` as `filter_by`. It uses the polygon's
+bounding box as a cheap server-side pre-filter, then clips the result to the
+exact shape. Here we keep only the national parks that lie within Fryslân.
+
+```{r filter}
+parks <- pdok_read(
+  "rvo/nationale-parken-geharmoniseerd", "protectedsite",
+  filter_by = fryslan
+)
+parks$text
+```
+
+A static map of the province with its national parks:
+
+```{r map-static}
+tmap_mode("plot")
+
+tm_shape(fryslan) +
+  tm_borders(col = "grey40") +
+  tm_shape(parks) +
+  tm_polygons(fill = "text", fill.legend = tm_legend("National park")) +
+  tm_title("National parks in Fryslân")
+```
+
+The same in interactive mode — zoom in and click a park:
+
+```{r map-interactive}
+tmap_mode("view")
+
+tm_shape(parks) +
+  tm_polygons(fill = "text", id = "text", fill.legend = tm_legend("National park"))
+```
+
+```{r reset, include = FALSE}
+tmap_mode("plot")
+```
+
+## 3. What happens under the hood
+
+`filter_by` folds a two-stage workflow into one call. You can also run the two
+stages yourself, which is useful when you want to reuse the pre-filtered data or
+apply a different spatial predicate.
+
+```{r two-stage}
+# Stage 1: cheap server-side pre-filter by the bounding box of Fryslân
+parks_in_bbox <- pdok_read(
+  "rvo/nationale-parken-geharmoniseerd", "protectedsite",
+  bbox = fryslan
+)
+
+# Stage 2: exact client-side clip to the polygon
+pdok_filter_by(parks_in_bbox, fryslan)$text
+```
+
+`pdok_filter_by()` reconciles coordinate reference systems for you and accepts a
+`predicate` (`"intersects"` by default, but also `"within"`, `"contains"`, and
+more). The plain-`sf` equivalent, once both objects share a CRS, is:
+
+```{r plain-sf}
+fryslan_ll <- sf::st_transform(fryslan, sf::st_crs(parks_in_bbox))
+parks_in_bbox[fryslan_ll, , op = sf::st_intersects]$text
+```
+
+## 4. From an address to its area
+
+Because `filter_by` also accepts a point, you can answer *"which municipality is
+this address in?"* Geocode the address with `pdok_geocode()`, then filter the
+municipalities by that point.
+
+```{r address}
+address <- pdok_geocode("Tweebaksmarkt 52, Leeuwarden")
+
+pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+  datetime = 2024, filter_by = address
+)$statnaam
+```
+
+The same idea scales up: geocode a place as a polygon (for example
+`pdok_geocode("Fryslân", type = "provincie")`) and use it directly as
+`filter_by`.

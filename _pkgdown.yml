@@ -3,6 +3,15 @@ url: https://coeneisma.github.io/pdokr/
 template:
   bootstrap: 5
 
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - '`articles/getting-started`'
+  - '`articles/filtering-by-area`'
+  - '`articles/coordinate-reference-systems`'
+  - '`articles/pdok-by-hand`'
+
 reference:
 - title: Search & discovery
   desc: Find datasets and the layers within them.
