@@ -1,25 +1,3 @@
-mock_index_body <- function() {
-  paste0(
-    '{"apis":[',
-    '{"title":"CBS Gebiedsindelingen","description":"Administrative boundaries.",',
-    '"keywords":["gemeente","provincie"],',
-    '"links":[{"rel":"root","href":"https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1"}]},',
-    '{"title":"BAG","description":"Buildings and addresses.",',
-    '"keywords":["bag","adres"],',
-    '"links":[{"rel":"root","href":"https://api.pdok.nl/lv/bag/ogc/v1"}]}',
-    ']}'
-  )
-}
-
-mock_index_resp <- function() {
-  httr2::response(
-    status_code = 200,
-    url = "https://api.pdok.nl/index.json",
-    headers = list(`Content-Type` = "application/json"),
-    body = charToRaw(mock_index_body())
-  )
-}
-
 test_that("pdok_list_datasets returns the registry tibble", {
   httr2::local_mocked_responses(function(req) mock_index_resp())
 
@@ -38,7 +16,8 @@ test_that("pdok_search_datasets filters case-insensitively", {
 
   expect_equal(pdok_search_datasets("gemeente")$id, "cbs/gebiedsindelingen")
   expect_equal(pdok_search_datasets("GEMEENTE")$id, "cbs/gebiedsindelingen")
-  expect_equal(pdok_search_datasets("bag")$id, "lv/bag")
+  # BAG is an ogc/v2 dataset; it must be included (the version regex fix).
+  expect_equal(pdok_search_datasets("bag")$id, "kadaster/bag")
   expect_equal(nrow(pdok_search_datasets("no-such-thing-xyz")), 0L)
 })
 

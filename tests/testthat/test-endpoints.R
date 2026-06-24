@@ -1,15 +1,27 @@
-test_that("resolve_dataset handles a registry id", {
+test_that("resolve_dataset looks a registry id up in the index (any version)", {
+  httr2::local_mocked_responses(function(req) mock_index_resp())
+
   res <- resolve_dataset("cbs/gebiedsindelingen")
   expect_equal(res$id, "cbs/gebiedsindelingen")
   expect_equal(res$ogc, "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1")
   expect_null(res$wfs)
   expect_equal(res$services, "ogc")
+
+  # BAG is an ogc/v2 dataset; the resolved URL must use v2, not an assumed v1.
+  res2 <- resolve_dataset("kadaster/bag")
+  expect_equal(res2$ogc, "https://api.pdok.nl/kadaster/bag/ogc/v2")
 })
 
 test_that("resolve_dataset trims surrounding slashes from an id", {
+  httr2::local_mocked_responses(function(req) mock_index_resp())
   res <- resolve_dataset("/cbs/gebiedsindelingen/")
   expect_equal(res$id, "cbs/gebiedsindelingen")
   expect_equal(res$ogc, "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1")
+})
+
+test_that("resolve_dataset errors on an unknown registry id", {
+  httr2::local_mocked_responses(function(req) mock_index_resp())
+  expect_error(resolve_dataset("no/such-dataset"), "Unknown dataset")
 })
 
 test_that("resolve_dataset passes through a raw OGC URL", {
@@ -48,7 +60,8 @@ test_that("parse_index builds a registry from an index body", {
       description = "Buildings and addresses.",
       keywords = list("bag"),
       links = list(
-        list(href = "https://api.pdok.nl/lv/bag/ogc/v1", rel = "root")
+        # An ogc/v2 dataset must be included, not dropped.
+        list(href = "https://api.pdok.nl/kadaster/bag/ogc/v2", rel = "root")
       )
     )
   ))
@@ -60,9 +73,12 @@ test_that("parse_index builds a registry from an index body", {
     c("id", "name", "description", "keywords", "services", "owner", "ogc_url")
   )
   expect_equal(nrow(reg), 2L)
-  expect_equal(reg$id, c("cbs/gebiedsindelingen", "lv/bag"))
-  expect_equal(reg$owner, c("cbs", "lv"))
-  expect_equal(reg$ogc_url[1], "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1")
+  expect_equal(reg$id, c("cbs/gebiedsindelingen", "kadaster/bag"))
+  expect_equal(reg$owner, c("cbs", "kadaster"))
+  expect_equal(reg$ogc_url, c(
+    "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1",
+    "https://api.pdok.nl/kadaster/bag/ogc/v2"
+  ))
   expect_type(reg$keywords, "list")
   expect_equal(reg$keywords[[1]], c("gemeente", "provincie"))
 })
