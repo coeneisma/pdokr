@@ -2,6 +2,11 @@ url: https://coeneisma.github.io/pdokr/
 
 template:
   bootstrap: 5
+  bslib:
+    primary: "#E8631C"          # PDOK orange (buttons, accents)
+    link-color: "#B23A0E"       # dark orange links
+    link-hover-color: "#E8631C"
+    light: "#F7F3EC"            # warm "paper" (the navbar uses .bg-light)
 
 articles:
 - title: Articles
