@@ -32,38 +32,43 @@ devtools::install_github("coeneisma/pdokr")
 
 ## Example
 
+Pick an area from the administrative boundaries, then load another layer
+within it. Here we take the historic centre of Delft and map every
+building in it.
+
 ``` r
 library(pdokr)
+library(tmap)
 
-# Search for a dataset
-pdok_search_datasets("nationale parken")
-#> # A tibble: 3 × 7
-#>   id                           name  description keywords services owner ogc_url
-#>   <chr>                        <chr> <chr>       <list>   <chr>    <chr> <chr>  
-#> 1 rvo/nationaal-beschermde-ge… Nati… In deze da… <chr>    ogc      rvo   https:…
-#> 2 rvo/nationale-parken-geharm… Nati… In deze da… <chr>    ogc      rvo   https:…
-#> 3 rvo/nationale-parken         Nati… Dit bestan… <chr>    ogc      rvo   https:…
+# A municipality, and one of its districts (the historic centre of Delft)
+gemeenten <- pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2024
+)
+delft <- gemeenten[gemeenten$statnaam == "Delft", ]
 
-# Load a layer as an sf object
-parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")
+wijken <- pdok_read(
+  "cbs/gebiedsindelingen", "wijk_gegeneraliseerd", datetime = 2024,
+  filter_by = delft, predicate = "within"
+)
+binnenstad <- wijken[wijken$statnaam == "Wijk 11 Binnenstad", ]
 
-# Filter to an area: the province of Utrecht, found by geocoding
-utrecht <- pdok_geocode("Utrecht", type = "provincie")
-pdok_filter_by(parks, utrecht)
-#> Simple feature collection with 1 feature and 14 fields
-#> Geometry type: MULTIPOLYGON
-#> Dimension:     XY
-#> Bounding box:  xmin: 5.239009 ymin: 51.95757 xmax: 5.566058 ymax: 52.13387
-#> Geodetic CRS:  WGS 84
-#> # A tibble: 1 × 15
-#>   id          gml_id language legalfoundationdate legalfoundationdocum…¹ localid
-#>   <chr>       <chr>  <chr>    <chr>               <chr>                  <chr>  
-#> 1 fc981af1-8… G_4a2… nld      ""                  ""                     L_4a24…
-#> # ℹ abbreviated name: ¹​legalfoundationdocument
-#> # ℹ 9 more variables: namespace <chr>, namestatus <chr>, nativeness <chr>,
-#> #   pronunciation <chr>, script <chr>, siteprotectionclassification <chr>,
-#> #   sourceofname <chr>, text <chr>, geometry <MULTIPOLYGON [°]>
+# Every building in that district, from the TOP10NL topography
+buildings <- pdok_read("brt/top10nl", "gebouw_vlak", filter_by = binnenstad)
+
+# Map it
+tmap_mode("plot")
+tm_shape(binnenstad) +
+  tm_borders(col = "grey40") +
+  tm_shape(buildings) +
+  tm_polygons(fill = "#d95f02", col = "white", lwd = 0.4) +
+  tm_title("Buildings in the historic centre of Delft")
 ```
+
+<img src="man/figures/README-example-1.png" alt="" width="100%" />
+
+The articles on the [package
+website](https://coeneisma.github.io/pdokr/) walk through this and other
+workflows, with interactive, zoomable maps.
 
 ## Learn more
 
