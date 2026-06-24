@@ -42,6 +42,18 @@ test_that("parse_locatieserver returns all fields as an sf", {
   expect_equal(sf::st_crs(out)$epsg, 4326L)
 })
 
+test_that("parse_locatieserver drops a result without geometry", {
+  docs <- list(
+    list(id = "a", type = "adres", weergavenaam = "A",
+         geometrie_ll = "POINT(5 52)"),
+    list(id = "b", type = "adres", weergavenaam = "B") # no geometry at all
+  )
+  res <- parse_locatieserver(docs)
+  expect_s3_class(res, "sf")
+  expect_equal(nrow(res), 1L)
+  expect_equal(res$weergavenaam, "A")
+})
+
 test_that("pdok_geocode returns an sf and transforms crs", {
   httr2::local_mocked_responses(list(ls_resp()))
   out <- pdok_geocode("De Bilt")
