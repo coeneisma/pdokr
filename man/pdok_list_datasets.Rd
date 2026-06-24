@@ -4,11 +4,7 @@
 \alias{pdok_list_datasets}
 \title{List PDOK datasets}
 \usage{
-pdok_list_datasets(refresh = FALSE)
-}
-\arguments{
-\item{refresh}{If \code{TRUE}, ignore the session cache and fetch the current list
-from PDOK again.}
+pdok_list_datasets()
 }
 \value{
 A \link[tibble:tibble]{tibble} with one row per dataset and the columns
@@ -18,10 +14,8 @@ A \link[tibble:tibble]{tibble} with one row per dataset and the columns
 }
 \description{
 Returns the full table of contents of datasets offered through the 'PDOK'
-OGC API Features platform. The list is fetched once from
-\url{https://api.pdok.nl/index.json} and cached for the session; if the
-service cannot be reached, a snapshot bundled with the package is used
-instead.
+OGC API Features platform, fetched live from
+\url{https://api.pdok.nl/index.json}.
 }
 \examples{
 \donttest{

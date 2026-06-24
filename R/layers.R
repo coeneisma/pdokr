@@ -78,12 +78,10 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 
 #' List the layers within a PDOK dataset
 #'
-#' Lists the layers (OGC API Features collections) offered by a dataset. The
-#' result is cached for the session.
+#' Lists the layers (OGC API Features collections) offered by a dataset.
 #'
 #' @param dataset A dataset id from [pdok_list_datasets()] (e.g.
 #'   `"cbs/gebiedsindelingen"`), or a raw OGC API base URL.
-#' @param refresh If `TRUE`, ignore the session cache and fetch again.
 #'
 #' @return A [tibble][tibble::tibble] with one row per layer and the columns
 #'   `dataset` (the dataset id, echoing the input so each row works directly
@@ -100,7 +98,7 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 #' pdok_list_layers("cbs/gebiedsindelingen")
 #' }
 #' @export
-pdok_list_layers <- function(dataset, refresh = FALSE) {
+pdok_list_layers <- function(dataset) {
   resolved <- resolve_dataset(dataset)
   if (is.null(resolved$ogc)) {
     cli::cli_abort(c(
@@ -110,26 +108,16 @@ pdok_list_layers <- function(dataset, refresh = FALSE) {
   }
 
   ogc <- resolved$ogc
-  key <- paste0("collections:", ogc)
-  if (!refresh) {
-    cached <- cache_get(key)
-    if (!is.null(cached)) {
-      return(cached)
-    }
-  }
-
   resp <- pdok_perform(
     pdok_request(paste0(ogc, "/collections"), query = list(f = "json"))
   )
   layers <- parse_collections(httr2::resp_body_json(resp))
   # Echo the dataset so each row is self-contained for pdok_read(dataset, layer).
-  layers <- tibble::add_column(
+  tibble::add_column(
     layers,
     dataset = rep(resolved$id, nrow(layers)),
     .before = 1L
   )
-  cache_set(key, layers)
-  layers
 }
 
 #' Search the layers within a PDOK dataset
@@ -140,7 +128,6 @@ pdok_list_layers <- function(dataset, refresh = FALSE) {
 #' @param dataset A dataset id from [pdok_list_datasets()] (e.g.
 #'   `"cbs/gebiedsindelingen"`), or a raw OGC API base URL.
 #' @param query A single non-empty string to search for, e.g. `"gemeente"`.
-#' @param refresh If `TRUE`, ignore the session cache and fetch again.
 #'
 #' @return A [tibble][tibble::tibble] with the same columns as
 #'   [pdok_list_layers()], containing only the matching rows (zero rows when
@@ -151,12 +138,12 @@ pdok_list_layers <- function(dataset, refresh = FALSE) {
 #' pdok_search_layers("cbs/gebiedsindelingen", "gemeente")
 #' }
 #' @export
-pdok_search_layers <- function(dataset, query, refresh = FALSE) {
+pdok_search_layers <- function(dataset, query) {
   if (!rlang::is_string(query) || !nzchar(query)) {
     cli::cli_abort("{.arg query} must be a single non-empty string.")
   }
 
-  layers <- pdok_list_layers(dataset, refresh = refresh)
+  layers <- pdok_list_layers(dataset)
   haystack <- tolower(paste(layers$layer, layers$title, layers$description))
   keep <- grepl(tolower(query), haystack, fixed = TRUE)
   layers[keep, , drop = FALSE]

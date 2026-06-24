@@ -37,6 +37,3 @@ reference:
   desc: Look up addresses and place names.
   contents:
   - pdok_geocode
-- title: Utilities
-  contents:
-  - pdok_clear_cache

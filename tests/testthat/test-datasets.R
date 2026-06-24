@@ -21,8 +21,6 @@ mock_index_resp <- function() {
 }
 
 test_that("pdok_list_datasets returns the registry tibble", {
-  pdok_clear_cache()
-  on.exit(pdok_clear_cache(), add = TRUE)
   httr2::local_mocked_responses(function(req) mock_index_resp())
 
   reg <- pdok_list_datasets()
@@ -35,28 +33,7 @@ test_that("pdok_list_datasets returns the registry tibble", {
   expect_true("cbs/gebiedsindelingen" %in% reg$id)
 })
 
-test_that("the dataset index is cached for the session", {
-  pdok_clear_cache()
-  on.exit(pdok_clear_cache(), add = TRUE)
-
-  n <- 0L
-  httr2::local_mocked_responses(function(req) {
-    n <<- n + 1L
-    if (n > 1L) {
-      cli::cli_abort("Network was hit a second time.")
-    }
-    mock_index_resp()
-  })
-
-  first <- pdok_list_datasets()
-  second <- pdok_list_datasets()
-  expect_equal(first, second)
-  expect_equal(n, 1L)
-})
-
 test_that("pdok_search_datasets filters case-insensitively", {
-  pdok_clear_cache()
-  on.exit(pdok_clear_cache(), add = TRUE)
   httr2::local_mocked_responses(function(req) mock_index_resp())
 
   expect_equal(pdok_search_datasets("gemeente")$id, "cbs/gebiedsindelingen")
@@ -71,14 +48,9 @@ test_that("pdok_search_datasets validates its query", {
   expect_error(pdok_search_datasets(c("a", "b")), "single non-empty string")
 })
 
-test_that("fetch_index falls back to the bundled snapshot on failure", {
-  pdok_clear_cache()
-  on.exit(pdok_clear_cache(), add = TRUE)
+test_that("pdok_list_datasets errors when PDOK is unreachable", {
   httr2::local_mocked_responses(function(req) {
     rlang::abort("service down", class = "httr2_failure")
   })
-
-  expect_warning(reg <- pdok_list_datasets(), "snapshot")
-  expect_gt(nrow(reg), 0L)
-  expect_true(all(c("id", "name") %in% names(reg)))
+  expect_error(pdok_list_datasets(), "reach PDOK")
 })

@@ -50,30 +50,18 @@ test_that("parse_collections builds a layer registry", {
   expect_equal(reg$end_date, as.Date(c(NA, "2015-12-31")))
 })
 
-test_that("pdok_list_layers returns and caches the layer tibble", {
-  pdok_clear_cache()
-  on.exit(pdok_clear_cache(), add = TRUE)
+test_that("pdok_list_layers returns the layer tibble", {
+  httr2::local_mocked_responses(function(req) mock_collections_resp())
 
-  n <- 0L
-  httr2::local_mocked_responses(function(req) {
-    n <<- n + 1L
-    if (n > 1L) cli::cli_abort("Network was hit a second time.")
-    mock_collections_resp()
-  })
-
-  first <- pdok_list_layers("cbs/gebiedsindelingen")
-  second <- pdok_list_layers("cbs/gebiedsindelingen")
-  expect_equal(first, second)
-  expect_equal(n, 1L)
-  expect_true("gemeente_gegeneraliseerd" %in% first$layer)
+  layers <- pdok_list_layers("cbs/gebiedsindelingen")
+  expect_s3_class(layers, "tbl_df")
+  expect_true("gemeente_gegeneraliseerd" %in% layers$layer)
   # Each row echoes its dataset, so it works directly with pdok_read().
-  expect_equal(names(first)[1], "dataset")
-  expect_true(all(first$dataset == "cbs/gebiedsindelingen"))
+  expect_equal(names(layers)[1], "dataset")
+  expect_true(all(layers$dataset == "cbs/gebiedsindelingen"))
 })
 
 test_that("pdok_search_layers filters case-insensitively", {
-  pdok_clear_cache()
-  on.exit(pdok_clear_cache(), add = TRUE)
   httr2::local_mocked_responses(function(req) mock_collections_resp())
 
   res <- pdok_search_layers("cbs/gebiedsindelingen", "provincie")
