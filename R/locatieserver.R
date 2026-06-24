@@ -23,17 +23,24 @@ parse_locatieserver <- function(docs, call = rlang::caller_env()) {
   # attribute columns.
   geom_fields <- c("geometrie_ll", "geometrie_rd", "centroide_ll", "centroide_rd")
 
+  empty <- sf::st_sf(
+    weergavenaam = character(),
+    type = character(),
+    geometry = sf::st_sfc(crs = 4326)
+  )
   if (length(docs) == 0L) {
-    return(sf::st_sf(
-      weergavenaam = character(),
-      type = character(),
-      geometry = sf::st_sfc(crs = 4326)
-    ))
+    return(empty)
   }
 
+  # Drop any result without a geometry (st_as_sfc() would error on an NA WKT).
   wkt <- vapply(docs, function(d) {
     d$geometrie_ll %||% d$centroide_ll %||% NA_character_
   }, character(1))
+  docs <- docs[!is.na(wkt)]
+  wkt <- wkt[!is.na(wkt)]
+  if (length(docs) == 0L) {
+    return(empty)
+  }
   geometry <- sf::st_as_sfc(wkt, crs = 4326)
 
   keys <- unique(unlist(lapply(docs, names)))
