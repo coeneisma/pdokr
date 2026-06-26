@@ -46,12 +46,12 @@ test_that("paginate_ogc follows next links across pages", {
     "https://api.pdok.nl/x/ogc/v1/collections/c/items",
     query = list(f = "json")
   )
-  expect_equal(res$n_features, 3L)
-  expect_length(res$pages, 2L)
-  expect_equal(res$content_crs, 4326L)
+  expect_s3_class(res, "sf")
+  expect_equal(nrow(res), 3L)
+  expect_equal(sf::st_crs(res)$epsg, 4326L)
 })
 
-test_that("paginate_ogc stops at max_features", {
+test_that("paginate_ogc stops at max_features (raw features)", {
   p1 <- make_fc(list(c(5, 52), c(5.1, 52.1)),
                 next_url = "https://api.pdok.nl/x/ogc/v1/collections/c/items?cursor=abc")
   p2 <- make_fc(list(c(5.2, 52.2)))
@@ -62,8 +62,24 @@ test_that("paginate_ogc stops at max_features", {
     query = list(f = "json"),
     max_features = 2
   )
-  expect_equal(res$n_features, 2L)
-  expect_length(res$pages, 1L)
+  expect_equal(nrow(res), 2L)
+})
+
+test_that("paginate_ogc stops on the KEPT count when process filters", {
+  # Each page has 2 features; `process` keeps only the first of each page.
+  p1 <- make_fc(list(c(5, 52), c(5.1, 52.1)),
+                next_url = "https://api.pdok.nl/x/ogc/v1/collections/c/items?cursor=abc")
+  p2 <- make_fc(list(c(5.2, 52.2), c(5.3, 52.3)))
+  httr2::local_mocked_responses(list(mock_resp(p1), mock_resp(p2)))
+
+  res <- paginate_ogc(
+    "https://api.pdok.nl/x/ogc/v1/collections/c/items",
+    query = list(f = "json"),
+    max_features = 2,
+    process = function(page) page[1, , drop = FALSE]
+  )
+  # 1 kept per page, so it must fetch both pages to reach 2 (not stop after one).
+  expect_equal(nrow(res), 2L)
 })
 
 test_that("paginate_ogc handles an empty collection", {
@@ -72,7 +88,8 @@ test_that("paginate_ogc handles an empty collection", {
     "https://api.pdok.nl/x/ogc/v1/collections/c/items",
     query = list(f = "json")
   )
-  expect_equal(res$n_features, 0L)
+  expect_s3_class(res, "sf")
+  expect_equal(nrow(res), 0L)
 })
 
 test_that("paginate_ogc reads Content-Crs from the first response", {
@@ -84,7 +101,7 @@ test_that("paginate_ogc reads Content-Crs from the first response", {
     "https://api.pdok.nl/x/ogc/v1/collections/c/items",
     query = list(f = "json")
   )
-  expect_equal(res$content_crs, 28992L)
+  expect_equal(sf::st_crs(res)$epsg, 28992L)
 })
 
 test_that("pdok_perform turns a 404 into a cli error", {
