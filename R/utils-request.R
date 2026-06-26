@@ -15,7 +15,15 @@ pdok_request <- function(url, query = NULL) {
     req, "pdokr (https://github.com/coeneisma/pdokr)"
   )
   req <- httr2::req_timeout(req, 60)
-  req <- httr2::req_retry(req, max_tries = 3)
+  # Retry transient server errors too (PDOK, e.g. BAG, occasionally returns a
+  # 500/502/504 under load); httr2's default only retries 429/503.
+  req <- httr2::req_retry(
+    req,
+    max_tries = 3,
+    is_transient = function(resp) {
+      httr2::resp_status(resp) %in% c(429L, 500L, 502L, 503L, 504L)
+    }
+  )
 
   query <- Filter(Negate(is.null), query %||% list())
   if (length(query) > 0L) {
