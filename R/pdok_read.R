@@ -15,13 +15,19 @@ format_datetime <- function(x, call = rlang::caller_env()) {
   )
 }
 
-# Internal: read a layer over OGC API Features (paginated).
+# Internal: read a layer over OGC API Features (paginated, with an optional
+# per-page spatial clip so max_features applies to the kept features).
 read_ogc <- function(ogc, layer, bbox, datetime, max_features,
+                     filter_by = NULL, predicate = "intersects",
                      call = rlang::caller_env()) {
-  query <- list(
-    f = "json",
-    limit = if (is.null(max_features)) 1000L else min(1000L, max_features)
-  )
+  # When clipping, fetch full pages and let paginate_ogc stop on the kept
+  # count; otherwise the page size can be capped at max_features.
+  page_size <- if (!is.null(filter_by) || is.null(max_features)) {
+    1000L
+  } else {
+    min(1000L, max_features)
+  }
+  query <- list(f = "json", limit = page_size)
   if (!is.null(bbox)) {
     query$bbox <- paste(as_bbox_crs84(bbox, call = call), collapse = ",")
   }
@@ -29,14 +35,17 @@ read_ogc <- function(ogc, layer, bbox, datetime, max_features,
     query$datetime <- format_datetime(datetime, call = call)
   }
 
-  url <- paste0(ogc, "/collections/", layer, "/items")
-  res <- paginate_ogc(url, query = query, max_features = max_features, call = call)
-  out <- parse_features(res$pages, res$content_crs, call = call)
-
-  if (!is.null(max_features) && nrow(out) > max_features) {
-    out <- out[seq_len(max_features), , drop = FALSE]
+  process <- if (!is.null(filter_by)) {
+    function(page) pdok_filter_by(page, filter_by, predicate = predicate)
+  } else {
+    NULL
   }
-  out
+
+  url <- paste0(ogc, "/collections/", layer, "/items")
+  paginate_ogc(
+    url, query = query, max_features = max_features,
+    process = process, call = call
+  )
 }
 
 #' Read a PDOK layer as an sf object
@@ -116,7 +125,10 @@ pdok_read <- function(dataset, layer, bbox = NULL, filter_by = NULL,
   server_bbox <- bbox %||% filter_by
 
   resolved <- resolve_dataset(dataset)
-  out <- read_ogc(resolved$ogc, layer, server_bbox, datetime, max_features)
+  out <- read_ogc(
+    resolved$ogc, layer, server_bbox, datetime, max_features,
+    filter_by = filter_by, predicate = predicate
+  )
 
   if (nrow(out) == 0L) {
     cli::cli_warn(c(
@@ -128,9 +140,6 @@ pdok_read <- function(dataset, layer, bbox = NULL, filter_by = NULL,
 
   if (!is.null(crs)) {
     out <- sf::st_transform(out, crs)
-  }
-  if (!is.null(filter_by)) {
-    out <- pdok_filter_by(out, filter_by, predicate = predicate)
   }
   out
 }

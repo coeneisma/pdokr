@@ -68,26 +68,28 @@ pdok_perform <- function(req, call = rlang::caller_env()) {
   )
 }
 
-#' Follow OGC API Features cursor pagination
+#' Follow OGC API Features cursor pagination, assembling an sf object
 #'
-#' Performs the initial request and follows `rel = "next"` links until the
-#' server stops offering one or `max_features` is reached.
+#' Performs the initial request and follows `rel = "next"` links. Each page is
+#' parsed to `sf` (and passed through `process`, if given) as it arrives, so
+#' when `process` filters the data the loop stops as soon as `max_features`
+#' *kept* features have been collected — not after `max_features` raw features.
 #'
 #' @param url The items endpoint URL.
 #' @param query Query parameters for the first request (the `next` links carry
 #'   their own parameters).
-#' @param max_features Stop once at least this many features have been
+#' @param max_features Stop once at least this many (kept) features have been
 #'   collected; `NULL` for all.
+#' @param process Optional function applied to each page's `sf` (e.g. a spatial
+#'   clip). Returns the features to keep from that page.
 #' @param call Calling environment, for error messages.
 #'
-#' @return A list with `pages` (a character vector of raw GeoJSON page bodies),
-#'   `content_crs` (the EPSG code from the first `Content-Crs` header, or
-#'   `NULL`), and `n_features` (the number of features collected).
+#' @return An `sf` object with the (kept) features, trimmed to `max_features`.
 #' @noRd
 paginate_ogc <- function(url, query = NULL, max_features = NULL,
-                         call = rlang::caller_env()) {
-  pages <- character(0)
-  n_features <- 0L
+                         process = NULL, call = rlang::caller_env()) {
+  parts <- list()
+  n_kept <- 0L
   content_crs <- NULL
   next_url <- url
   next_query <- query
@@ -96,7 +98,7 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
   # spinner that reports the running feature count. cli keeps it quiet in
   # non-interactive sessions.
   cli::cli_progress_bar(
-    format = "{cli::pb_spin} Downloading PDOK features: {n_features} fetched",
+    format = "{cli::pb_spin} Downloading PDOK features: {n_kept} fetched",
     clear = TRUE
   )
 
@@ -108,8 +110,14 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
     }
 
     parsed <- httr2::resp_body_json(resp)
-    pages <- c(pages, httr2::resp_body_string(resp))
-    n_features <- n_features + length(parsed$features %||% list())
+    page <- parse_features(httr2::resp_body_string(resp), content_crs, call = call)
+    if (!is.null(process) && nrow(page) > 0L) {
+      page <- process(page)
+    }
+    if (nrow(page) > 0L) {
+      parts[[length(parts) + 1L]] <- page
+    }
+    n_kept <- n_kept + nrow(page)
     cli::cli_progress_update()
 
     next_href <- NULL
@@ -120,7 +128,7 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
       }
     }
 
-    if (!is.null(max_features) && n_features >= max_features) break
+    if (!is.null(max_features) && n_kept >= max_features) break
     if (is.null(next_href)) break
 
     next_url <- next_href
@@ -128,7 +136,14 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
   }
   cli::cli_progress_done()
 
-  list(pages = pages, content_crs = content_crs, n_features = n_features)
+  if (length(parts) == 0L) {
+    return(sf::st_sf(geometry = sf::st_sfc(crs = content_crs %||% NA_integer_)))
+  }
+  out <- if (length(parts) == 1L) parts[[1]] else do.call(rbind, parts)
+  if (!is.null(max_features) && nrow(out) > max_features) {
+    out <- out[seq_len(max_features), , drop = FALSE]
+  }
+  out
 }
 
 #' Combine GeoJSON page bodies into a single sf object
