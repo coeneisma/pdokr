@@ -22,6 +22,7 @@ handed to the `filter_by` argument of `pdok_read()`.
 ```{r setup}
 library(pdokr)
 library(tmap)
+library(dplyr)
 ```
 
 ## 1. A name to a point
@@ -30,7 +31,7 @@ In its simplest form you pass a query and get back the single best match.
 
 ```{r address}
 home <- pdok_geocode("Domplein 1, Utrecht")
-home[, c("weergavenaam", "type", "score")]
+home |> select(weergavenaam, type, score)
 ```
 
 It is an ordinary `sf` object with a point geometry, ready to map.
@@ -71,7 +72,8 @@ service's relevance `score`. That is convenient, but a single name often exists
 at several levels — "Utrecht" is a municipality, a province, *and* a town:
 
 ```{r ambiguous}
-pdok_geocode("Utrecht", limit = 5)[, c("weergavenaam", "type", "score")]
+pdok_geocode("Utrecht", limit = 5) |>
+  select(weergavenaam, type, score)
 ```
 
 Pass `type` to pin down exactly which level you mean. The same query then
@@ -120,7 +122,7 @@ buurten <- pdok_read(
   filter_by = boundary, predicate = "intersects"
 )
 centres <- suppressWarnings(sf::st_centroid(buurten))
-buurten <- buurten[lengths(sf::st_within(centres, boundary)) > 0, ]
+buurten <- filter(buurten, lengths(sf::st_within(centres, boundary)) > 0)
 nrow(buurten)
 ```
 

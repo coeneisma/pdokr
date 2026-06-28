@@ -22,6 +22,7 @@ pre-filter by a rectangle (a bounding box), but not by an arbitrary polygon.
 ```{r setup}
 library(pdokr)
 library(tmap)
+library(dplyr)
 ```
 
 ## 1. Get a filter geometry
@@ -35,7 +36,7 @@ provinces <- pdok_read(
   "cbs/gebiedsindelingen", "provincie_gegeneraliseerd",
   datetime = 2025
 )
-fryslan <- provinces[provinces$statnaam == "Fryslân", ]
+fryslan <- filter(provinces, statnaam == "Fryslân")
 ```
 
 Any polygon works, though: a nature reserve, a water-authority area, a polygon
