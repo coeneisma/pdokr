@@ -1,0 +1,13 @@
+^LICENSE\.md$
+^data-raw$
+^_pkgdown\.yml$
+^pkgdown$
+^cran-comments\.md$
+^pdokr\.Rproj$
+^\.Rproj\.user$
+^docs$
+^README\.Rmd$
+^doc$
+^Meta$
+^vignettes/articles$
+^\.github$

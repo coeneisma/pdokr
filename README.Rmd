@@ -1,24 +1,32 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # pdokr <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
-
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/pdokr)](https://CRAN.R-project.org/package=pdokr)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN status](https://www.r-pkg.org/badges/version/pdokr)](https://CRAN.R-project.org/package=pdokr)
 [![R-CMD-check](https://github.com/coeneisma/pdokr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/coeneisma/pdokr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `pdokr` makes it easy to work with open geographic data from
 [PDOK](https://www.pdok.nl/) (Publieke Dienstverlening Op de Kaart), the
-national geodata platform of the Netherlands. It helps you discover
-datasets and their layers, load a layer as an
-[`sf`](https://r-spatial.github.io/sf/) object (with automatic
-pagination and explicit coordinate reference system handling), filter
-data by any polygon area, and geocode addresses and place names.
+national geodata platform of the Netherlands. It helps you discover datasets and
+their layers, load a layer as an [`sf`](https://r-spatial.github.io/sf/) object
+(with automatic pagination and explicit coordinate reference system handling),
+filter data by any polygon area, and geocode addresses and place names.
 
 ## Installation
 
@@ -32,11 +40,10 @@ devtools::install_github("coeneisma/pdokr")
 
 ## Example
 
-Pick an area from the administrative boundaries, then load another layer
-within it. Here we take the historic centre of Delft and map every
-building in it.
+Pick an area from the administrative boundaries, then load another layer within
+it. Here we take the historic centre of Delft and map every building in it.
 
-``` r
+```{r example, message = FALSE}
 library(pdokr)
 library(tmap)
 
@@ -64,15 +71,11 @@ tm_shape(binnenstad) +
   tm_title("Buildings in the historic centre of Delft")
 ```
 
-<img src="man/figures/README-example-1.png" alt="" width="100%" />
-
-The articles on the [package
-website](https://coeneisma.github.io/pdokr/) walk through this and other
-workflows, with interactive, zoomable maps.
+The articles on the [package website](https://coeneisma.github.io/pdokr/) walk
+through this and other workflows, with interactive, zoomable maps.
 
 ## Learn more
 
-See the [package website](https://coeneisma.github.io/pdokr/) for the
-reference documentation and articles on getting started, filtering data
-by area, working with coordinate reference systems, and querying PDOK by
-hand.
+See the [package website](https://coeneisma.github.io/pdokr/) for the reference
+documentation and articles on getting started, filtering data by area, working
+with coordinate reference systems, and querying PDOK by hand.

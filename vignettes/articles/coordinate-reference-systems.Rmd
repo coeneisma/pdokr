@@ -1,0 +1,126 @@
+---
+title: "Coordinate reference systems"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 5,
+  fig.height = 5,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+Dutch geodata lives in a few different coordinate reference systems (CRS), and
+mixing them up is a classic source of confusion. This article explains which
+ones you will meet, how PDOK serves them, and how `pdokr` handles them.
+
+```{r setup}
+library(pdokr)
+library(tmap)
+```
+
+## The CRSs you will meet
+
+| EPSG | Name | Units | Where |
+|------|------|-------|-------|
+| 28992 | Amersfoort / RD New | metres | the Dutch national grid; most data is *stored* in this |
+| 4326 | WGS 84 (CRS84, lon/lat) | degrees | the default for web/GeoJSON |
+| 3857 | Web Mercator | metres | web map tiles |
+| 4258 | ETRS89 (lon/lat) | degrees | the European reference frame |
+
+## What PDOK offers per layer
+
+`pdok_list_layers()` reports, for each layer, the CRSs it can deliver (`crs`) and
+the CRS the data is stored in (`storage_crs`).
+
+```{r layers}
+layers <- pdok_list_layers("cbs/gebiedsindelingen")
+gemeente <- layers[layers$layer == "gemeente_gegeneraliseerd", ]
+
+gemeente$crs[[1]]
+gemeente$storage_crs
+```
+
+So this layer is stored in RD New (28992) but can be served in several CRSs.
+
+## What `pdok_read()` returns
+
+Over the OGC API, PDOK serves GeoJSON, whose default is CRS84 (lon/lat). So by
+default `pdok_read()` gives you lon/lat:
+
+```{r default}
+gemeenten <- pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+  datetime = 2025
+)
+sf::st_crs(gemeenten)$epsg
+```
+
+Ask for another CRS with the `crs` argument. `pdokr` does this transformation
+client-side with `sf::st_transform()`, so it works for any target CRS — even one
+the service does not offer.
+
+```{r rdnew}
+gemeenten_rd <- pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+  datetime = 2025, crs = 28992
+)
+sf::st_crs(gemeenten_rd)$epsg
+```
+
+The coordinates differ accordingly — degrees versus metres:
+
+```{r bbox}
+sf::st_bbox(gemeenten)
+sf::st_bbox(gemeenten_rd)
+```
+
+## Why it matters for maps
+
+The same data plotted in lon/lat and in RD New is *not* the same picture. Lon/lat
+is unprojected, so at Dutch latitudes (~52° N) the country looks horizontally
+stretched; RD New is an accurate planar projection.
+
+The lon/lat graticule (the grid of meridians and parallels) makes the difference
+obvious: it is a perfect rectangular grid in lon/lat, but the *same* lines run
+slightly skewed in RD New, because that projection is gently rotated relative to
+north.
+
+```{r map-lonlat}
+tmap_mode("plot")
+tm_shape(gemeenten) +
+  tm_polygons(fill = "grey95", col = "grey50", lwd = 0.3) +
+  tm_graticules(col = "steelblue", lwd = 0.5) +
+  tm_title("Lon/lat (EPSG:4326)")
+```
+
+```{r map-rdnew}
+tm_shape(gemeenten_rd) +
+  tm_polygons(fill = "grey95", col = "grey50", lwd = 0.3) +
+  tm_graticules(col = "steelblue", lwd = 0.5) +
+  tm_title("RD New (EPSG:28992)")
+```
+
+For analysis in metres (distances, areas, buffers) use RD New; for web maps,
+lon/lat or Web Mercator.
+
+## Two things `pdokr` handles for you
+
+* **The `bbox` pre-filter is always CRS84.** Whatever CRS your `bbox` or
+  `filter_by` geometry is in, `pdokr` converts its extent to lon/lat before
+  sending it to the server, because that is what the OGC `bbox` parameter
+  expects.
+* **Axis order.** "CRS84" means longitude/latitude order, while EPSG:4326 is
+  formally latitude/longitude. `sf` consistently stores coordinates as
+  x = longitude, y = latitude, and `pdokr` follows that, so you do not have to
+  think about axis swaps.
+
+## Where to next
+
+* [Getting started](getting-started.html) — the basics of reading and mapping a
+  layer.
+* [Working with PDOK by hand](pdok-by-hand.html) — what `pdokr` does under the
+  hood, CRS handling included.

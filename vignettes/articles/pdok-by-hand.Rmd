@@ -1,0 +1,143 @@
+---
+title: "Working with PDOK by hand"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+`pdokr` is a thin convenience layer over PDOK's open web services. This article
+shows how to talk to those services directly with
+[`httr2`](https://httr2.r-lib.org/) and [`sf`](https://r-spatial.github.io/sf/),
+so you understand what the package automates and can drop down to raw requests
+when you need to.
+
+```{r setup}
+library(httr2)
+library(sf)
+```
+
+## The dataset index
+
+Every OGC API dataset is listed at `https://api.pdok.nl/index.json`.
+
+```{r index}
+index <- request("https://api.pdok.nl/index.json") |>
+  req_perform() |>
+  resp_body_json()
+
+length(index$apis)
+index$apis[[1]]$links[[1]]$href
+```
+
+`pdok_list_datasets()` fetches and tidies exactly this.
+
+## The layers in a dataset
+
+Each dataset exposes its layers at `{base}/collections?f=json`.
+
+```{r collections}
+collections <- request("https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/collections") |>
+  req_url_query(f = "json") |>
+  req_perform() |>
+  resp_body_json()
+
+vapply(collections$collections, function(x) x$id, character(1))[1:6]
+```
+
+That is what `pdok_list_layers()` parses.
+
+## Reading features
+
+Features come from `{base}/collections/{layer}/items` as GeoJSON. Add query
+parameters for the format, a page size, and optional filters. Here we ask for the
+2024 provinces.
+
+```{r items}
+url <- paste0(
+  "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/",
+  "collections/provincie_gegeneraliseerd/items"
+)
+
+resp <- request(url) |>
+  req_url_query(
+    f = "json",
+    limit = 12,
+    datetime = "2024-07-01T00:00:00Z"
+  ) |>
+  req_perform()
+
+provinces <- read_sf(resp_body_string(resp))
+provinces[, "statnaam"]
+```
+
+The CRS of the returned coordinates is announced in a response header (CRS84,
+i.e. lon/lat, by default):
+
+```{r crs}
+resp_header(resp, "Content-Crs")
+```
+
+A bounding box pre-filter is just another query parameter,
+`bbox = "xmin,ymin,xmax,ymax"` in CRS84.
+
+## Pagination
+
+The API does not return all features at once. Each response carries a `next`
+link when more pages are available; you follow it until it disappears. (PDOK uses
+cursor-based pagination, so you cannot jump to an offset.)
+
+```{r pagination}
+body <- resp_body_json(resp)
+next_link <- Filter(function(l) l$rel == "next", body$links)
+length(next_link) # 0 here: all 12 provinces fit on one page
+```
+
+`pdok_read()` runs this loop for you and binds the pages into one `sf` object.
+
+## WFS, the older service
+
+PDOK also offers an older Web Feature Service (WFS) for some datasets. `pdokr`
+is an OGC API Features client and does not read WFS — almost all vector data
+(including BAG) is now available over the OGC API. On the rare occasion you need
+a WFS-only layer, GDAL can read it directly, optionally with a server-side
+spatial filter:
+
+```{r wfs, eval = FALSE}
+# Read a WFS layer by hand (the layer's CRS is RD New / EPSG:28992):
+buildings <- read_sf(
+  "WFS:https://service.pdok.nl/some/dataset/wfs/v1_0",
+  layer = "namespace:layer",
+  wkt_filter = sf::st_as_text(area_in_rd_new)
+)
+```
+
+## Putting it together
+
+What we read by hand is an ordinary `sf` object, ready to map:
+
+```{r map}
+library(tmap)
+tmap_mode("plot")
+
+tm_shape(provinces) +
+  tm_polygons(fill = "grey95", col = "grey40") +
+  tm_title("Provinces, fetched by hand")
+```
+
+Everything above is what `pdokr` wraps: discovery, pagination, CRS handling,
+and the GeoJSON-to-`sf` conversion, behind a handful of `pdok_*()` functions.
+
+## Where to next
+
+* [Getting started](getting-started.html) — the same tasks with the `pdok_*()`
+  functions.
+* [Coordinate reference systems](coordinate-reference-systems.html) — more on
+  CRS84, RD New and axis order.
