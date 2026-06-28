@@ -22,6 +22,7 @@ coloured by construction year.
 ```{r setup}
 library(pdokr)
 library(tmap)
+library(dplyr)
 ```
 
 ## 1. Choose an area
@@ -33,13 +34,13 @@ centre of Rotterdam.
 gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2025
 )
-rotterdam <- gemeenten[gemeenten$statnaam == "Rotterdam", ]
+rotterdam <- filter(gemeenten, statnaam == "Rotterdam")
 
 buurten <- pdok_read(
   "cbs/gebiedsindelingen", "buurt_gegeneraliseerd", datetime = 2025,
   filter_by = rotterdam, predicate = "within"
 )
-stadsdriehoek <- buurten[buurten$statnaam == "Stadsdriehoek", ]
+stadsdriehoek <- filter(buurten, statnaam == "Stadsdriehoek")
 ```
 
 ## 2. Load every building in it
@@ -56,7 +57,7 @@ nrow(buildings)
 BAG records an unknown construction year as `9999`; we set those to `NA`.
 
 ```{r clean}
-buildings$bouwjaar[buildings$bouwjaar == 9999] <- NA
+buildings <- mutate(buildings, bouwjaar = na_if(bouwjaar, 9999))
 range(buildings$bouwjaar, na.rm = TRUE)
 ```
 
