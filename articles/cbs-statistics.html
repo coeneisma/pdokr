@@ -98,9 +98,18 @@ This article maps the population density across the neighbourhoods of
 Amsterdam.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/coeneisma/pdokr" class="external-link">pdokr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-tmap/tmap" class="external-link">tmap</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-tmap/tmap" class="external-link">tmap</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="read-the-neighbourhoods-of-one-municipality">1. Read the neighbourhoods of one municipality<a class="anchor" aria-label="anchor" href="#read-the-neighbourhoods-of-one-municipality"></a>
+<h2 id="read-the-neighbourhoods-of-one-municipality">Read the neighbourhoods of one municipality<a class="anchor" aria-label="anchor" href="#read-the-neighbourhoods-of-one-municipality"></a>
 </h2>
 <p>The <code>cbs/wijken-en-buurten-2025</code> dataset has
 <code>gemeenten</code>, <code>wijken</code> and <code>buurten</code>
@@ -110,7 +119,7 @@ layers. We take the boundary of Amsterdam from the
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gemeenten</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span><span class="st">"cbs/wijken-en-buurten-2025"</span>, <span class="st">"gemeenten"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ⠙ Downloading PDOK features: 424 fetched</span></span>
-<span><span class="va">amsterdam</span> <span class="op">&lt;-</span> <span class="va">gemeenten</span><span class="op">[</span><span class="va">gemeenten</span><span class="op">$</span><span class="va">gemeentenaam</span> <span class="op">==</span> <span class="st">"Amsterdam"</span>, <span class="op">]</span></span>
+<span><span class="va">amsterdam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">gemeenten</span>, <span class="va">gemeentenaam</span> <span class="op">==</span> <span class="st">"Amsterdam"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">buurten</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span></span>
 <span>  <span class="st">"cbs/wijken-en-buurten-2025"</span>, <span class="st">"buurten"</span>,</span>
@@ -121,23 +130,24 @@ layers. We take the boundary of Amsterdam from the
 <span><span class="co">#&gt; [1] 519</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="handle-the-no-data-code">2. Handle the “no data” code<a class="anchor" aria-label="anchor" href="#handle-the-no-data-code"></a>
+<h2 id="handle-the-no-data-code">Handle the “no data” code<a class="anchor" aria-label="anchor" href="#handle-the-no-data-code"></a>
 </h2>
 <p>CBS marks a figure that is unknown or suppressed (too few cases, or a
 non-residential area) with a large negative sentinel such as
 <code>-99997</code>. We turn those into <code>NA</code> so they do not
 distort the map.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">buurten</span><span class="op">$</span><span class="va">bevolkingsdichtheid_inwoners_per_km2</span><span class="op">[</span></span>
-<span>  <span class="va">buurten</span><span class="op">$</span><span class="va">bevolkingsdichtheid_inwoners_per_km2</span> <span class="op">&lt;</span> <span class="fl">0</span></span>
-<span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
+<code class="sourceCode R"><span><span class="va">buurten</span> <span class="op">&lt;-</span> <span class="va">buurten</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>bevolkingsdichtheid_inwoners_per_km2 <span class="op">=</span></span>
+<span>           <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">bevolkingsdichtheid_inwoners_per_km2</span> <span class="op">&lt;</span> <span class="fl">0</span>, <span class="cn">NA_real_</span>,</span>
+<span>                   <span class="va">bevolkingsdichtheid_inwoners_per_km2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">buurten</span><span class="op">$</span><span class="va">bevolkingsdichtheid_inwoners_per_km2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs </span></span>
 <span><span class="co">#&gt;       3    5689   10396   11815   17892   34968      44</span></span></code></pre></div>
 <p>The value is the number of inhabitants per square kilometre.</p>
 </div>
 <div class="section level2">
-<h2 id="draw-the-choropleth">3. Draw the choropleth<a class="anchor" aria-label="anchor" href="#draw-the-choropleth"></a>
+<h2 id="draw-the-choropleth">Draw the choropleth<a class="anchor" aria-label="anchor" href="#draw-the-choropleth"></a>
 </h2>
 <p>A quantile classification keeps each colour class roughly equal in
 size, which works well for a skewed variable like density.

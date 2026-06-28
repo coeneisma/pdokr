@@ -12,9 +12,18 @@ makes it a one-liner.
 
 library(pdokr)
 library(tmap)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 ```
 
-## 1. Get a filter geometry
+## Get a filter geometry
 
 The area you filter by is just an `sf` polygon. The most common source
 is the CBS administrative boundaries (`"cbs/gebiedsindelingen"`). Here
@@ -26,7 +35,7 @@ provinces <- pdok_read(
   "cbs/gebiedsindelingen", "provincie_gegeneraliseerd",
   datetime = 2025
 )
-fryslan <- provinces[provinces$statnaam == "Fryslân", ]
+fryslan <- filter(provinces, statnaam == "Fryslân")
 ```
 
 Any polygon works, though: a nature reserve, a water-authority area, a
@@ -34,7 +43,7 @@ polygon you drew yourself, or a result from
 [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
 (see the last section).
 
-## 2. Filter another layer to that area
+## Filter another layer to that area
 
 Pass the filter geometry to
 [`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md)
@@ -83,7 +92,7 @@ tm_basemap("CartoDB.Positron") +
               fill.legend = tm_legend("National park"))
 ```
 
-## 3. What happens under the hood
+## What happens under the hood
 
 `filter_by` folds a two-stage workflow into one call. You can also run
 the two stages yourself, which is useful when you want to reuse the
@@ -117,7 +126,7 @@ parks_in_bbox[fryslan_ll, , op = sf::st_intersects]$text
 #> [4] "Schiermonnikoog"
 ```
 
-## 4. From an address to its area
+## From an address to its area
 
 Because `filter_by` also accepts a point, you can answer *“which
 municipality is this address in?”* Geocode the address with

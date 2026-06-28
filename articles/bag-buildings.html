@@ -97,9 +97,18 @@ article maps the buildings of one neighbourhood, coloured by
 construction year.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/coeneisma/pdokr" class="external-link">pdokr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-tmap/tmap" class="external-link">tmap</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-tmap/tmap" class="external-link">tmap</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="choose-an-area">1. Choose an area<a class="anchor" aria-label="anchor" href="#choose-an-area"></a>
+<h2 id="choose-an-area">Choose an area<a class="anchor" aria-label="anchor" href="#choose-an-area"></a>
 </h2>
 <p>We use the administrative boundaries to select the
 <code>Stadsdriehoek</code>, the historic centre of Rotterdam.</p>
@@ -107,16 +116,16 @@ construction year.</p>
 <code class="sourceCode R"><span><span class="va">gemeenten</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span></span>
 <span>  <span class="st">"cbs/gebiedsindelingen"</span>, <span class="st">"gemeente_gegeneraliseerd"</span>, datetime <span class="op">=</span> <span class="fl">2025</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">rotterdam</span> <span class="op">&lt;-</span> <span class="va">gemeenten</span><span class="op">[</span><span class="va">gemeenten</span><span class="op">$</span><span class="va">statnaam</span> <span class="op">==</span> <span class="st">"Rotterdam"</span>, <span class="op">]</span></span>
+<span><span class="va">rotterdam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">gemeenten</span>, <span class="va">statnaam</span> <span class="op">==</span> <span class="st">"Rotterdam"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">buurten</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span></span>
 <span>  <span class="st">"cbs/gebiedsindelingen"</span>, <span class="st">"buurt_gegeneraliseerd"</span>, datetime <span class="op">=</span> <span class="fl">2025</span>,</span>
 <span>  filter_by <span class="op">=</span> <span class="va">rotterdam</span>, predicate <span class="op">=</span> <span class="st">"within"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">stadsdriehoek</span> <span class="op">&lt;-</span> <span class="va">buurten</span><span class="op">[</span><span class="va">buurten</span><span class="op">$</span><span class="va">statnaam</span> <span class="op">==</span> <span class="st">"Stadsdriehoek"</span>, <span class="op">]</span></span></code></pre></div>
+<span><span class="va">stadsdriehoek</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">buurten</span>, <span class="va">statnaam</span> <span class="op">==</span> <span class="st">"Stadsdriehoek"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="load-every-building-in-it">2. Load every building in it<a class="anchor" aria-label="anchor" href="#load-every-building-in-it"></a>
+<h2 id="load-every-building-in-it">Load every building in it<a class="anchor" aria-label="anchor" href="#load-every-building-in-it"></a>
 </h2>
 <p>The <code>kadaster/bag</code> dataset has a <code>pand</code>
 (building) layer. We filter it to the neighbourhood;
@@ -124,20 +133,18 @@ construction year.</p>
 exact shape.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">buildings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span><span class="st">"kadaster/bag"</span>, <span class="st">"pand"</span>, filter_by <span class="op">=</span> <span class="va">stadsdriehoek</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ⠙ Downloading PDOK features: 363 fetched</span></span>
-<span><span class="co">#&gt; ⠹ Downloading PDOK features: 807 fetched</span></span>
-<span><span class="co">#&gt; ⠹ Downloading PDOK features: 1022 fetched</span></span>
+<span><span class="co">#&gt; ⠙ Downloading PDOK features: 1022 fetched</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">buildings</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1022</span></span></code></pre></div>
 <p>BAG records an unknown construction year as <code>9999</code>; we set
 those to <code>NA</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">buildings</span><span class="op">$</span><span class="va">bouwjaar</span><span class="op">[</span><span class="va">buildings</span><span class="op">$</span><span class="va">bouwjaar</span> <span class="op">==</span> <span class="fl">9999</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
+<code class="sourceCode R"><span><span class="va">buildings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">buildings</span>, bouwjaar <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/na_if.html" class="external-link">na_if</a></span><span class="op">(</span><span class="va">bouwjaar</span>, <span class="fl">9999</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">buildings</span><span class="op">$</span><span class="va">bouwjaar</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1609 2026</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="map-by-construction-year">3. Map by construction year<a class="anchor" aria-label="anchor" href="#map-by-construction-year"></a>
+<h2 id="map-by-construction-year">Map by construction year<a class="anchor" aria-label="anchor" href="#map-by-construction-year"></a>
 </h2>
 <p>Rotterdam’s historic centre was largely destroyed in the May 1940
 bombing and rebuilt afterwards. To make that dividing line jump out, we

@@ -11,7 +11,7 @@ object, and take it from there.
 library(pdokr)
 ```
 
-## 1. Find a dataset
+## Find a dataset
 
 PDOK serves many datasets. Search them by a partial, case-insensitive
 term with
@@ -32,7 +32,7 @@ pdok_search_datasets("gebiedsindelingen")
 The `id` column is what the rest of the package uses. Here we will use
 the CBS administrative boundaries, `"cbs/gebiedsindelingen"`.
 
-## 2. List the layers in a dataset
+## List the layers in a dataset
 
 A dataset contains one or more layers. List them with
 [`pdok_list_layers()`](https://coeneisma.github.io/pdokr/reference/pdok_list_layers.md)
@@ -63,7 +63,7 @@ Each row carries its `dataset`, the `layer` id you pass to
 the period the layer covers (`start_date` / `end_date`), and the
 coordinate reference systems it offers.
 
-## 3. Load a layer
+## Load a layer
 
 [`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md)
 loads a layer as an `sf` object, handling pagination for you. The CBS
@@ -100,7 +100,7 @@ gemeenten
 #> #   geometry <MULTIPOLYGON [°]>
 ```
 
-## 4. Make a map
+## Make a map
 
 The result is a plain `sf` object, so any mapping package works. We use
 [`tmap`](https://r-tmap.github.io/tmap/). A static overview:

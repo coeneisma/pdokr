@@ -96,7 +96,7 @@ take it from there.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/coeneisma/pdokr" class="external-link">pdokr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="find-a-dataset">1. Find a dataset<a class="anchor" aria-label="anchor" href="#find-a-dataset"></a>
+<h2 id="find-a-dataset">Find a dataset<a class="anchor" aria-label="anchor" href="#find-a-dataset"></a>
 </h2>
 <p>PDOK serves many datasets. Search them by a partial, case-insensitive
 term with <code><a href="../reference/pdok_search_datasets.html">pdok_search_datasets()</a></code>, or list them all with
@@ -113,7 +113,7 @@ we will use the CBS administrative boundaries,
 <code>"cbs/gebiedsindelingen"</code>.</p>
 </div>
 <div class="section level2">
-<h2 id="list-the-layers-in-a-dataset">2. List the layers in a dataset<a class="anchor" aria-label="anchor" href="#list-the-layers-in-a-dataset"></a>
+<h2 id="list-the-layers-in-a-dataset">List the layers in a dataset<a class="anchor" aria-label="anchor" href="#list-the-layers-in-a-dataset"></a>
 </h2>
 <p>A dataset contains one or more layers. List them with
 <code><a href="../reference/pdok_list_layers.html">pdok_list_layers()</a></code> (or filter them with
@@ -140,7 +140,7 @@ you pass to <code><a href="../reference/pdok_read.html">pdok_read()</a></code>, 
 reference systems it offers.</p>
 </div>
 <div class="section level2">
-<h2 id="load-a-layer">3. Load a layer<a class="anchor" aria-label="anchor" href="#load-a-layer"></a>
+<h2 id="load-a-layer">Load a layer<a class="anchor" aria-label="anchor" href="#load-a-layer"></a>
 </h2>
 <p><code><a href="../reference/pdok_read.html">pdok_read()</a></code> loads a layer as an <code>sf</code> object,
 handling pagination for you. The CBS boundaries hold every year in one
@@ -174,7 +174,7 @@ layer, so we select 2025 with <code>datetime</code>.</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   geometry &lt;MULTIPOLYGON [°]&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="make-a-map">4. Make a map<a class="anchor" aria-label="anchor" href="#make-a-map"></a>
+<h2 id="make-a-map">Make a map<a class="anchor" aria-label="anchor" href="#make-a-map"></a>
 </h2>
 <p>The result is a plain <code>sf</code> object, so any mapping package
 works. We use <a href="https://r-tmap.github.io/tmap/" class="external-link"><code>tmap</code></a>. A static

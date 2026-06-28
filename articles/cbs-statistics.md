@@ -12,9 +12,18 @@ population density across the neighbourhoods of Amsterdam.
 
 library(pdokr)
 library(tmap)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 ```
 
-## 1. Read the neighbourhoods of one municipality
+## Read the neighbourhoods of one municipality
 
 The `cbs/wijken-en-buurten-2025` dataset has `gemeenten`, `wijken` and
 `buurten` layers. We take the boundary of Amsterdam from the `gemeenten`
@@ -24,7 +33,7 @@ layer, then read the `buurten` (neighbourhoods) inside it.
 
 gemeenten <- pdok_read("cbs/wijken-en-buurten-2025", "gemeenten")
 #> ⠙ Downloading PDOK features: 424 fetched
-amsterdam <- gemeenten[gemeenten$gemeentenaam == "Amsterdam", ]
+amsterdam <- filter(gemeenten, gemeentenaam == "Amsterdam")
 
 buurten <- pdok_read(
   "cbs/wijken-en-buurten-2025", "buurten",
@@ -35,7 +44,7 @@ nrow(buurten)
 #> [1] 519
 ```
 
-## 2. Handle the “no data” code
+## Handle the “no data” code
 
 CBS marks a figure that is unknown or suppressed (too few cases, or a
 non-residential area) with a large negative sentinel such as `-99997`.
@@ -43,9 +52,10 @@ We turn those into `NA` so they do not distort the map.
 
 ``` r
 
-buurten$bevolkingsdichtheid_inwoners_per_km2[
-  buurten$bevolkingsdichtheid_inwoners_per_km2 < 0
-] <- NA
+buurten <- buurten |>
+  mutate(bevolkingsdichtheid_inwoners_per_km2 =
+           if_else(bevolkingsdichtheid_inwoners_per_km2 < 0, NA_real_,
+                   bevolkingsdichtheid_inwoners_per_km2))
 summary(buurten$bevolkingsdichtheid_inwoners_per_km2)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
 #>       3    5689   10396   11815   17892   34968      44
@@ -53,7 +63,7 @@ summary(buurten$bevolkingsdichtheid_inwoners_per_km2)
 
 The value is the number of inhabitants per square kilometre.
 
-## 3. Draw the choropleth
+## Draw the choropleth
 
 A quantile classification keeps each colour class roughly equal in size,
 which works well for a skewed variable like density. Neighbourhoods

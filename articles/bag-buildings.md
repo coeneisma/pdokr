@@ -11,9 +11,18 @@ neighbourhood, coloured by construction year.
 
 library(pdokr)
 library(tmap)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 ```
 
-## 1. Choose an area
+## Choose an area
 
 We use the administrative boundaries to select the `Stadsdriehoek`, the
 historic centre of Rotterdam.
@@ -23,16 +32,16 @@ historic centre of Rotterdam.
 gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2025
 )
-rotterdam <- gemeenten[gemeenten$statnaam == "Rotterdam", ]
+rotterdam <- filter(gemeenten, statnaam == "Rotterdam")
 
 buurten <- pdok_read(
   "cbs/gebiedsindelingen", "buurt_gegeneraliseerd", datetime = 2025,
   filter_by = rotterdam, predicate = "within"
 )
-stadsdriehoek <- buurten[buurten$statnaam == "Stadsdriehoek", ]
+stadsdriehoek <- filter(buurten, statnaam == "Stadsdriehoek")
 ```
 
-## 2. Load every building in it
+## Load every building in it
 
 The `kadaster/bag` dataset has a `pand` (building) layer. We filter it
 to the neighbourhood;
@@ -42,9 +51,7 @@ pre-filters at the server and clips to the exact shape.
 ``` r
 
 buildings <- pdok_read("kadaster/bag", "pand", filter_by = stadsdriehoek)
-#> ⠙ Downloading PDOK features: 363 fetched
-#> ⠹ Downloading PDOK features: 807 fetched
-#> ⠹ Downloading PDOK features: 1022 fetched
+#> ⠙ Downloading PDOK features: 1022 fetched
 nrow(buildings)
 #> [1] 1022
 ```
@@ -54,12 +61,12 @@ BAG records an unknown construction year as `9999`; we set those to
 
 ``` r
 
-buildings$bouwjaar[buildings$bouwjaar == 9999] <- NA
+buildings <- mutate(buildings, bouwjaar = na_if(bouwjaar, 9999))
 range(buildings$bouwjaar, na.rm = TRUE)
 #> [1] 1609 2026
 ```
 
-## 3. Map by construction year
+## Map by construction year
 
 Rotterdam’s historic centre was largely destroyed in the May 1940
 bombing and rebuilt afterwards. To make that dividing line jump out, we

@@ -12,9 +12,18 @@ boundary can be handed to the `filter_by` argument of
 
 library(pdokr)
 library(tmap)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 ```
 
-## 1. A name to a point
+## A name to a point
 
 In its simplest form you pass a query and get back the single best
 match.
@@ -22,7 +31,7 @@ match.
 ``` r
 
 home <- pdok_geocode("Domplein 1, Utrecht")
-home[, c("weergavenaam", "type", "score")]
+home |> select(weergavenaam, type, score)
 #> Simple feature collection with 1 feature and 3 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
@@ -47,7 +56,7 @@ tm_basemap("CartoDB.Positron") +
   tm_dots(fill = "#E8631C", size = 1)
 ```
 
-## 2. Search levels: the `type` argument
+## Search levels: the `type` argument
 
 The Locatieserver does not only know addresses. Every result has a
 `type`, and the geometry you get back depends on it — a point for
@@ -74,7 +83,8 @@ levels — “Utrecht” is a municipality, a province, *and* a town:
 
 ``` r
 
-pdok_geocode("Utrecht", limit = 5)[, c("weergavenaam", "type", "score")]
+pdok_geocode("Utrecht", limit = 5) |>
+  select(weergavenaam, type, score)
 #> Simple feature collection with 5 features and 3 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
@@ -126,7 +136,7 @@ tm_shape(area) +
 
 ![](geocoding_files/figure-html/levels-map-1.png)
 
-## 3. Combine with `pdok_filter_by()`
+## Combine with `pdok_filter_by()`
 
 This is where geocoding earns its place in a workflow. Many tasks start
 with “the data inside *this* area” — and
@@ -148,7 +158,7 @@ buurten <- pdok_read(
   filter_by = boundary, predicate = "intersects"
 )
 centres <- suppressWarnings(sf::st_centroid(buurten))
-buurten <- buurten[lengths(sf::st_within(centres, boundary)) > 0, ]
+buurten <- filter(buurten, lengths(sf::st_within(centres, boundary)) > 0)
 nrow(buurten)
 #> [1] 24
 ```
