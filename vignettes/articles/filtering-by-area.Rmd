@@ -33,7 +33,7 @@ province of Fryslân.
 ```{r geometry}
 provinces <- pdok_read(
   "cbs/gebiedsindelingen", "provincie_gegeneraliseerd",
-  datetime = 2024
+  datetime = 2025
 )
 fryslan <- provinces[provinces$statnaam == "Fryslân", ]
 ```
@@ -72,8 +72,10 @@ The same in interactive mode — zoom in and click a park:
 ```{r map-interactive}
 tmap_mode("view")
 
-tm_shape(parks) +
-  tm_polygons(fill = "text", id = "text", fill.legend = tm_legend("National park"))
+tm_basemap("CartoDB.Positron") +
+  tm_shape(parks) +
+  tm_polygons(fill = "text", fill_alpha = 0.6, id = "text",
+              fill.legend = tm_legend("National park"))
 ```
 
 ```{r reset, include = FALSE}
@@ -117,10 +119,19 @@ address <- pdok_geocode("Tweebaksmarkt 52, Leeuwarden")
 
 pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
-  datetime = 2024, filter_by = address
+  datetime = 2025, filter_by = address
 )$statnaam
 ```
 
 The same idea scales up: geocode a place as a polygon (for example
 `pdok_geocode("Fryslân", type = "provincie")`) and use it directly as
 `filter_by`.
+
+## Where to next
+
+* [Geocoding](geocoding.html) — turn a place name into the boundary you filter
+  by.
+* [Mapping buildings by construction year](bag-buildings.html) — read a BAG
+  layer inside an area.
+* [Thematic maps from CBS statistics](cbs-statistics.html) — a choropleth for
+  one municipality's neighbourhoods.

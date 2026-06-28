@@ -54,7 +54,7 @@ default `pdok_read()` gives you lon/lat:
 ```{r default}
 gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
-  datetime = 2024
+  datetime = 2025
 )
 sf::st_crs(gemeenten)$epsg
 ```
@@ -66,7 +66,7 @@ the service does not offer.
 ```{r rdnew}
 gemeenten_rd <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
-  datetime = 2024, crs = 28992
+  datetime = 2025, crs = 28992
 )
 sf::st_crs(gemeenten_rd)$epsg
 ```
@@ -117,3 +117,10 @@ lon/lat or Web Mercator.
   formally latitude/longitude. `sf` consistently stores coordinates as
   x = longitude, y = latitude, and `pdokr` follows that, so you do not have to
   think about axis swaps.
+
+## Where to next
+
+* [Getting started](getting-started.html) — the basics of reading and mapping a
+  layer.
+* [Working with PDOK by hand](pdok-by-hand.html) — what `pdokr` does under the
+  hood, CRS handling included.
