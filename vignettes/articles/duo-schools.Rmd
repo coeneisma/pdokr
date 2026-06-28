@@ -36,7 +36,15 @@ read_duo <- function(resource_id) {
     "https://onderwijsdata.duo.nl/api/3/action/datastore_search",
     "?resource_id=", resource_id, "&limit=50000"
   )
-  fromJSON(url)$result$records
+  # the responses are large, so download to a file and retry if one drops
+  for (attempt in 1:4) {
+    tmp <- tempfile(fileext = ".json")
+    ok <- tryCatch({ download.file(url, tmp, quiet = TRUE); TRUE },
+                   error = function(e) FALSE)
+    if (ok) return(fromJSON(tmp)$result$records)
+    Sys.sleep(2)
+  }
+  stop("DUO request failed after several attempts")
 }
 ```
 
