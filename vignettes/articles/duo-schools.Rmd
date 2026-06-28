@@ -24,28 +24,30 @@ library(pdokr)
 library(tmap)
 library(sf)
 library(dplyr)
-library(jsonlite)
+library(httr2)
 ```
 
 DUO publishes its data through a [CKAN open-data
-API](https://onderwijsdata.duo.nl/). Every table is one resource; this small
-helper fetches one as a data frame.
+API](https://onderwijsdata.duo.nl/). Every table is one resource. Some are large,
+so this helper fetches one in pages, letting `httr2` retry any request that drops.
 
 ```{r helper}
-read_duo <- function(resource_id) {
-  url <- paste0(
-    "https://onderwijsdata.duo.nl/api/3/action/datastore_search",
-    "?resource_id=", resource_id, "&limit=50000"
-  )
-  # the responses are large, so download to a file and retry if one drops
-  for (attempt in 1:4) {
-    tmp <- tempfile(fileext = ".json")
-    ok <- tryCatch({ download.file(url, tmp, quiet = TRUE); TRUE },
-                   error = function(e) FALSE)
-    if (ok) return(fromJSON(tmp)$result$records)
-    Sys.sleep(2)
+read_duo <- function(resource_id, page_size = 5000) {
+  pages <- list()
+  offset <- 0
+  repeat {
+    resp <- request("https://onderwijsdata.duo.nl/api/3/action/datastore_search") |>
+      req_url_query(resource_id = resource_id, limit = page_size, offset = offset) |>
+      req_retry(max_tries = 4) |>
+      req_perform() |>
+      resp_body_json(simplifyVector = TRUE)
+    page <- resp$result$records
+    if (length(page) == 0) break
+    pages[[length(pages) + 1]] <- page
+    if (nrow(page) < page_size) break
+    offset <- offset + page_size
   }
-  stop("DUO request failed after several attempts")
+  do.call(rbind, pages)
 }
 ```
 

@@ -34,4 +34,4 @@ Config/testthat/edition: 3
 URL: https://github.com/coeneisma/pdokr, https://coeneisma.github.io/pdokr/
 BugReports: https://github.com/coeneisma/pdokr/issues
 Language: en-US
-Config/Needs/website: rmarkdown, tmap, dplyr, jsonlite
+Config/Needs/website: rmarkdown, tmap, dplyr
