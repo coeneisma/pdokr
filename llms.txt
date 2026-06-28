@@ -1,0 +1,134 @@
+# pdokr
+
+`pdokr` makes it easy to work with open geographic data from
+[PDOK](https://www.pdok.nl/) (Publieke Dienstverlening Op de Kaart), the
+national geodata platform of the Netherlands. It helps you discover
+datasets and their layers, load a layer as an
+[`sf`](https://r-spatial.github.io/sf/) object (with automatic
+pagination and explicit coordinate reference system handling), filter
+data by any polygon area, and geocode addresses and place names.
+
+## Installation
+
+You can install the development version of `pdokr` from
+[GitHub](https://github.com/coeneisma/pdokr) with:
+
+``` r
+
+# install.packages("devtools")
+devtools::install_github("coeneisma/pdokr")
+```
+
+## Example
+
+Pick an area from the administrative boundaries, then load another layer
+within it. Here we take the historic centre of Delft and map every
+building in it.
+
+``` r
+
+library(pdokr)
+library(tmap)
+
+# A municipality, and one of its districts (the historic centre of Delft)
+gemeenten <- pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2024
+)
+delft <- gemeenten[gemeenten$statnaam == "Delft", ]
+
+wijken <- pdok_read(
+  "cbs/gebiedsindelingen", "wijk_gegeneraliseerd", datetime = 2024,
+  filter_by = delft, predicate = "within"
+)
+binnenstad <- wijken[wijken$statnaam == "Wijk 11 Binnenstad", ]
+
+# Every building in that district, from the TOP10NL topography
+buildings <- pdok_read("brt/top10nl", "gebouw_vlak", filter_by = binnenstad)
+
+# Map it
+tmap_mode("plot")
+tm_shape(binnenstad) +
+  tm_borders(col = "grey40") +
+  tm_shape(buildings) +
+  tm_polygons(fill = "#d95f02", col = "white", lwd = 0.4) +
+  tm_title("Buildings in the historic centre of Delft")
+```
+
+![](reference/figures/README-example-1.png)
+
+The articles on the [package
+website](https://coeneisma.github.io/pdokr/) walk through this and other
+workflows, with interactive, zoomable maps.
+
+## Learn more
+
+See the [package website](https://coeneisma.github.io/pdokr/) for the
+reference documentation and articles on getting started, filtering data
+by area, working with coordinate reference systems, and querying PDOK by
+hand.
+
+# Package index
+
+## Search & discovery
+
+Find datasets and the layers within them.
+
+- [`pdok_list_datasets()`](https://coeneisma.github.io/pdokr/reference/pdok_list_datasets.md)
+  : List PDOK datasets
+- [`pdok_search_datasets()`](https://coeneisma.github.io/pdokr/reference/pdok_search_datasets.md)
+  : Search PDOK datasets
+- [`pdok_list_layers()`](https://coeneisma.github.io/pdokr/reference/pdok_list_layers.md)
+  : List the layers within a PDOK dataset
+- [`pdok_search_layers()`](https://coeneisma.github.io/pdokr/reference/pdok_search_layers.md)
+  : Search the layers within a PDOK dataset
+
+## Loading data
+
+Read a layer as an sf object.
+
+- [`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md)
+  : Read a PDOK layer as an sf object
+
+## Spatial filtering
+
+Filter a layer by any polygon area.
+
+- [`pdok_filter_by()`](https://coeneisma.github.io/pdokr/reference/pdok_filter_by.md)
+  : Spatially filter an sf layer by any polygon
+
+## Geocoding
+
+Look up addresses and place names.
+
+- [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
+  : Geocode an address or place name with the PDOK Locatieserver
+
+# Articles
+
+### Get started
+
+- [Getting
+  started](https://coeneisma.github.io/pdokr/articles/getting-started.md):
+
+### Essentials
+
+- [Filtering data by
+  area](https://coeneisma.github.io/pdokr/articles/filtering-by-area.md):
+- [Geocoding: from names to
+  locations](https://coeneisma.github.io/pdokr/articles/geocoding.md):
+- [Coordinate reference
+  systems](https://coeneisma.github.io/pdokr/articles/coordinate-reference-systems.md):
+
+### Examples
+
+- [Mapping buildings by construction year
+  (BAG)](https://coeneisma.github.io/pdokr/articles/bag-buildings.md):
+- [Combining with external data: school locations
+  (DUO)](https://coeneisma.github.io/pdokr/articles/duo-schools.md):
+- [Thematic maps from CBS
+  statistics](https://coeneisma.github.io/pdokr/articles/cbs-statistics.md):
+
+### Advanced
+
+- [Working with PDOK by
+  hand](https://coeneisma.github.io/pdokr/articles/pdok-by-hand.md):

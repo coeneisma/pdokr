@@ -1,0 +1,143 @@
+# Coordinate reference systems
+
+Dutch geodata lives in a few different coordinate reference systems
+(CRS), and mixing them up is a classic source of confusion. This article
+explains which ones you will meet, how PDOK serves them, and how `pdokr`
+handles them.
+
+``` r
+
+library(pdokr)
+library(tmap)
+```
+
+## The CRSs you will meet
+
+| EPSG | Name | Units | Where |
+|----|----|----|----|
+| 28992 | Amersfoort / RD New | metres | the Dutch national grid; most data is *stored* in this |
+| 4326 | WGS 84 (CRS84, lon/lat) | degrees | the default for web/GeoJSON |
+| 3857 | Web Mercator | metres | web map tiles |
+| 4258 | ETRS89 (lon/lat) | degrees | the European reference frame |
+
+## What PDOK offers per layer
+
+[`pdok_list_layers()`](https://coeneisma.github.io/pdokr/reference/pdok_list_layers.md)
+reports, for each layer, the CRSs it can deliver (`crs`) and the CRS the
+data is stored in (`storage_crs`).
+
+``` r
+
+layers <- pdok_list_layers("cbs/gebiedsindelingen")
+gemeente <- layers[layers$layer == "gemeente_gegeneraliseerd", ]
+
+gemeente$crs[[1]]
+#> [1]  4326 28992  3857  4258
+gemeente$storage_crs
+#> [1] 28992
+```
+
+So this layer is stored in RD New (28992) but can be served in several
+CRSs.
+
+## What `pdok_read()` returns
+
+Over the OGC API, PDOK serves GeoJSON, whose default is CRS84 (lon/lat).
+So by default
+[`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md)
+gives you lon/lat:
+
+``` r
+
+gemeenten <- pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+  datetime = 2025
+)
+sf::st_crs(gemeenten)$epsg
+#> [1] 4326
+```
+
+Ask for another CRS with the `crs` argument. `pdokr` does this
+transformation client-side with
+[`sf::st_transform()`](https://r-spatial.github.io/sf/reference/st_transform.html),
+so it works for any target CRS — even one the service does not offer.
+
+``` r
+
+gemeenten_rd <- pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+  datetime = 2025, crs = 28992
+)
+sf::st_crs(gemeenten_rd)$epsg
+#> [1] 28992
+```
+
+The coordinates differ accordingly — degrees versus metres:
+
+``` r
+
+sf::st_bbox(gemeenten)
+#>      xmin      ymin      xmax      ymax 
+#>  3.358378 50.750367  7.227498 53.554047
+sf::st_bbox(gemeenten_rd)
+#>     xmin     ymin     xmax     ymax 
+#>  13565.4 306846.2 278026.1 619231.6
+```
+
+## Why it matters for maps
+
+The same data plotted in lon/lat and in RD New is *not* the same
+picture. Lon/lat is unprojected, so at Dutch latitudes (~52° N) the
+country looks horizontally stretched; RD New is an accurate planar
+projection.
+
+The lon/lat graticule (the grid of meridians and parallels) makes the
+difference obvious: it is a perfect rectangular grid in lon/lat, but the
+*same* lines run slightly skewed in RD New, because that projection is
+gently rotated relative to north.
+
+``` r
+
+tmap_mode("plot")
+#> ℹ tmap modes "plot" - "view"
+#> ℹ toggle with `tmap::ttm()`
+tm_shape(gemeenten) +
+  tm_polygons(fill = "grey95", col = "grey50", lwd = 0.3) +
+  tm_graticules(col = "steelblue", lwd = 0.5) +
+  tm_title("Lon/lat (EPSG:4326)")
+```
+
+![](coordinate-reference-systems_files/figure-html/map-lonlat-1.png)
+
+``` r
+
+tm_shape(gemeenten_rd) +
+  tm_polygons(fill = "grey95", col = "grey50", lwd = 0.3) +
+  tm_graticules(col = "steelblue", lwd = 0.5) +
+  tm_title("RD New (EPSG:28992)")
+```
+
+![](coordinate-reference-systems_files/figure-html/map-rdnew-1.png)
+
+For analysis in metres (distances, areas, buffers) use RD New; for web
+maps, lon/lat or Web Mercator.
+
+## Two things `pdokr` handles for you
+
+- **The `bbox` pre-filter is always CRS84.** Whatever CRS your `bbox` or
+  `filter_by` geometry is in, `pdokr` converts its extent to lon/lat
+  before sending it to the server, because that is what the OGC `bbox`
+  parameter expects.
+- **Axis order.** “CRS84” means longitude/latitude order, while
+  EPSG:4326 is formally latitude/longitude. `sf` consistently stores
+  coordinates as x = longitude, y = latitude, and `pdokr` follows that,
+  so you do not have to think about axis swaps.
+
+## Where to next
+
+- [Getting
+  started](https://coeneisma.github.io/pdokr/articles/getting-started.md)
+  — the basics of reading and mapping a layer.
+- [Working with PDOK by
+  hand](https://coeneisma.github.io/pdokr/articles/pdok-by-hand.md) —
+  what `pdokr` does under the hood, CRS handling included.

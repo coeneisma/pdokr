@@ -1,0 +1,16 @@
+pandoc: 3.8.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  articles/bag-buildings: bag-buildings.html
+  articles/cbs-statistics: cbs-statistics.html
+  articles/coordinate-reference-systems: coordinate-reference-systems.html
+  articles/duo-schools: duo-schools.html
+  articles/filtering-by-area: filtering-by-area.html
+  articles/geocoding: geocoding.html
+  articles/getting-started: getting-started.html
+  articles/pdok-by-hand: pdok-by-hand.html
+last_built: 2026-06-28T18:27Z
+urls:
+  reference: https://coeneisma.github.io/pdokr/reference
+  article: https://coeneisma.github.io/pdokr/articles
