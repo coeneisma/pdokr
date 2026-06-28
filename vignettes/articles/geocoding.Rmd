@@ -1,0 +1,155 @@
+---
+title: "Geocoding: from names to locations"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+`pdok_geocode()` turns a name — an address, a postcode, a street, a town, a
+municipality, a province — into spatial data, using the PDOK
+[Locatieserver](https://www.pdok.nl/). The result is an `sf` object, so it plugs
+straight into the rest of `pdokr`: most usefully, a geocoded boundary can be
+handed to the `filter_by` argument of `pdok_read()`.
+
+```{r setup}
+library(pdokr)
+library(tmap)
+```
+
+## 1. A name to a point
+
+In its simplest form you pass a query and get back the single best match.
+
+```{r address}
+home <- pdok_geocode("Domplein 1, Utrecht")
+home[, c("weergavenaam", "type", "score")]
+```
+
+It is an ordinary `sf` object with a point geometry, ready to map.
+
+```{r address-map}
+tmap_mode("view")
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(home) +
+  tm_dots(fill = "#E8631C", size = 1)
+```
+
+```{r reset1, include = FALSE}
+tmap_mode("plot")
+```
+
+## 2. Search levels: the `type` argument
+
+The Locatieserver does not only know addresses. Every result has a `type`, and
+the geometry you get back depends on it — a point for pinpoint locations, a line
+for a road, a polygon for an area.
+
+| `type` | Geometry | What it is |
+|--------|----------|------------|
+| `adres` | point | a specific address |
+| `postcode` | point | the centre of a postcode |
+| `hectometerpaal` | point | a motorway distance marker |
+| `appartementsrecht` | point | an apartment right |
+| `weg` | line | a (named) road |
+| `buurt`, `wijk` | polygon | a neighbourhood or district |
+| `woonplaats` | polygon | a town or city |
+| `gemeente` | polygon | a municipality |
+| `provincie` | polygon | a province |
+| `perceel` | polygon | a cadastral parcel |
+
+By default `pdok_geocode()` returns the best match of *any* type, ranked by the
+service's relevance `score`. That is convenient, but a single name often exists
+at several levels — "Utrecht" is a municipality, a province, *and* a town:
+
+```{r ambiguous}
+pdok_geocode("Utrecht", limit = 5)[, c("weergavenaam", "type", "score")]
+```
+
+Pass `type` to pin down exactly which level you mean. The same query then
+returns very different geometry:
+
+```{r levels}
+point <- pdok_geocode("Domplein 1, Utrecht")          # adres  -> point
+road  <- pdok_geocode("Oudegracht, Utrecht", type = "weg")   # weg    -> line
+area  <- pdok_geocode("Binnenstad, Utrecht", type = "wijk")  # wijk   -> polygon
+
+sf::st_geometry_type(point)
+sf::st_geometry_type(road)
+sf::st_geometry_type(area)
+```
+
+Seen together, the three levels nest neatly — the address sits on the road,
+which lies inside the district.
+
+```{r levels-map}
+tm_shape(area) +
+  tm_polygons(fill = "#F7F3EC", col = "grey50") +
+  tm_shape(road) +
+  tm_lines(col = "#1f78b4", lwd = 2) +
+  tm_shape(point) +
+  tm_dots(fill = "#E8631C", size = 0.6) +
+  tm_title("Three search levels: district, road, address")
+```
+
+## 3. Combine with `pdok_filter_by()`
+
+This is where geocoding earns its place in a workflow. Many tasks start with
+"the data inside *this* area" — and `pdok_geocode()` gives you that area as a
+boundary without having to find and load an administrative layer first. A
+geocoded `gemeente`, `wijk` or `provincie` polygon drops straight into
+`filter_by`.
+
+```{r combine}
+boundary <- pdok_geocode("De Bilt", type = "gemeente")
+
+# read the neighbourhoods that meet the boundary, then keep those whose centre
+# lies inside it. A geocoded boundary is generalised, so it clips edge
+# neighbourhoods unevenly; `predicate = "within"` alone would drop some, while
+# `"intersects"` pulls in slivers of neighbouring municipalities.
+buurten <- pdok_read(
+  "cbs/gebiedsindelingen", "buurt_gegeneraliseerd", datetime = 2025,
+  filter_by = boundary, predicate = "intersects"
+)
+centres <- suppressWarnings(sf::st_centroid(buurten))
+buurten <- buurten[lengths(sf::st_within(centres, boundary)) > 0, ]
+nrow(buurten)
+```
+
+The geocoded boundary did the filtering; the result is every neighbourhood
+inside the municipality of De Bilt. On an interactive map you can see where that
+is and hover for the neighbourhood names:
+
+```{r combine-map}
+tmap_mode("view")
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(buurten) +
+  tm_polygons(
+    fill = "statnaam",
+    fill.scale = tm_scale_categorical(values = "brewer.set3"),
+    fill.legend = tm_legend(show = FALSE),
+    col = "white", fill_alpha = 0.6, id = "statnaam"
+  )
+```
+
+```{r reset3, include = FALSE}
+tmap_mode("plot")
+```
+
+The same pattern works for any layer: geocode the area you care about, then read
+the buildings, parcels or statistics within it.
+
+## Where to next
+
+* [Filtering data by area](filtering-by-area.html) — more on `pdok_filter_by()`.
+* [Mapping buildings by construction year](bag-buildings.html) — read a BAG
+  layer inside an area.
