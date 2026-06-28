@@ -180,10 +180,9 @@ binnenstad <- filter(wijken, grepl("Binnenstad", statnaam))
 centre_schools <- pdok_filter_by(utrecht_schools, binnenstad, predicate = "within")
 
 panden <- pdok_read("kadaster/bag", "pand", filter_by = binnenstad)
-#> ⠙ Downloading PDOK features: 1558 fetched
-#> ⠹ Downloading PDOK features: 2059 fetched
-#> ⠸ Downloading PDOK features: 4480 fetched
-#> ⠼ Downloading PDOK features: 6026 fetched
+#> ⠙ Downloading PDOK features: 2059 fetched
+#> ⠹ Downloading PDOK features: 4480 fetched
+#> ⠹ Downloading PDOK features: 6026 fetched
 school_buildings <- panden |>
   st_filter(centre_schools) |>
   st_join(select(centre_schools, school, sector, STRAATNAAM))
