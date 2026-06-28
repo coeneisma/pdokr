@@ -25,7 +25,7 @@ library(tmap)
 library(dplyr)
 ```
 
-## 1. Read the neighbourhoods of one municipality
+## Read the neighbourhoods of one municipality
 
 The `cbs/wijken-en-buurten-2025` dataset has `gemeenten`, `wijken` and `buurten`
 layers. We take the boundary of Amsterdam from the `gemeenten` layer, then read
@@ -42,7 +42,7 @@ buurten <- pdok_read(
 nrow(buurten)
 ```
 
-## 2. Handle the "no data" code
+## Handle the "no data" code
 
 CBS marks a figure that is unknown or suppressed (too few cases, or a
 non-residential area) with a large negative sentinel such as `-99997`. We turn
@@ -58,7 +58,7 @@ summary(buurten$bevolkingsdichtheid_inwoners_per_km2)
 
 The value is the number of inhabitants per square kilometre.
 
-## 3. Draw the choropleth
+## Draw the choropleth
 
 A quantile classification keeps each colour class roughly equal in size, which
 works well for a skewed variable like density. Neighbourhoods without a value

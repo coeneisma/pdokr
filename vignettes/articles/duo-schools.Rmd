@@ -51,7 +51,7 @@ read_duo <- function(resource_id, page_size = 5000) {
 }
 ```
 
-## 1. Fetch the education locations
+## Fetch the education locations
 
 The `onderwijslocaties` resource lists every location where education *may* take
 place, each with coordinates and a `BAG_ID`.
@@ -66,7 +66,7 @@ schools. A conference centre that hosts the odd exam, or a commercial training
 firm, is in here too. Mapping them straight away would put dots where no school
 exists.
 
-## 2. Keep only the recognised schools
+## Keep only the recognised schools
 
 To find the schools recognised in law we combine two more DUO tables. The
 `relaties...` resource links a location (`ONDERWIJSLOCATIECODE`) to a recognised
@@ -110,7 +110,7 @@ recognised institution, so only its official location appears here, not its
 every building. The map below is therefore dominated by primary and secondary
 schools, which register each site.
 
-## 3. Make it spatial and combine with PDOK
+## Make it spatial and combine with PDOK
 
 The coordinates are WGS84 longitude/latitude, so we build an `sf` object and use
 `pdok_filter_by()` with a municipal boundary to zoom in on Utrecht.
@@ -143,7 +143,7 @@ tm_shape(utrecht) +
   tm_title("Recognised schools in Utrecht, by sector")
 ```
 
-## 4. Map the school buildings
+## Map the school buildings
 
 Each school sits in a building from the BAG. We read the `pand` (building) layer
 for the historic centre, keep the footprints that contain a school, and carry

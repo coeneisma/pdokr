@@ -25,7 +25,7 @@ library(tmap)
 library(dplyr)
 ```
 
-## 1. Choose an area
+## Choose an area
 
 We use the administrative boundaries to select the `Stadsdriehoek`, the historic
 centre of Rotterdam.
@@ -43,7 +43,7 @@ buurten <- pdok_read(
 stadsdriehoek <- filter(buurten, statnaam == "Stadsdriehoek")
 ```
 
-## 2. Load every building in it
+## Load every building in it
 
 The `kadaster/bag` dataset has a `pand` (building) layer. We filter it to the
 neighbourhood; `pdok_read()` pre-filters at the server and clips to the exact
@@ -61,7 +61,7 @@ buildings <- mutate(buildings, bouwjaar = na_if(bouwjaar, 9999))
 range(buildings$bouwjaar, na.rm = TRUE)
 ```
 
-## 3. Map by construction year
+## Map by construction year
 
 Rotterdam's historic centre was largely destroyed in the May 1940 bombing and
 rebuilt afterwards. To make that dividing line jump out, we colour the buildings

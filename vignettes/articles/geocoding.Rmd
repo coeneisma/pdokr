@@ -25,7 +25,7 @@ library(tmap)
 library(dplyr)
 ```
 
-## 1. A name to a point
+## A name to a point
 
 In its simplest form you pass a query and get back the single best match.
 
@@ -48,7 +48,7 @@ tm_basemap("CartoDB.Positron") +
 tmap_mode("plot")
 ```
 
-## 2. Search levels: the `type` argument
+## Search levels: the `type` argument
 
 The Locatieserver does not only know addresses. Every result has a `type`, and
 the geometry you get back depends on it — a point for pinpoint locations, a line
@@ -102,7 +102,7 @@ tm_shape(area) +
   tm_title("Three search levels: district, road, address")
 ```
 
-## 3. Combine with `pdok_filter_by()`
+## Combine with `pdok_filter_by()`
 
 This is where geocoding earns its place in a workflow. Many tasks start with
 "the data inside *this* area" — and `pdok_geocode()` gives you that area as a
