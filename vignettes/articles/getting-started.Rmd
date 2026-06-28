@@ -50,12 +50,12 @@ reference systems it offers.
 ## 3. Load a layer
 
 `pdok_read()` loads a layer as an `sf` object, handling pagination for you. The
-CBS boundaries hold every year in one layer, so we select 2024 with `datetime`.
+CBS boundaries hold every year in one layer, so we select 2025 with `datetime`.
 
 ```{r read}
 gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
-  datetime = 2024
+  datetime = 2025
 )
 gemeenten
 ```
@@ -80,8 +80,10 @@ can hover over — try it:
 ```{r map-interactive}
 tmap_mode("view")
 
-tm_shape(gemeenten) +
-  tm_polygons(fill = "grey95", col = "grey40", lwd = 0.4, id = "statnaam")
+tm_basemap("CartoDB.Positron") +
+  tm_shape(gemeenten) +
+  tm_polygons(fill = "grey95", col = "grey40", lwd = 0.4, fill_alpha = 0.5,
+              id = "statnaam")
 ```
 
 ```{r reset, include = FALSE}

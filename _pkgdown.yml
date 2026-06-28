@@ -8,13 +8,54 @@ template:
     link-hover-color: "#E8631C"
     light: "#F7F3EC"            # warm "paper" (the navbar uses .bg-light)
 
+navbar:
+  structure:
+    left:  [reference, getstarted, essentials, advanced, examples, news]
+    right: [search, github]
+  components:
+    getstarted:
+      text: Getting started
+      href: articles/getting-started.html
+    essentials:
+      text: Essentials
+      menu:
+      - text: Filtering data by area
+        href: articles/filtering-by-area.html
+      - text: Geocoding
+        href: articles/geocoding.html
+      - text: Coordinate reference systems
+        href: articles/coordinate-reference-systems.html
+    advanced:
+      text: Advanced
+      menu:
+      - text: Working with PDOK by hand
+        href: articles/pdok-by-hand.html
+    examples:
+      text: Examples
+      menu:
+      - text: Mapping buildings by construction year
+        href: articles/bag-buildings.html
+      - text: "Combining with external data: school locations (DUO)"
+        href: articles/duo-schools.html
+      - text: Thematic maps from CBS statistics
+        href: articles/cbs-statistics.html
+
 articles:
-- title: Articles
-  navbar: ~
+- title: Get started
   contents:
   - '`articles/getting-started`'
+- title: Essentials
+  contents:
   - '`articles/filtering-by-area`'
+  - '`articles/geocoding`'
   - '`articles/coordinate-reference-systems`'
+- title: Examples
+  contents:
+  - '`articles/bag-buildings`'
+  - '`articles/duo-schools`'
+  - '`articles/cbs-statistics`'
+- title: Advanced
+  contents:
   - '`articles/pdok-by-hand`'
 
 reference:

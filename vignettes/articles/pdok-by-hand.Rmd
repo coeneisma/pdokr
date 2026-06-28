@@ -134,3 +134,10 @@ tm_shape(provinces) +
 
 Everything above is what `pdokr` wraps: discovery, pagination, CRS handling,
 and the GeoJSON-to-`sf` conversion, behind a handful of `pdok_*()` functions.
+
+## Where to next
+
+* [Getting started](getting-started.html) — the same tasks with the `pdok_*()`
+  functions.
+* [Coordinate reference systems](coordinate-reference-systems.html) — more on
+  CRS84, RD New and axis order.

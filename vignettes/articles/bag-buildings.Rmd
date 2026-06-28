@@ -1,0 +1,104 @@
+---
+title: "Mapping buildings by construction year (BAG)"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+The [BAG](https://www.pdok.nl/) (Basisregistratie Adressen en Gebouwen) holds
+every building in the Netherlands, with attributes such as the year it was
+built. It is served over the OGC API Features service, so `pdok_read()` reads it
+like any other layer. This article maps the buildings of one neighbourhood,
+coloured by construction year.
+
+```{r setup}
+library(pdokr)
+library(tmap)
+```
+
+## 1. Choose an area
+
+We use the administrative boundaries to select the `Stadsdriehoek`, the historic
+centre of Rotterdam.
+
+```{r area}
+gemeenten <- pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2025
+)
+rotterdam <- gemeenten[gemeenten$statnaam == "Rotterdam", ]
+
+buurten <- pdok_read(
+  "cbs/gebiedsindelingen", "buurt_gegeneraliseerd", datetime = 2025,
+  filter_by = rotterdam, predicate = "within"
+)
+stadsdriehoek <- buurten[buurten$statnaam == "Stadsdriehoek", ]
+```
+
+## 2. Load every building in it
+
+The `kadaster/bag` dataset has a `pand` (building) layer. We filter it to the
+neighbourhood; `pdok_read()` pre-filters at the server and clips to the exact
+shape.
+
+```{r buildings}
+buildings <- pdok_read("kadaster/bag", "pand", filter_by = stadsdriehoek)
+nrow(buildings)
+```
+
+BAG records an unknown construction year as `9999`; we set those to `NA`.
+
+```{r clean}
+buildings$bouwjaar[buildings$bouwjaar == 9999] <- NA
+range(buildings$bouwjaar, na.rm = TRUE)
+```
+
+## 3. Map by construction year
+
+Rotterdam's historic centre was largely destroyed in the May 1940 bombing and
+rebuilt afterwards. To make that dividing line jump out, we colour the buildings
+that pre-date the bombing (before 1940) in **cool blues** and the post-war
+rebuild in **warm tones** — the surviving pre-war buildings stand out against a
+sea of reconstruction.
+
+```{r map-static}
+tmap_mode("plot")
+
+era_scale <- tm_scale_intervals(
+  breaks = c(1600, 1900, 1940, 1960, 1980, 2000, 2026),
+  values = c("#1f78b4", "#a6cee3", "#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c")
+)
+
+tm_shape(buildings) +
+  tm_polygons(fill = "bouwjaar", fill.scale = era_scale, col = NULL) +
+  tm_title("Buildings in Rotterdam's Stadsdriehoek, by construction year")
+```
+
+The same map interactively — zoom in and click a building:
+
+```{r map-interactive}
+tmap_mode("view")
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(buildings) +
+  tm_polygons(fill = "bouwjaar", fill.scale = era_scale, col = NULL,
+              id = "identificatie", popup = tm_popup(vars = c("Built" = "bouwjaar")))
+```
+
+```{r reset, include = FALSE}
+tmap_mode("plot")
+```
+
+## Where to next
+
+* [Filtering data by area](filtering-by-area.html) — the load-then-filter
+  workflow used here.
+* [Combining with external data](duo-schools.html) — join `pdokr` with another
+  open API.
