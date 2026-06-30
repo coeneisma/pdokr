@@ -23,6 +23,8 @@ navbar:
         href: articles/filtering-by-area.html
       - text: Geocoding
         href: articles/geocoding.html
+      - text: PDOK basemaps
+        href: articles/basemaps.html
       - text: Coordinate reference systems
         href: articles/coordinate-reference-systems.html
     advanced:
@@ -48,6 +50,7 @@ articles:
   contents:
   - '`articles/filtering-by-area`'
   - '`articles/geocoding`'
+  - '`articles/basemaps`'
   - '`articles/coordinate-reference-systems`'
 - title: Examples
   contents:
@@ -78,3 +81,7 @@ reference:
   desc: Look up addresses and place names.
   contents:
   - pdok_geocode
+- title: Basemaps
+  desc: The official PDOK basemap as a map background.
+  contents:
+  - pdok_basemap

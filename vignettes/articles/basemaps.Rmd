@@ -1,0 +1,185 @@
+---
+title: "PDOK basemaps"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+`pdokr` is for reading PDOK *data*. For the *background* of a map — the reference
+topography under your own layers — PDOK publishes its official basiskaart, and
+`pdok_basemap()` hands you the URL for it. Nothing is downloaded: you get a URL
+to pass to your mapping package, so it is instant and works offline.
+
+```{r setup}
+library(pdokr)
+library(tmap)
+library(sf)
+library(dplyr)
+library(mapgl)
+library(leaflet)
+```
+
+## Two kinds of basemap
+
+`pdok_basemap()` returns one of two things, set by `format`:
+
+- **raster** (the default) — a classic tile URL (`{z}/{x}/{y}`, PNG/JPEG). Works
+  with `tmap`, `leaflet` *and* `maplibre`/`mapgl`. The safe, universal choice.
+- **vector** — a Mapbox-GL *style* URL. Works with `maplibre`/`mapgl` only, but
+  stays razor-sharp at every zoom and can tilt into 3D.
+
+```{r show-urls}
+pdok_basemap()                                # raster, default style
+pdok_basemap("grijs")                         # another raster style
+pdok_basemap("standaard", format = "vector")  # a vector style URL
+```
+
+The available styles differ per format:
+
+| `format = "raster"` | `format = "vector"` |
+|---|---|
+| `standaard`, `grijs`, `pastel`, `water`, `luchtfoto` | `standaard`, `zonder_labels`, `luchtfoto`, `darkmode` |
+
+(`luchtfoto` is aerial imagery.)
+
+## Raster basemaps — tmap & leaflet
+
+Hand the URL to `tm_basemap()`. Here are the twelve province outlines on the
+standard PDOK basemap — drawing only the borders keeps the basemap readable:
+
+```{r data}
+provinces <- pdok_read(
+  "cbs/gebiedsindelingen", "provincie_gegeneraliseerd", datetime = 2025
+)
+```
+
+```{r raster-tmap}
+tmap_mode("view")
+
+tm_basemap(pdok_basemap("standaard")) +
+  tm_shape(provinces) +
+  tm_borders(col = "#E8631C", lwd = 1.5) +
+  tm_credits("Kaartgegevens © Kadaster")
+```
+
+```{r reset, include = FALSE}
+tmap_mode("plot")
+```
+
+In plain `leaflet` the same URL is the `urlTemplate`:
+
+```{r leaflet, eval = FALSE}
+leaflet() |>
+  addTiles(
+    urlTemplate = pdok_basemap("standaard"),
+    attribution = "Kaartgegevens &copy; Kadaster"
+  ) |>
+  addPolygons(data = st_transform(provinces, 4326))
+```
+
+A raster basemap is ordinary web tiles, so it also works in **static** maps:
+switch to `tmap_mode("plot")` (or use `ggplot2` with `maptiles`/`ggspatial`) and
+the tiles are downloaded and drawn into the image. The vector style, by contrast,
+is rendered live in the browser, so it is interactive-only.
+
+```{r raster-static}
+tmap_mode("plot")
+
+utrecht <- filter(provinces, statnaam == "Utrecht")
+
+tm_basemap(pdok_basemap("standaard")) +
+  tm_shape(utrecht) +
+  tm_borders(col = "#E8631C", lwd = 2) +
+  tm_credits("Kaartgegevens © Kadaster")
+```
+
+## The styles, side by side {.tabset}
+
+The five raster styles over the same spot in Utrecht. Each tab is just
+`leaflet() |> addTiles(pdok_basemap("<style>"))` — only the style name changes.
+
+### standaard
+
+```{r gal-standaard, echo = FALSE}
+leaflet() |>
+  addTiles(pdok_basemap("standaard"), attribution = "&copy; Kadaster") |>
+  setView(5.121, 52.090, zoom = 14)
+```
+
+### grijs
+
+```{r gal-grijs, echo = FALSE}
+leaflet() |>
+  addTiles(pdok_basemap("grijs"), attribution = "&copy; Kadaster") |>
+  setView(5.121, 52.090, zoom = 14)
+```
+
+### pastel
+
+```{r gal-pastel, echo = FALSE}
+leaflet() |>
+  addTiles(pdok_basemap("pastel"), attribution = "&copy; Kadaster") |>
+  setView(5.121, 52.090, zoom = 14)
+```
+
+### water
+
+```{r gal-water, echo = FALSE}
+leaflet() |>
+  addTiles(pdok_basemap("water"), attribution = "&copy; Kadaster") |>
+  setView(5.121, 52.090, zoom = 14)
+```
+
+### luchtfoto
+
+```{r gal-luchtfoto, echo = FALSE}
+leaflet() |>
+  addTiles(pdok_basemap("luchtfoto"), attribution = "&copy; Kadaster") |>
+  setView(5.121, 52.090, zoom = 14)
+```
+
+## Vector basemaps — maplibre / mapgl
+
+[`mapgl`](https://walker-data.com/mapgl/) brings the MapLibre and Mapbox GL
+libraries to R: vector maps that stay sharp at any zoom and can tilt into 3D. A
+GL map takes a *style* URL — exactly what `pdok_basemap(format = "vector")`
+returns.
+
+```{r vector-maplibre}
+maplibre(style = pdok_basemap("standaard", format = "vector")) |>
+  add_line_layer(
+    id = "provinces", source = provinces,
+    line_color = "#E8631C", line_width = 2
+  ) |>
+  fit_bounds(provinces, animate = FALSE)
+```
+
+## Which should I use?
+
+| | raster | vector |
+|---|---|---|
+| Works in | tmap, leaflet, mapgl | maplibre / mapgl |
+| Extra package | none (you likely have tmap or leaflet) | `mapgl` |
+| Look | fixed tiles, fine for most maps | razor-sharp, tiltable, 3D-capable |
+| Best for | quick maps, the common case | polished, interactive, 3D |
+
+When in doubt, use the **raster** default — it works everywhere.
+
+## Attribution
+
+The basemap data is © Kadaster / PDOK. Show this on any map that uses it — via
+`tm_credits()` in `tmap`, the `attribution =` argument in `leaflet`. The vector
+style already carries its attribution, which `maplibre`/`mapgl` displays.
+
+## Where to next
+
+* [Getting started](getting-started.html) — reading and mapping PDOK data.
+* [Filtering data by area](filtering-by-area.html) — `pdok_filter_by()`.
