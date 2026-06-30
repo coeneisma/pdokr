@@ -73,10 +73,11 @@ The same in interactive mode — zoom in and click a park:
 ```{r map-interactive}
 tmap_mode("view")
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(parks) +
   tm_polygons(fill = "text", fill_alpha = 0.6, id = "text",
-              fill.legend = tm_legend("National park"))
+              fill.legend = tm_legend("National park")) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ```{r reset, include = FALSE}
@@ -136,3 +137,5 @@ The same idea scales up: geocode a place as a polygon (for example
   layer inside an area.
 * [Thematic maps from CBS statistics](cbs-statistics.html) — a choropleth for
   one municipality's neighbourhoods.
+* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+  other styles.
