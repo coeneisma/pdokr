@@ -58,8 +58,8 @@ parks <- pdok_read(
   filter_by = fryslan
 )
 parks$text
-#> [1] "De Alde Feanen"     "Drents-Friese Wold" "Lauwersmeer"       
-#> [4] "Schiermonnikoog"
+#> [1] "Lauwersmeer"        "Schiermonnikoog"    "De Alde Feanen"    
+#> [4] "Drents-Friese Wold"
 ```
 
 A static map of the province with its national parks:
@@ -86,10 +86,11 @@ The same in interactive mode — zoom in and click a park:
 tmap_mode("view")
 #> ℹ tmap modes "plot" - "view"
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(parks) +
   tm_polygons(fill = "text", fill_alpha = 0.6, id = "text",
-              fill.legend = tm_legend("National park"))
+              fill.legend = tm_legend("National park")) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ## What happens under the hood
@@ -108,8 +109,8 @@ parks_in_bbox <- pdok_read(
 
 # Stage 2: exact client-side clip to the polygon
 pdok_filter_by(parks_in_bbox, fryslan)$text
-#> [1] "De Alde Feanen"     "Drents-Friese Wold" "Lauwersmeer"       
-#> [4] "Schiermonnikoog"
+#> [1] "Lauwersmeer"        "Schiermonnikoog"    "De Alde Feanen"    
+#> [4] "Drents-Friese Wold"
 ```
 
 [`pdok_filter_by()`](https://coeneisma.github.io/pdokr/reference/pdok_filter_by.md)
@@ -122,8 +123,8 @@ share a CRS, is:
 
 fryslan_ll <- sf::st_transform(fryslan, sf::st_crs(parks_in_bbox))
 parks_in_bbox[fryslan_ll, , op = sf::st_intersects]$text
-#> [1] "De Alde Feanen"     "Drents-Friese Wold" "Lauwersmeer"       
-#> [4] "Schiermonnikoog"
+#> [1] "Lauwersmeer"        "Schiermonnikoog"    "De Alde Feanen"    
+#> [4] "Drents-Friese Wold"
 ```
 
 ## From an address to its area
@@ -158,3 +159,6 @@ The same idea scales up: geocode a place as a polygon (for example
 - [Thematic maps from CBS
   statistics](https://coeneisma.github.io/pdokr/articles/cbs-statistics.md)
   — a choropleth for one municipality’s neighbourhoods.
+- [PDOK
+  basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
+  the grey background map used here, and the other styles.

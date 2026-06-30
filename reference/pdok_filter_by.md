@@ -63,16 +63,17 @@ utrecht <- pdok_read(
 )
 utrecht <- utrecht[utrecht$statnaam == "Utrecht", ]
 parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")
+#> ⠙ Downloading PDOK features: 22 fetched
 pdok_filter_by(parks, utrecht)
 #> Simple feature collection with 1 feature and 14 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
-#> Bounding box:  xmin: 5.239009 ymin: 51.95757 xmax: 5.566058 ymax: 52.13387
+#> Bounding box:  xmin: 5.147185 ymin: 51.95757 xmax: 5.566058 ymax: 52.22923
 #> Geodetic CRS:  WGS 84
 #> # A tibble: 1 × 15
 #>   id          gml_id language legalfoundationdate legalfoundationdocum…¹ localid
 #>   <chr>       <chr>  <chr>    <chr>               <chr>                  <chr>  
-#> 1 fc981af1-8… G_4a2… nld      ""                  ""                     L_4a24…
+#> 1 4d5b664b-7… G_4a2… nld      20131001            prov. Utrecht          L_4a24…
 #> # ℹ abbreviated name: ¹​legalfoundationdocument
 #> # ℹ 9 more variables: namespace <chr>, namestatus <chr>, nativeness <chr>,
 #> #   pronunciation <chr>, script <chr>, siteprotectionclassification <chr>,

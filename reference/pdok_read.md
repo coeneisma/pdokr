@@ -95,6 +95,7 @@ to find layer ids.
 # \donttest{
 # A whole layer: the Dutch national parks
 parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")
+#> ⠙ Downloading PDOK features: 22 fetched
 
 # Municipalities for 2024, in RD New (EPSG:28992)
 pdok_read(

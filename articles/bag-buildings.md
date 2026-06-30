@@ -51,7 +51,9 @@ pre-filters at the server and clips to the exact shape.
 ``` r
 
 buildings <- pdok_read("kadaster/bag", "pand", filter_by = stadsdriehoek)
-#> ⠙ Downloading PDOK features: 1022 fetched
+#> ⠙ Downloading PDOK features: 363 fetched
+#> ⠹ Downloading PDOK features: 807 fetched
+#> ⠹ Downloading PDOK features: 1022 fetched
 nrow(buildings)
 #> [1] 1022
 ```
@@ -85,9 +87,11 @@ era_scale <- tm_scale_intervals(
   values = c("#1f78b4", "#a6cee3", "#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c")
 )
 
-tm_shape(buildings) +
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(buildings) +
   tm_polygons(fill = "bouwjaar", fill.scale = era_scale, col = NULL) +
-  tm_title("Buildings in Rotterdam's Stadsdriehoek, by construction year")
+  tm_title("Buildings in Rotterdam's Stadsdriehoek, by construction year") +
+  tm_credits("Kaartgegevens © Kadaster")
 #> [plot mode] fit legend/component: Some legend items or map compoments do not
 #> fit well, and are therefore rescaled.
 #> ℹ Set the tmap option `component.autoscale = FALSE` to disable rescaling.
@@ -102,10 +106,11 @@ The same map interactively — zoom in and click a building:
 tmap_mode("view")
 #> ℹ tmap modes "plot" - "view"
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(buildings) +
   tm_polygons(fill = "bouwjaar", fill.scale = era_scale, col = NULL,
-              id = "identificatie", popup = tm_popup(vars = c("Built" = "bouwjaar")))
+              id = "identificatie", popup = tm_popup(vars = c("Built" = "bouwjaar"))) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ## Where to next
@@ -116,3 +121,6 @@ tm_basemap("CartoDB.Positron") +
 - [Combining with external
   data](https://coeneisma.github.io/pdokr/articles/duo-schools.md) —
   join `pdokr` with another open API.
+- [PDOK
+  basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
+  the grey background map used here, and the other styles.

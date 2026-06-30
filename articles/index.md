@@ -11,6 +11,8 @@
   area](https://coeneisma.github.io/pdokr/articles/filtering-by-area.md):
 - [Geocoding: from names to
   locations](https://coeneisma.github.io/pdokr/articles/geocoding.md):
+- [PDOK
+  basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md):
 - [Coordinate reference
   systems](https://coeneisma.github.io/pdokr/articles/coordinate-reference-systems.md):
 

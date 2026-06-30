@@ -21,3 +21,7 @@
   - Geocoding of addresses and place names with
     [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md),
     returning `sf` points and administrative polygons.
+  - The official PDOK basemap as a map background with
+    [`pdok_basemap()`](https://coeneisma.github.io/pdokr/reference/pdok_basemap.md),
+    returning a raster tile URL (`tmap`/`leaflet`) or a vector style URL
+    (`maplibre`/`mapgl`).

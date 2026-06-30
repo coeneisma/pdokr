@@ -47,11 +47,13 @@ buildings <- pdok_read("brt/top10nl", "gebouw_vlak", filter_by = binnenstad)
 
 # Map it
 tmap_mode("plot")
-tm_shape(binnenstad) +
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(binnenstad) +
   tm_borders(col = "grey40") +
   tm_shape(buildings) +
   tm_polygons(fill = "#d95f02", col = "white", lwd = 0.4) +
-  tm_title("Buildings in the historic centre of Delft")
+  tm_title("Buildings in the historic centre of Delft") +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ![](reference/figures/README-example-1.png)
@@ -103,6 +105,13 @@ Look up addresses and place names.
 - [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
   : Geocode an address or place name with the PDOK Locatieserver
 
+## Basemaps
+
+The official PDOK basemap as a map background.
+
+- [`pdok_basemap()`](https://coeneisma.github.io/pdokr/reference/pdok_basemap.md)
+  : A PDOK basemap to use as a map background
+
 # Articles
 
 ### Get started
@@ -116,6 +125,8 @@ Look up addresses and place names.
   area](https://coeneisma.github.io/pdokr/articles/filtering-by-area.md):
 - [Geocoding: from names to
   locations](https://coeneisma.github.io/pdokr/articles/geocoding.md):
+- [PDOK
+  basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md):
 - [Coordinate reference
   systems](https://coeneisma.github.io/pdokr/articles/coordinate-reference-systems.md):
 

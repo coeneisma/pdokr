@@ -21,6 +21,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-essentials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Essentials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-essentials"><li><a class="dropdown-item" href="../articles/filtering-by-area.html">Filtering data by area</a></li>
     <li><a class="dropdown-item" href="../articles/geocoding.html">Geocoding</a></li>
+    <li><a class="dropdown-item" href="../articles/basemaps.html">PDOK basemaps</a></li>
     <li><a class="dropdown-item" href="../articles/coordinate-reference-systems.html">Coordinate reference systems</a></li>
   </ul></li>
 <li class="nav-item dropdown">
@@ -55,6 +56,7 @@
 <li>Loading layers as <code>sf</code> objects with <code><a href="../reference/pdok_read.html">pdok_read()</a></code>, with automatic pagination, server-side bounding-box and temporal pre-filtering, and client-side CRS transformation.</li>
 <li>Spatial filtering by any polygon (or point) with <code><a href="../reference/pdok_filter_by.html">pdok_filter_by()</a></code>, also available in one call through the <code>filter_by</code> argument of <code><a href="../reference/pdok_read.html">pdok_read()</a></code>.</li>
 <li>Geocoding of addresses and place names with <code><a href="../reference/pdok_geocode.html">pdok_geocode()</a></code>, returning <code>sf</code> points and administrative polygons.</li>
+<li>The official PDOK basemap as a map background with <code><a href="../reference/pdok_basemap.html">pdok_basemap()</a></code>, returning a raster tile URL (<code>tmap</code>/<code>leaflet</code>) or a vector style URL (<code>maplibre</code>/<code>mapgl</code>).</li>
 </ul></li>
 </ul></div>
   </main></div>

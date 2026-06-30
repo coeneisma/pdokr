@@ -75,15 +75,17 @@ tmap_mode("plot")
 #> ℹ tmap modes "plot" - "view"
 #> ℹ toggle with `tmap::ttm()`
 
-tm_shape(buurten) +
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(buurten) +
   tm_polygons(
     fill = "bevolkingsdichtheid_inwoners_per_km2",
     fill.scale = tm_scale_intervals(n = 6, style = "quantile",
                                     values = "brewer.yl_or_rd"),
     fill.legend = tm_legend("Inhabitants per km2"),
-    col = "white", lwd = 0.2
+    col = "white", lwd = 0.2, fill_alpha = 0.8
   ) +
-  tm_title("Population density by neighbourhood, Amsterdam (CBS 2025)")
+  tm_title("Population density by neighbourhood, Amsterdam (CBS 2025)") +
+  tm_credits("Kaartgegevens © Kadaster")
 #> [plot mode] fit legend/component: Some legend items or map compoments do not
 #> fit well, and are therefore rescaled.
 #> ℹ Set the tmap option `component.autoscale = FALSE` to disable rescaling.
@@ -100,7 +102,7 @@ you keep your bearings:
 tmap_mode("view")
 #> ℹ tmap modes "plot" - "view"
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(buurten) +
   tm_polygons(
     fill = "bevolkingsdichtheid_inwoners_per_km2",
@@ -110,7 +112,8 @@ tm_basemap("CartoDB.Positron") +
     col = "white", lwd = 0.2, fill_alpha = 0.6,
     id = "buurtnaam",
     popup = tm_popup(vars = c("Inhabitants per km2" = "bevolkingsdichtheid_inwoners_per_km2"))
-  )
+  ) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 To map a different figure, swap `bevolkingsdichtheid_inwoners_per_km2`
@@ -127,3 +130,6 @@ boundaries).
 - [Coordinate reference
   systems](https://coeneisma.github.io/pdokr/articles/coordinate-reference-systems.md)
   — working in RD New (EPSG:28992), the Dutch national grid.
+- [PDOK
+  basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
+  the grey background map used here, and the other styles.

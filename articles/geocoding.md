@@ -51,9 +51,10 @@ tmap_mode("view")
 #> ℹ tmap modes "plot" - "view"
 #> ℹ toggle with `tmap::ttm()`
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(home) +
-  tm_dots(fill = "#E8631C", size = 1)
+  tm_dots(fill = "#E8631C", size = 1) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ## Search levels: the `type` argument
@@ -172,14 +173,15 @@ you can see where that is and hover for the neighbourhood names:
 tmap_mode("view")
 #> ℹ tmap modes "plot" - "view"
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(buurten) +
   tm_polygons(
     fill = "statnaam",
     fill.scale = tm_scale_categorical(values = "brewer.set3"),
     fill.legend = tm_legend(show = FALSE),
     col = "white", fill_alpha = 0.6, id = "statnaam"
-  )
+  ) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 The same pattern works for any layer: geocode the area you care about,
@@ -194,3 +196,6 @@ then read the buildings, parcels or statistics within it.
 - [Mapping buildings by construction
   year](https://coeneisma.github.io/pdokr/articles/bag-buildings.md) —
   read a BAG layer inside an area.
+- [PDOK
+  basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
+  the grey background map used here, and the other styles.

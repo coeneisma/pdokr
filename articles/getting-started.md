@@ -127,10 +127,11 @@ map you can hover over — try it:
 tmap_mode("view")
 #> ℹ tmap modes "plot" - "view"
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(gemeenten) +
-  tm_polygons(fill = "grey95", col = "grey40", lwd = 0.4, fill_alpha = 0.5,
-              id = "statnaam")
+  tm_polygons(fill = "red", fill_alpha = 0, col = "red", lwd = 0.8,
+              id = "statnaam") +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ## Where to next
@@ -146,3 +147,6 @@ tm_basemap("CartoDB.Positron") +
 - [Working with PDOK by
   hand](https://coeneisma.github.io/pdokr/articles/pdok-by-hand.md) —
   the raw OGC API and WFS requests the package automates.
+- [PDOK
+  basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
+  the grey background map used here, and the other styles.

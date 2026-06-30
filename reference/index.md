@@ -33,3 +33,10 @@ Look up addresses and place names.
 
 - [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
   : Geocode an address or place name with the PDOK Locatieserver
+
+## Basemaps
+
+The official PDOK basemap as a map background.
+
+- [`pdok_basemap()`](https://coeneisma.github.io/pdokr/reference/pdok_basemap.md)
+  : A PDOK basemap to use as a map background

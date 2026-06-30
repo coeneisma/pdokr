@@ -47,11 +47,13 @@ buildings <- pdok_read("brt/top10nl", "gebouw_vlak", filter_by = binnenstad)
 
 # Map it
 tmap_mode("plot")
-tm_shape(binnenstad) +
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(binnenstad) +
   tm_borders(col = "grey40") +
   tm_shape(buildings) +
   tm_polygons(fill = "#d95f02", col = "white", lwd = 0.4) +
-  tm_title("Buildings in the historic centre of Delft")
+  tm_title("Buildings in the historic centre of Delft") +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ![](reference/figures/README-example-1.png)
