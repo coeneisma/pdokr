@@ -170,7 +170,7 @@ school that uses it.
 ```{r map-interactive}
 tmap_mode("view")
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(school_buildings) +
   tm_polygons(
     fill = "sector",
@@ -179,7 +179,8 @@ tm_basemap("CartoDB.Positron") +
     col = "grey30", lwd = 0.5, id = "school",
     popup = tm_popup(vars = c("School" = "school", "Sector" = "sector",
                               "Street" = "STRAATNAAM"))
-  )
+  ) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ```{r reset, include = FALSE}
@@ -191,3 +192,5 @@ tmap_mode("plot")
 * [Filtering data by area](filtering-by-area.html) — more on `pdok_filter_by()`.
 * [Mapping buildings by construction year](bag-buildings.html) — another BAG
   example, using the `pand` (building) layer.
+* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+  other styles.

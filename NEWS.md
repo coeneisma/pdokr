@@ -11,3 +11,6 @@
     available in one call through the `filter_by` argument of `pdok_read()`.
   * Geocoding of addresses and place names with `pdok_geocode()`, returning
     `sf` points and administrative polygons.
+  * The official PDOK basemap as a map background with `pdok_basemap()`,
+    returning a raster tile URL (`tmap`/`leaflet`) or a vector style URL
+    (`maplibre`/`mapgl`).

@@ -67,15 +67,17 @@ works well for a skewed variable like density. Neighbourhoods without a value
 ```{r map-static}
 tmap_mode("plot")
 
-tm_shape(buurten) +
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(buurten) +
   tm_polygons(
     fill = "bevolkingsdichtheid_inwoners_per_km2",
     fill.scale = tm_scale_intervals(n = 6, style = "quantile",
                                     values = "brewer.yl_or_rd"),
     fill.legend = tm_legend("Inhabitants per km2"),
-    col = "white", lwd = 0.2
+    col = "white", lwd = 0.2, fill_alpha = 0.8
   ) +
-  tm_title("Population density by neighbourhood, Amsterdam (CBS 2025)")
+  tm_title("Population density by neighbourhood, Amsterdam (CBS 2025)") +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 The same map interactively — hover for the neighbourhood name and click for the
@@ -85,7 +87,7 @@ bearings:
 ```{r map-interactive}
 tmap_mode("view")
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(buurten) +
   tm_polygons(
     fill = "bevolkingsdichtheid_inwoners_per_km2",
@@ -95,7 +97,8 @@ tm_basemap("CartoDB.Positron") +
     col = "white", lwd = 0.2, fill_alpha = 0.6,
     id = "buurtnaam",
     popup = tm_popup(vars = c("Inhabitants per km2" = "bevolkingsdichtheid_inwoners_per_km2"))
-  )
+  ) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ```{r reset, include = FALSE}
@@ -113,3 +116,5 @@ or two after the boundaries).
   workflow.
 * [Coordinate reference systems](coordinate-reference-systems.html) — working in
   RD New (EPSG:28992), the Dutch national grid.
+* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+  other styles.

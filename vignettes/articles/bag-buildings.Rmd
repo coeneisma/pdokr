@@ -77,9 +77,11 @@ era_scale <- tm_scale_intervals(
   values = c("#1f78b4", "#a6cee3", "#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c")
 )
 
-tm_shape(buildings) +
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(buildings) +
   tm_polygons(fill = "bouwjaar", fill.scale = era_scale, col = NULL) +
-  tm_title("Buildings in Rotterdam's Stadsdriehoek, by construction year")
+  tm_title("Buildings in Rotterdam's Stadsdriehoek, by construction year") +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 The same map interactively — zoom in and click a building:
@@ -87,10 +89,11 @@ The same map interactively — zoom in and click a building:
 ```{r map-interactive}
 tmap_mode("view")
 
-tm_basemap("CartoDB.Positron") +
+tm_basemap(pdok_basemap("grijs")) +
   tm_shape(buildings) +
   tm_polygons(fill = "bouwjaar", fill.scale = era_scale, col = NULL,
-              id = "identificatie", popup = tm_popup(vars = c("Built" = "bouwjaar")))
+              id = "identificatie", popup = tm_popup(vars = c("Built" = "bouwjaar"))) +
+  tm_credits("Kaartgegevens © Kadaster")
 ```
 
 ```{r reset, include = FALSE}
@@ -103,3 +106,5 @@ tmap_mode("plot")
   workflow used here.
 * [Combining with external data](duo-schools.html) — join `pdokr` with another
   open API.
+* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+  other styles.
