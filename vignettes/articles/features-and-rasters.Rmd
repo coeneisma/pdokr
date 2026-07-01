@@ -1,0 +1,137 @@
+---
+title: "Features and rasters"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+PDOK data comes in two fundamentally different shapes, and `pdokr` gives you
+both. Most functions return **vector features** as `sf`; `pdok_ahn()` returns
+**raster** data as a `terra` object. This article explains the difference, when
+you reach for which, and how the two work together.
+
+```{r setup}
+library(pdokr)
+library(sf)
+library(terra)
+library(tmap)
+```
+
+## Features: discrete objects
+
+A **feature** is a *thing* with a geometry (point, line, or polygon) and
+attributes. A building, a road, a municipality. `pdok_read()` returns features
+as an `sf` object — one row per object. (We ask for RD New coordinates,
+EPSG:28992, so they line up with the AHN raster later on.)
+
+```{r features}
+area <- st_as_sfc(st_bbox(
+  c(xmin = 136300, ymin = 456000, xmax = 136600, ymax = 456300), crs = 28992
+))
+buildings <- pdok_read("kadaster/bag", "pand", filter_by = area, crs = 28992)
+
+buildings[, "bouwjaar"]
+```
+
+Each building is a polygon you can select, filter, and query by attribute.
+
+## Rasters: a grid of values
+
+A **raster** is a *grid of cells*, each holding a value — a continuous surface
+rather than a set of objects. AHN, the national height model, is a raster: every
+0.5 × 0.5 m cell holds an elevation in metres (NAP).
+
+We will look at a stretch of North Sea coastal dunes, where the relief is
+dramatic. First, so you know *where* we are looking — the red square marks the
+spot (zoom out to place it on the coast):
+
+```{r locator}
+dunes <- st_as_sfc(st_bbox(
+  c(xmin = 99000, ymin = 487500, xmax = 100500, ymax = 489000), crs = 28992
+))
+
+tmap_mode("view")
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(dunes, bbox = st_bbox(
+    c(xmin = 88000, ymin = 478000, xmax = 112000, ymax = 500000), crs = 28992
+  )) +
+  tm_borders(col = "red", lwd = 2) +
+  tm_credits("Kaartgegevens © Kadaster")
+```
+
+```{r reset, include = FALSE}
+tmap_mode("plot")
+```
+
+`pdok_ahn()` returns the elevation there as a `terra` `SpatRaster`:
+
+```{r raster}
+elevation <- pdok_ahn(dunes, model = "dtm")
+elevation
+```
+
+```{r raster-plot}
+plot(elevation, main = "Terrain height (m NAP) — coastal dunes")
+```
+
+There are no "objects" here — just a height value everywhere.
+
+## When do you use which?
+
+| | Features (`sf`) | Raster (`terra`) |
+|---|---|---|
+| Data model | discrete objects + attributes | grid of cells with values |
+| Good for | things with boundaries & identities | continuous phenomena |
+| Examples | buildings, parcels, boundaries, roads | elevation, temperature, imagery, land cover |
+| Query | "which buildings are …?" | "what is the height at …?" |
+| pdokr | `pdok_read()`, `pdok_geocode()`, `pdok_filter_by()` | `pdok_ahn()` |
+
+## Combining the two
+
+The real power is combining them: `terra::extract()` reads raster values onto
+features. Because both our buildings and the AHN raster are in RD New, we can
+extract directly — for each building, the median surface height within its
+footprint (its roof top above NAP):
+
+```{r combine}
+surface <- pdok_ahn(area, model = "dsm")
+
+buildings$top_m <- terra::extract(surface, buildings, fun = median, na.rm = TRUE)$dsm
+
+buildings[, "top_m"]
+```
+
+The same idea with the *surface* minus the *terrain* model gives building
+*heights* — the basis for a 3D map (see below).
+
+## Reading the landscape
+
+Because AHN is so detailed, a little raster maths reveals the landscape. A
+*hillshade* (a simulated sun angle over the terrain) turns the dune heights into
+a relief image — impossible with features alone:
+
+```{r hillshade}
+slope  <- terrain(elevation, "slope", unit = "radians")
+aspect <- terrain(elevation, "aspect", unit = "radians")
+hillshade <- shade(slope, aspect)
+
+plot(hillshade, col = grey(0:100 / 100), legend = FALSE,
+     main = "Hillshade — the dunes revealed")
+```
+
+AHN this way exposes dunes, dikes, ancient terpen and old riverbeds across the
+otherwise flat Netherlands.
+
+## Where to next
+
+* [3D buildings from BAG and AHN](3d-buildings.html) — combine footprints with
+  heights into a 3D map.
+* [Getting started](getting-started.html) — the vector basics.

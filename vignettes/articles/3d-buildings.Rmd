@@ -1,0 +1,111 @@
+---
+title: "3D buildings from BAG and AHN"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+[Mapping buildings by construction year](bag-buildings.html) drew building
+footprints flat. Here we lift them into **3D**, using two PDOK sources together:
+the footprints from the BAG (vector, `sf`) and the heights from AHN (raster,
+`terra`). The recipe is simple — a footprint plus a height is an extruded block —
+and it is built entirely from open PDOK data. We take the cluster of towers
+around Rotterdam's Erasmusbrug, a real skyline.
+
+```{r setup}
+library(pdokr)
+library(sf)
+library(terra)
+library(mapgl)
+```
+
+## An area, from a place name
+
+We geocode the Erasmusbrug — the bridge that spans the river — and take a 750 m
+circle around its centre, which covers the towers on both banks (Kop van Zuid,
+the Boompjes, the Zalmhaventoren). Asking for RD New coordinates (EPSG:28992)
+means the footprints and the AHN raster share one coordinate system, so no
+reprojection is needed later.
+
+```{r area}
+bridge <- pdok_geocode("Erasmusbrug, Rotterdam", type = "weg", crs = 28992)
+area <- st_buffer(st_centroid(st_geometry(bridge)), 750)
+```
+
+## Footprints from the BAG
+
+```{r footprints}
+footprints <- pdok_read("kadaster/bag", "pand", filter_by = area, crs = 28992)
+nrow(footprints)
+```
+
+## Heights from AHN
+
+AHN comes in two flavours: the **DSM** (digital surface model — the top of
+everything, including roofs) and the **DTM** (digital terrain model — the bare
+ground). Their difference is the height of whatever stands on the ground.
+
+```{r heights}
+object_height <- pdok_ahn(area, "dsm") - pdok_ahn(area, "dtm")
+names(object_height) <- "height"
+```
+
+`terra::extract()` reads that height onto each footprint. We take the *highest*
+cell within each polygon — the top of the tower rather than its podium:
+
+```{r extract}
+footprints$height <- terra::extract(
+  object_height, footprints, fun = max, na.rm = TRUE
+)$height
+
+# keep the buildings with a sensible height, and only the columns we map
+buildings <- footprints[
+  is.finite(footprints$height) & footprints$height > 2,
+  c("identificatie", "height")
+]
+range(round(buildings$height))
+```
+
+## Extrude into 3D
+
+A `maplibre` map extrudes the footprints by the height column. On the PDOK vector
+basemap, tilted, Rotterdam's river towers rise over the Maas — drag to look
+around, and click a building for its height.
+
+```{r map-3d}
+maplibre(
+  style = pdok_basemap("standaard", format = "vector"),
+  pitch = 55, projection = "mercator"
+) |>
+  add_fill_extrusion_layer(
+    id = "buildings", source = buildings,
+    fill_extrusion_color = "#E8631C",
+    fill_extrusion_height = get_column("height"),
+    fill_extrusion_opacity = 0.9,
+    tooltip = "height"
+  ) |>
+  add_control(html = "Kaartgegevens &copy; Kadaster", position = "bottom-right") |>
+  fit_bounds(buildings, animate = FALSE)
+```
+
+That is real PDOK data in 3D: BAG footprints, AHN heights, combined in R.
+
+PDOK also publishes a ready-made 3D city model — the *3D Basisvoorziening* — as
+OGC API **3D Tiles**. Those you would view with a 3D-tiles renderer such as
+[`rdeck`](https://github.com/anthonynorth/rdeck) (deck.gl's `Tile3DLayer`),
+pointing it at the tileset URL; that is rendering a finished model, rather than
+the `sf` + `terra` analysis we did here.
+
+## Where to next
+
+* [Features and rasters](features-and-rasters.html) — the vector/raster
+  distinction this builds on.
+* [PDOK basemaps](basemaps.html) — the vector basemap used here.

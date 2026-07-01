@@ -25,6 +25,8 @@ navbar:
         href: articles/geocoding.html
       - text: PDOK basemaps
         href: articles/basemaps.html
+      - text: Features and rasters
+        href: articles/features-and-rasters.html
       - text: Coordinate reference systems
         href: articles/coordinate-reference-systems.html
     advanced:
@@ -37,6 +39,8 @@ navbar:
       menu:
       - text: Mapping buildings by construction year
         href: articles/bag-buildings.html
+      - text: 3D buildings from BAG and AHN
+        href: articles/3d-buildings.html
       - text: "Combining with external data: school locations (DUO)"
         href: articles/duo-schools.html
       - text: Thematic maps from CBS statistics
@@ -51,10 +55,12 @@ articles:
   - '`articles/filtering-by-area`'
   - '`articles/geocoding`'
   - '`articles/basemaps`'
+  - '`articles/features-and-rasters`'
   - '`articles/coordinate-reference-systems`'
 - title: Examples
   contents:
   - '`articles/bag-buildings`'
+  - '`articles/3d-buildings`'
   - '`articles/duo-schools`'
   - '`articles/cbs-statistics`'
 - title: Advanced
@@ -85,3 +91,7 @@ reference:
   desc: The official PDOK basemap as a map background.
   contents:
   - pdok_basemap
+- title: Raster & height
+  desc: Elevation data (AHN) as a terra raster.
+  contents:
+  - pdok_ahn
