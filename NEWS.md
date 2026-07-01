@@ -14,3 +14,6 @@
   * The official PDOK basemap as a map background with `pdok_basemap()`,
     returning a raster tile URL (`tmap`/`leaflet`) or a vector style URL
     (`maplibre`/`mapgl`).
+  * AHN (Actueel Hoogtebestand Nederland) elevation data with `pdok_ahn()`,
+    returning a `terra` raster of terrain (`dtm`) or surface (`dsm`) heights —
+    pdokr's first raster capability, alongside the vector `sf` functions.
