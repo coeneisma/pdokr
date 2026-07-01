@@ -159,6 +159,7 @@ maplibre(style = pdok_basemap("standaard", format = "vector")) |>
     id = "provinces", source = provinces,
     line_color = "#E8631C", line_width = 2
   ) |>
+  add_control(html = "Kaartgegevens &copy; Kadaster", position = "bottom-right") |>
   fit_bounds(provinces, animate = FALSE)
 ```
 
@@ -176,8 +177,8 @@ When in doubt, use the **raster** default — it works everywhere.
 ## Attribution
 
 The basemap data is © Kadaster / PDOK. Show this on any map that uses it — via
-`tm_credits()` in `tmap`, the `attribution =` argument in `leaflet`. The vector
-style already carries its attribution, which `maplibre`/`mapgl` displays.
+`tm_credits()` in `tmap`, the `attribution =` argument in `leaflet`, and a small
+`add_control()` in `maplibre`/`mapgl` (as the vector map above does).
 
 ## Where to next
 
