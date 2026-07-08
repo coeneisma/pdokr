@@ -16,8 +16,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Access Open Geodata from the Dutch PDOK Platform">
-<meta name="description" content="Tools to discover, download, and spatially filter open geographic data from PDOK (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as simple feature (sf) objects through OGC API Features endpoints, with a transparent fallback to the Web Feature Service (WFS), automatic pagination, and explicit coordinate reference system handling. Loaded layers can be filtered by any polygon area, and addresses or place names can be geocoded through the PDOK location server. See &lt;https://www.pdok.nl/&gt; for more information about the platform and its services.">
-<meta property="og:description" content="Tools to discover, download, and spatially filter open geographic data from PDOK (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as simple feature (sf) objects through OGC API Features endpoints, with a transparent fallback to the Web Feature Service (WFS), automatic pagination, and explicit coordinate reference system handling. Loaded layers can be filtered by any polygon area, and addresses or place names can be geocoded through the PDOK location server. See &lt;https://www.pdok.nl/&gt; for more information about the platform and its services.">
+<meta name="description" content="Tools to discover, download, and spatially filter open geographic data from PDOK (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as vector simple feature (sf) objects through OGC API Features endpoints, with automatic pagination and explicit coordinate reference system handling. Loaded layers can be filtered by any polygon area, and addresses or place names can be geocoded through the PDOK location server. The focus is on vector feature data; raster, tile, and coverage services are out of scope. See &lt;https://www.pdok.nl/&gt; for more information about the platform and its services.">
+<meta property="og:description" content="Tools to discover, download, and spatially filter open geographic data from PDOK (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as vector simple feature (sf) objects through OGC API Features endpoints, with automatic pagination and explicit coordinate reference system handling. Loaded layers can be filtered by any polygon area, and addresses or place names can be geocoded through the PDOK location server. The focus is on vector feature data; raster, tile, and coverage services are out of scope. See &lt;https://www.pdok.nl/&gt; for more information about the platform and its services.">
 <meta property="og:image" content="https://coeneisma.github.io/pdokr/logo.png">
 </head>
 <body>
@@ -84,6 +84,7 @@
 <!-- badges: start -->
 
 <p><code>pdokr</code> makes it easy to work with open geographic data from <a href="https://www.pdok.nl/" class="external-link">PDOK</a> (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. It helps you discover datasets and their layers, load a layer as an <a href="https://r-spatial.github.io/sf/" class="external-link"><code>sf</code></a> object (with automatic pagination and explicit coordinate reference system handling), filter data by any polygon area, and geocode addresses and place names.</p>
+<p><code>pdokr</code> is a client for PDOK’s <strong>OGC API Features</strong> services: it reads <em>vector</em> feature data (points, lines, polygons) as <code>sf</code>. Raster, tile, and coverage services are out of scope. For the official PDOK map background, use <code><a href="reference/pdok_basemap.html">pdok_basemap()</a></code>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -182,7 +183,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

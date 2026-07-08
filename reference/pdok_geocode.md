@@ -86,7 +86,7 @@ pdok_geocode("De Bilt", type = "gemeente")
 #> # A tibble: 1 × 16
 #>   weergavenaam     type     score gemeentenaam provincienaam bron  identificatie
 #>   <chr>            <chr>    <dbl> <chr>        <chr>         <chr> <chr>        
-#> 1 Gemeente De Bilt gemeente  13.4 De Bilt      Utrecht       Best… 0310         
+#> 1 Gemeente De Bilt gemeente  13.9 De Bilt      Utrecht       Best… 0310         
 #> # ℹ 9 more variables: provinciecode <chr>, gemeentecode <chr>, suggest <chr>,
 #> #   provincieafkorting <chr>, id <chr>, shards <chr>, typesortering <chr>,
 #> #   shard <chr>, geometry <MULTIPOLYGON [°]>

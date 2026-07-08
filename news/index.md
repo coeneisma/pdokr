@@ -13,7 +13,9 @@
   - Loading layers as `sf` objects with
     [`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md),
     with automatic pagination, server-side bounding-box and temporal
-    pre-filtering, and client-side CRS transformation.
+    pre-filtering, and client-side CRS transformation. `pdokr` is an OGC
+    API Features client and reads vector features only; a dataset that
+    serves tiles or coverages instead is reported with a clear error.
   - Spatial filtering by any polygon (or point) with
     [`pdok_filter_by()`](https://coeneisma.github.io/pdokr/reference/pdok_filter_by.md),
     also available in one call through the `filter_by` argument of

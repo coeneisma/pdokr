@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   articles/bag-buildings: bag-buildings.html
@@ -11,7 +11,7 @@ articles:
   articles/geocoding: geocoding.html
   articles/getting-started: getting-started.html
   articles/pdok-by-hand: pdok-by-hand.html
-last_built: 2026-06-30T21:32Z
+last_built: 2026-07-08T21:01Z
 urls:
   reference: https://coeneisma.github.io/pdokr/reference
   article: https://coeneisma.github.io/pdokr/articles

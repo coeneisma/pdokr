@@ -59,7 +59,7 @@ The `onderwijslocaties` resource lists every location where education
 
 locations <- read_duo("a7e3f323-6e46-4dca-a834-369d9d520aa8")
 nrow(locations)
-#> [1] 13597
+#> [1] 13601
 ```
 
 There is a catch: these are *possible* education locations, not
@@ -102,12 +102,12 @@ link <- relations |>
 # inner join drops every location without a recognised institution
 schools <- inner_join(locations, link, by = "ONDERWIJSLOCATIECODE")
 nrow(schools)
-#> [1] 9674
+#> [1] 9677
 count(schools, sector)
 #>             sector    n
 #> 1 Higher education   62
-#> 2          Primary 7227
-#> 3        Secondary 1474
+#> 2          Primary 7228
+#> 3        Secondary 1476
 #> 4          Special  708
 #> 5 Vocational (MBO)  203
 ```
@@ -180,11 +180,10 @@ binnenstad <- filter(wijken, grepl("Binnenstad", statnaam))
 centre_schools <- pdok_filter_by(utrecht_schools, binnenstad, predicate = "within")
 
 panden <- pdok_read("kadaster/bag", "pand", filter_by = binnenstad)
-#> ⠙ Downloading PDOK features: 995 fetched
-#> ⠹ Downloading PDOK features: 1461 fetched
-#> ⠸ Downloading PDOK features: 2978 fetched
-#> ⠼ Downloading PDOK features: 4007 fetched
-#> ⠴ Downloading PDOK features: 5560 fetched
+#> ⠙ Downloading PDOK features: 964 fetched
+#> ⠹ Downloading PDOK features: 1460 fetched
+#> ⠸ Downloading PDOK features: 2785 fetched
+#> ⠼ Downloading PDOK features: 5090 fetched
 #> ⠴ Downloading PDOK features: 6026 fetched
 school_buildings <- panden |>
   st_filter(centre_schools) |>

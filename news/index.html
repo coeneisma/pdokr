@@ -53,7 +53,7 @@
 <h2 class="pkg-version" data-toc-text="development version" id="pdokr-development-version">pdokr (development version)<a class="anchor" aria-label="anchor" href="#pdokr-development-version"></a></h2>
 <ul><li>First release. <code>pdokr</code> provides:
 <ul><li>Dataset and layer discovery with <code><a href="../reference/pdok_list_datasets.html">pdok_list_datasets()</a></code>, <code><a href="../reference/pdok_search_datasets.html">pdok_search_datasets()</a></code>, <code><a href="../reference/pdok_list_layers.html">pdok_list_layers()</a></code> and <code><a href="../reference/pdok_search_layers.html">pdok_search_layers()</a></code>, fetched live from the PDOK index.</li>
-<li>Loading layers as <code>sf</code> objects with <code><a href="../reference/pdok_read.html">pdok_read()</a></code>, with automatic pagination, server-side bounding-box and temporal pre-filtering, and client-side CRS transformation.</li>
+<li>Loading layers as <code>sf</code> objects with <code><a href="../reference/pdok_read.html">pdok_read()</a></code>, with automatic pagination, server-side bounding-box and temporal pre-filtering, and client-side CRS transformation. <code>pdokr</code> is an OGC API Features client and reads vector features only; a dataset that serves tiles or coverages instead is reported with a clear error.</li>
 <li>Spatial filtering by any polygon (or point) with <code><a href="../reference/pdok_filter_by.html">pdok_filter_by()</a></code>, also available in one call through the <code>filter_by</code> argument of <code><a href="../reference/pdok_read.html">pdok_read()</a></code>.</li>
 <li>Geocoding of addresses and place names with <code><a href="../reference/pdok_geocode.html">pdok_geocode()</a></code>, returning <code>sf</code> points and administrative polygons.</li>
 <li>The official PDOK basemap as a map background with <code><a href="../reference/pdok_basemap.html">pdok_basemap()</a></code>, returning a raster tile URL (<code>tmap</code>/<code>leaflet</code>) or a vector style URL (<code>maplibre</code>/<code>mapgl</code>).</li>
@@ -67,7 +67,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
