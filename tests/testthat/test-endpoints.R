@@ -95,3 +95,16 @@ test_that("parse_index returns an empty registry for an empty index", {
   reg <- parse_index(list(apis = list()))
   expect_equal(nrow(reg), 0L)
 })
+
+test_that("ogc_supports_features reads the conformance document", {
+  httr2::local_mocked_responses(function(req) mock_conformance_resp(features = TRUE))
+  expect_true(ogc_supports_features("https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1"))
+
+  httr2::local_mocked_responses(function(req) mock_conformance_resp(features = FALSE))
+  expect_false(ogc_supports_features("https://api.pdok.nl/kadaster/brt-achtergrondkaart/ogc/v1"))
+})
+
+test_that("ogc_supports_features returns NA when it cannot be determined", {
+  httr2::local_mocked_responses(function(req) cli::cli_abort("unreachable"))
+  expect_true(is.na(ogc_supports_features("https://api.pdok.nl/x/ogc/v1")))
+})

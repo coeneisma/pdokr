@@ -125,9 +125,12 @@ pdok_read <- function(dataset, layer, bbox = NULL, filter_by = NULL,
   server_bbox <- bbox %||% filter_by
 
   resolved <- resolve_dataset(dataset)
-  out <- read_ogc(
-    resolved$ogc, layer, server_bbox, datetime, max_features,
-    filter_by = filter_by, predicate = predicate
+  out <- tryCatch(
+    read_ogc(
+      resolved$ogc, layer, server_bbox, datetime, max_features,
+      filter_by = filter_by, predicate = predicate
+    ),
+    error = function(cnd) abort_not_features(resolved$id, resolved$ogc, cnd)
   )
 
   if (nrow(out) == 0L) {

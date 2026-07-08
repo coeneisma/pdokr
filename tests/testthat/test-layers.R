@@ -85,3 +85,20 @@ test_that("pdok_list_layers rejects a WFS URL", {
     "WFS"
   )
 })
+
+test_that("pdok_list_layers reports a non-Features dataset clearly", {
+  fail_collections <- httr2::response(
+    status_code = 404,
+    url = "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/collections",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw("{}")
+  )
+  httr2::local_mocked_responses(mock_pdok_dispatcher(
+    collections = fail_collections,
+    conformance = mock_conformance_resp(features = FALSE)
+  ))
+  expect_error(
+    pdok_list_layers("cbs/gebiedsindelingen"),
+    "does not offer OGC API Features"
+  )
+})
