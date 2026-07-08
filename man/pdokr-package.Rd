@@ -8,7 +8,17 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Tools to discover, download, and spatially filter open geographic data from 'PDOK' (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as simple feature ('sf') objects through 'OGC' API Features endpoints, with a transparent fallback to the Web Feature Service ('WFS'), automatic pagination, and explicit coordinate reference system handling. Loaded layers can be filtered by any polygon area, and addresses or place names can be geocoded through the 'PDOK' location server. See \url{https://www.pdok.nl/} for more information about the platform and its services.
+Tools to discover, download, and spatially filter open geographic data from 'PDOK' (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as vector simple feature ('sf') objects through 'OGC' API Features endpoints, with automatic pagination and explicit coordinate reference system handling. Loaded layers can be filtered by any polygon area, and addresses or place names can be geocoded through the 'PDOK' location server. The focus is on vector feature data; raster, tile, and coverage services are out of scope. See \url{https://www.pdok.nl/} for more information about the platform and its services.
+}
+\details{
+\code{pdokr} is a client for PDOK's \strong{OGC API Features} services. It reads
+\emph{vector} feature data — points, lines, and polygons — and returns it as
+\link[sf:st_sf]{sf} objects. Raster, tile, and coverage services (such as
+elevation grids or map-tile backgrounds) are out of scope: \code{pdok_read()}
+loads features only. A handful of datasets listed by
+\code{\link[=pdok_list_datasets]{pdok_list_datasets()}} serve tiles or coverages rather than features;
+those cannot be read as \code{sf}, and \code{pdok_read()} reports this clearly. For
+the official PDOK map background, use \code{\link[=pdok_basemap]{pdok_basemap()}}.
 }
 \seealso{
 Useful links:

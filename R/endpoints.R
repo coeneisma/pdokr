@@ -65,6 +65,68 @@ resolve_dataset <- function(dataset, call = rlang::caller_env()) {
   )
 }
 
+#' Does an OGC API base URL offer OGC API Features?
+#'
+#' Fetches the API's `/conformance` document and checks for the OGC API
+#' Features core conformance class. Used only on the error path, to tell a
+#' non-Features dataset (map tiles, coverages) apart from a genuine failure.
+#'
+#' @param ogc An OGC API base URL.
+#'
+#' @return `TRUE` or `FALSE`, or `NA` when it cannot be determined (e.g. the
+#'   service is unreachable).
+#' @noRd
+ogc_supports_features <- function(ogc) {
+  resp <- tryCatch(
+    pdok_perform(
+      pdok_request(paste0(ogc, "/conformance"), query = list(f = "json"))
+    ),
+    error = function(e) NULL
+  )
+  if (is.null(resp)) {
+    return(NA)
+  }
+  conf <- tryCatch(
+    as.character(unlist(httr2::resp_body_json(resp)$conformsTo, use.names = FALSE)),
+    error = function(e) character()
+  )
+  if (length(conf) == 0L) {
+    return(NA)
+  }
+  any(grepl("ogcapi-features-1/1.0/conf/core", conf, fixed = TRUE))
+}
+
+#' Raise a clear error when a dataset is not an OGC API Features service
+#'
+#' Called from the error handler of a read/list request. If the dataset's OGC
+#' API does not offer Features (it serves map tiles or coverages), aborts with
+#' an explanatory message; otherwise the original failure is re-raised
+#' unchanged, so genuine problems (wrong layer id, network error) keep their
+#' own message.
+#'
+#' @param id The dataset id, for the message.
+#' @param ogc The OGC API base URL, probed for Features support.
+#' @param cnd The original error condition to re-raise when Features *are*
+#'   offered.
+#' @param call Calling environment, for the abort.
+#'
+#' @return Never returns normally; always raises.
+#' @noRd
+abort_not_features <- function(id, ogc, cnd, call = rlang::caller_env()) {
+  if (isFALSE(ogc_supports_features(ogc))) {
+    cli::cli_abort(
+      c(
+        "Dataset {.val {id}} does not offer OGC API Features, so it cannot be read as {.cls sf}.",
+        "i" = "It serves map tiles or coverages instead; {.pkg pdokr} reads vector features only.",
+        "i" = "For the PDOK basemap, see {.fn pdok_basemap}."
+      ),
+      call = call
+    )
+  }
+  # A genuine Features API (or undeterminable): surface the original error.
+  rlang::cnd_signal(cnd)
+}
+
 #' Parse the PDOK API index into a dataset registry
 #'
 #' Turns the parsed body of `https://api.pdok.nl/index.json` into a tidy

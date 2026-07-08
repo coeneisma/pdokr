@@ -76,6 +76,42 @@ test_that("pdok_read rejects a non-spatial filter_by", {
   )
 })
 
+test_that("pdok_read reports a non-Features dataset clearly", {
+  fail_items <- httr2::response(
+    status_code = 404,
+    url = "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/collections/c/items",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw("{}")
+  )
+  httr2::local_mocked_responses(mock_pdok_dispatcher(
+    items = fail_items,
+    conformance = mock_conformance_resp(features = FALSE)
+  ))
+  expect_error(
+    pdok_read("cbs/gebiedsindelingen", "some_layer"),
+    "does not offer OGC API Features"
+  )
+})
+
+test_that("pdok_read keeps the original error on a genuine Features dataset", {
+  # A wrong layer id 404s, but the dataset *is* a Features API, so the tailored
+  # not-Features message must not hijack the real error.
+  fail_items <- httr2::response(
+    status_code = 404,
+    url = "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/collections/c/items",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw("{}")
+  )
+  httr2::local_mocked_responses(mock_pdok_dispatcher(
+    items = fail_items,
+    conformance = mock_conformance_resp(features = TRUE)
+  ))
+  expect_error(
+    pdok_read("cbs/gebiedsindelingen", "no_such_layer"),
+    "resource not found"
+  )
+})
+
 test_that("pdok_read validates layer and max_features", {
   expect_error(pdok_read("cbs/gebiedsindelingen", 1), "single non-empty string")
   expect_error(pdok_read("cbs/gebiedsindelingen", ""), "single non-empty string")
