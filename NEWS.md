@@ -6,7 +6,9 @@
     fetched live from the PDOK index.
   * Loading layers as `sf` objects with `pdok_read()`, with automatic
     pagination, server-side bounding-box and temporal pre-filtering, and
-    client-side CRS transformation.
+    client-side CRS transformation. `pdokr` is an OGC API Features client and
+    reads vector features only; a dataset that serves tiles or coverages
+    instead is reported with a clear error.
   * Spatial filtering by any polygon (or point) with `pdok_filter_by()`, also
     available in one call through the `filter_by` argument of `pdok_read()`.
   * Geocoding of addresses and place names with `pdok_geocode()`, returning
