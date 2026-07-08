@@ -101,10 +101,15 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 pdok_list_layers <- function(dataset) {
   resolved <- resolve_dataset(dataset)
   ogc <- resolved$ogc
-  resp <- pdok_perform(
-    pdok_request(paste0(ogc, "/collections"), query = list(f = "json"))
+  layers <- tryCatch(
+    {
+      resp <- pdok_perform(
+        pdok_request(paste0(ogc, "/collections"), query = list(f = "json"))
+      )
+      parse_collections(httr2::resp_body_json(resp))
+    },
+    error = function(cnd) abort_not_features(resolved$id, ogc, cnd)
   )
-  layers <- parse_collections(httr2::resp_body_json(resp))
   # Echo the dataset so each row is self-contained for pdok_read(dataset, layer).
   tibble::add_column(
     layers,

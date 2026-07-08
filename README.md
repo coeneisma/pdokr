@@ -20,6 +20,11 @@ datasets and their layers, load a layer as an
 pagination and explicit coordinate reference system handling), filter
 data by any polygon area, and geocode addresses and place names.
 
+`pdokr` is a client for PDOK’s **OGC API Features** services: it reads
+*vector* feature data (points, lines, polygons) as `sf`. Raster, tile,
+and coverage services are out of scope. For the official PDOK map
+background, use `pdok_basemap()`.
+
 ## Installation
 
 You can install the development version of `pdokr` from
