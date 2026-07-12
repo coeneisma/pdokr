@@ -4,13 +4,19 @@
 # passed through (an instant or an OGC interval such as "2020-01-01/2025-12-31").
 format_datetime <- function(x, call = rlang::caller_env()) {
   if (is.numeric(x) && length(x) == 1L && !is.na(x)) {
+    if (x <= 0 || x != round(x)) {
+      cli::cli_abort(
+        "{.arg datetime} year must be a single positive whole number (e.g. {.val {2026}}).",
+        call = call
+      )
+    }
     return(sprintf("%04d-07-01T00:00:00Z", as.integer(x)))
   }
   if (is.character(x) && length(x) == 1L && nzchar(x)) {
     return(x)
   }
   cli::cli_abort(
-    "{.arg datetime} must be a single year (e.g. {.val {2026}}) or an OGC datetime string.",
+    "{.arg datetime} must be a single year (e.g. {.val {2026}}), an OGC datetime string, or an interval such as {.val {\"2020-01-01/2025-12-31\"}}.",
     call = call
   )
 }
@@ -117,10 +123,9 @@ pdok_read <- function(dataset, layer, bbox = NULL, filter_by = NULL,
   if (!is.null(filter_by) && !inherits(filter_by, c("sf", "sfc"))) {
     cli::cli_abort("{.arg filter_by} must be an {.cls sf} or {.cls sfc} object.")
   }
-  if (!is.null(max_features) &&
-      (!is.numeric(max_features) || length(max_features) != 1L ||
-       is.na(max_features) || max_features < 1 || max_features != round(max_features))) {
-    cli::cli_abort("{.arg max_features} must be a single positive whole number or {.code NULL}.")
+  check_count(max_features, "max_features", allow_null = TRUE)
+  if (!is.null(crs)) {
+    check_crs(crs)
   }
 
   # filter_by drives the cheap server-side bbox pre-filter (an explicit bbox wins).

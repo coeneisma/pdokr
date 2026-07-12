@@ -63,16 +63,34 @@ test_that("as_bbox_crs84 errors on bad numeric or wrong type", {
   expect_error(as_bbox_crs84(list(1, 2, 3, 4)), "must be a numeric vector")
 })
 
-test_that("crs_to_uri formats an EPSG code", {
-  expect_equal(crs_to_uri(28992), "http://www.opengis.net/def/crs/EPSG/0/28992")
-  expect_equal(crs_to_uri(4326), "http://www.opengis.net/def/crs/EPSG/0/4326")
+test_that("as_bbox_crs84 pads a degenerate numeric point-bbox", {
+  # A point given as xmin==xmax, ymin==ymax must be widened, or the OGC bbox
+  # query is rejected by the server with HTTP 400.
+  out <- as_bbox_crs84(c(5, 52, 5, 52))
+  expect_gt(out[["xmax"]], out[["xmin"]])
+  expect_gt(out[["ymax"]], out[["ymin"]])
 })
 
-test_that("crs_to_uri validates its input", {
-  expect_error(crs_to_uri("28992"), "single positive EPSG code")
-  expect_error(crs_to_uri(c(1, 2)), "single positive EPSG code")
-  expect_error(crs_to_uri(-1), "single positive EPSG code")
-  expect_error(crs_to_uri(NA), "single positive EPSG code")
+test_that("check_crs validates an EPSG code", {
+  expect_equal(check_crs(28992), 28992L)
+  expect_equal(check_crs(4326), 4326L)
+  expect_error(check_crs("28992"), "single positive EPSG code")
+  expect_error(check_crs(c(1, 2)), "single positive EPSG code")
+  expect_error(check_crs(-1), "single positive EPSG code")
+  expect_error(check_crs(NA), "single positive EPSG code")
+  expect_error(check_crs(28992.5), "single positive EPSG code")
+})
+
+test_that("check_count validates a positive whole number", {
+  expect_equal(check_count(5, "limit"), 5L)
+  expect_null(check_count(NULL, "max_features", allow_null = TRUE))
+  expect_error(check_count(NULL, "limit"), "single positive whole number")
+  expect_error(check_count(0, "limit"), "single positive whole number")
+  expect_error(check_count(2.5, "limit"), "single positive whole number")
+  expect_error(check_count(-1, "limit"), "single positive whole number")
+  # allow_null message advertises NULL; the plain one does not.
+  expect_error(check_count("x", "max_features", allow_null = TRUE), "`NULL`")
+  expect_error(check_count(0, "max_features"), "max_features")
 })
 
 test_that("parse_content_crs reads EPSG and CRS84 headers", {

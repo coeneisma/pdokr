@@ -54,6 +54,19 @@ test_that("parse_locatieserver drops a result without geometry", {
   expect_equal(res$weergavenaam, "A")
 })
 
+test_that("parse_locatieserver collapses a multi-value field", {
+  # Locatieserver returns some fields as arrays; they must become one string,
+  # not a list-column or an error.
+  docs <- list(
+    list(id = "a", type = "adres", weergavenaam = "A",
+         geometrie_ll = "POINT(5 52)", suggest = list("Foo", "Bar"))
+  )
+  res <- parse_locatieserver(docs)
+  expect_equal(nrow(res), 1L)
+  expect_type(res$suggest, "character")
+  expect_equal(res$suggest, "Foo; Bar")
+})
+
 test_that("pdok_geocode returns an sf and transforms crs", {
   httr2::local_mocked_responses(list(ls_resp()))
   out <- pdok_geocode("De Bilt")
@@ -77,6 +90,18 @@ test_that("pdok_geocode validates its arguments", {
   expect_error(pdok_geocode("x", limit = 0), "positive whole number")
   expect_error(pdok_geocode("x", limit = 1.5), "positive whole number")
   expect_error(pdok_geocode("x", type = "stad"), "must be one of")
+  expect_error(pdok_geocode("x", crs = "RD"), "EPSG code")
+})
+
+test_that("pdok_geocode maps type and limit into the query", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    seen <<- req$url
+    ls_resp()
+  })
+  pdok_geocode("Utrecht", type = "gemeente", limit = 5)
+  expect_match(seen, "fq=type%3Agemeente")
+  expect_match(seen, "rows=5")
 })
 
 test_that("pdok_geocode works against the live Locatieserver", {

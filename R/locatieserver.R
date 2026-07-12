@@ -110,9 +110,9 @@ pdok_geocode <- function(query, type = NULL, crs = NULL, limit = 1) {
   if (!rlang::is_string(query) || !nzchar(query)) {
     cli::cli_abort("{.arg query} must be a single non-empty string.")
   }
-  if (!is.numeric(limit) || length(limit) != 1L || is.na(limit) ||
-      limit < 1 || limit != round(limit)) {
-    cli::cli_abort("{.arg limit} must be a single positive whole number.")
+  check_count(limit, "limit", allow_null = FALSE)
+  if (!is.null(crs)) {
+    check_crs(crs)
   }
 
   if (!is.null(type) &&

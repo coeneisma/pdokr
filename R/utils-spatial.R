@@ -82,25 +82,6 @@ as_bbox_crs84 <- function(x, call = rlang::caller_env()) {
   )
 }
 
-#' Format an EPSG code as an OGC CRS URI
-#'
-#' @param epsg A single positive EPSG code (whole number), e.g. `28992`.
-#' @param call Calling environment, for error messages.
-#'
-#' @return A single string, e.g.
-#'   `"http://www.opengis.net/def/crs/EPSG/0/28992"`.
-#' @noRd
-crs_to_uri <- function(epsg, call = rlang::caller_env()) {
-  if (!is.numeric(epsg) || length(epsg) != 1L || is.na(epsg) ||
-      epsg <= 0 || epsg != round(epsg)) {
-    cli::cli_abort(
-      "{.arg crs} must be a single positive EPSG code (a whole number).",
-      call = call
-    )
-  }
-  paste0("http://www.opengis.net/def/crs/EPSG/0/", format(epsg, scientific = FALSE))
-}
-
 #' Parse a Content-Crs response header into an EPSG code
 #'
 #' @param header The `Content-Crs` header value, e.g.
