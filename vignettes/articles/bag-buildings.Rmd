@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
 The [BAG](https://www.pdok.nl/) (Basisregistratie Adressen en Gebouwen) holds
 every building in the Netherlands, with attributes such as the year it was
 built. It is served over the OGC API Features service, so `pdok_read()` reads it
-like any other layer. This article maps the buildings of one neighbourhood,
-coloured by construction year.
+like any other layer. This article maps the buildings of one neighborhood,
+colored by construction year.
 
 ```{r setup}
 library(pdokr)
@@ -28,7 +28,7 @@ library(dplyr)
 ## Choose an area
 
 We use the administrative boundaries to select the `Stadsdriehoek`, the historic
-centre of Rotterdam.
+center of Rotterdam.
 
 ```{r area}
 gemeenten <- pdok_read(
@@ -46,7 +46,7 @@ stadsdriehoek <- filter(buurten, statnaam == "Stadsdriehoek")
 ## Load every building in it
 
 The `kadaster/bag` dataset has a `pand` (building) layer. We filter it to the
-neighbourhood; `pdok_read()` pre-filters at the server and clips to the exact
+neighborhood; `pdok_read()` pre-filters at the server and clips to the exact
 shape.
 
 ```{r buildings}
@@ -63,8 +63,8 @@ range(buildings$bouwjaar, na.rm = TRUE)
 
 ## Map by construction year
 
-Rotterdam's historic centre was largely destroyed in the May 1940 bombing and
-rebuilt afterwards. To make that dividing line jump out, we colour the buildings
+Rotterdam's historic center was largely destroyed in the May 1940 bombing and
+rebuilt afterwards. To make that dividing line jump out, we color the buildings
 that pre-date the bombing (before 1940) in **cool blues** and the post-war
 rebuild in **warm tones** — the surviving pre-war buildings stand out against a
 sea of reconstruction.
@@ -110,5 +110,5 @@ tmap_mode("plot")
   workflow used here.
 * [Combining with external data](duo-schools.html) — join `pdokr` with another
   open API.
-* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+* [PDOK basemaps](basemaps.html) — the gray background map used here, and the
   other styles.

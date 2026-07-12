@@ -100,5 +100,5 @@ tmap_mode("plot")
   `pdokr` handles RD New and lon/lat.
 * [Working with PDOK by hand](pdok-by-hand.html) — the raw OGC API and WFS
   requests the package automates.
-* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+* [PDOK basemaps](basemaps.html) — the gray background map used here, and the
   other styles.

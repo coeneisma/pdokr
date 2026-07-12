@@ -105,7 +105,7 @@ pdok_filter_by(parks_in_bbox, fryslan)$text
 `predicate` that sets *how* a feature must relate to the area to be kept:
 `"intersects"` (the default — touching the area in any way), `"within"` (lying
 entirely inside it), `"contains"`, `"disjoint"` (everything outside), and the
-more specialised `"overlaps"`, `"touches"`, `"crosses"`, `"covers"` and
+more specialized `"overlaps"`, `"touches"`, `"crosses"`, `"covers"` and
 `"covered_by"`. Each maps to the matching `sf` function `sf::st_<predicate>()`;
 see [`?sf::geos_binary_pred`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
 for the precise definition of each. The plain-`sf` equivalent, once both objects
@@ -142,6 +142,6 @@ The same idea scales up: geocode a place as a polygon (for example
 * [Mapping buildings by construction year](bag-buildings.html) — read a BAG
   layer inside an area.
 * [Thematic maps from CBS statistics](cbs-statistics.html) — a choropleth for
-  one municipality's neighbourhoods.
-* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+  one municipality's neighborhoods.
+* [PDOK basemaps](basemaps.html) — the gray background map used here, and the
   other styles.

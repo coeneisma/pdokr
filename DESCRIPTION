@@ -1,6 +1,6 @@
 Package: pdokr
 Title: Access Open Geodata from the Dutch 'PDOK' Platform
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R:
     person("Coen", "Eisma", , "coeneisma@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0007-9001-2572"))

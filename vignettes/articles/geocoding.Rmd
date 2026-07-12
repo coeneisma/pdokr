@@ -58,11 +58,11 @@ for a road, a polygon for an area.
 | `type` | Geometry | What it is |
 |--------|----------|------------|
 | `adres` | point | a specific address |
-| `postcode` | point | the centre of a postcode |
+| `postcode` | point | the center of a postcode |
 | `hectometerpaal` | point | a motorway distance marker |
 | `appartementsrecht` | point | an apartment right |
 | `weg` | line | a (named) road |
-| `buurt`, `wijk` | polygon | a neighbourhood or district |
+| `buurt`, `wijk` | polygon | a neighborhood or district |
 | `woonplaats` | polygon | a town or city |
 | `gemeente` | polygon | a municipality |
 | `provincie` | polygon | a province |
@@ -114,9 +114,9 @@ geocoded `gemeente`, `wijk` or `provincie` polygon drops straight into
 ```{r combine}
 boundary <- pdok_geocode("De Bilt", type = "gemeente")
 
-# read the neighbourhoods that meet the boundary, then keep those whose centre
+# read the neighborhoods that meet the boundary, then keep those whose center
 # lies inside it. A geocoded boundary is generalised, so it clips edge
-# neighbourhoods unevenly; `predicate = "within"` alone would drop some, while
+# neighborhoods unevenly; `predicate = "within"` alone would drop some, while
 # `"intersects"` pulls in slivers of neighbouring municipalities.
 buurten <- pdok_read(
   "cbs/gebiedsindelingen", "buurt_gegeneraliseerd", datetime = 2025,
@@ -127,9 +127,9 @@ buurten <- filter(buurten, lengths(sf::st_within(centres, boundary)) > 0)
 nrow(buurten)
 ```
 
-The geocoded boundary did the filtering; the result is every neighbourhood
+The geocoded boundary did the filtering; the result is every neighborhood
 inside the municipality of De Bilt. On an interactive map you can see where that
-is and hover for the neighbourhood names:
+is and hover for the neighborhood names:
 
 ```{r combine-map}
 tmap_mode("view")
@@ -157,5 +157,5 @@ the buildings, parcels or statistics within it.
 * [Filtering data by area](filtering-by-area.html) — more on `pdok_filter_by()`.
 * [Mapping buildings by construction year](bag-buildings.html) — read a BAG
   layer inside an area.
-* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+* [PDOK basemaps](basemaps.html) — the gray background map used here, and the
   other styles.

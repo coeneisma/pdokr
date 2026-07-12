@@ -1,4 +1,4 @@
-# pdokr (development version)
+# pdokr 0.1.0
 
 * First release. `pdokr` provides:
   * Dataset and layer discovery with `pdok_list_datasets()`,

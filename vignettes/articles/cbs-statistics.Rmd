@@ -14,10 +14,10 @@ knitr::opts_chunk$set(
 ```
 
 Statistics Netherlands ([CBS](https://www.cbs.nl/)) publishes a yearly dataset
-with hundreds of figures per neighbourhood — population, income, housing, energy
+with hundreds of figures per neighborhood — population, income, housing, energy
 use, distance to amenities, and much more. Because PDOK serves it with geometry,
 a single `pdok_read()` gives you everything you need for a choropleth. This
-article maps the population density across the neighbourhoods of Amsterdam.
+article maps the population density across the neighborhoods of Amsterdam.
 
 ```{r setup}
 library(pdokr)
@@ -25,11 +25,11 @@ library(tmap)
 library(dplyr)
 ```
 
-## Read the neighbourhoods of one municipality
+## Read the neighborhoods of one municipality
 
 The `cbs/wijken-en-buurten-2025` dataset has `gemeenten`, `wijken` and `buurten`
 layers. We take the boundary of Amsterdam from the `gemeenten` layer, then read
-the `buurten` (neighbourhoods) inside it.
+the `buurten` (neighborhoods) inside it.
 
 ```{r read}
 gemeenten <- pdok_read("cbs/wijken-en-buurten-2025", "gemeenten")
@@ -56,13 +56,13 @@ buurten <- buurten |>
 summary(buurten$bevolkingsdichtheid_inwoners_per_km2)
 ```
 
-The value is the number of inhabitants per square kilometre.
+The value is the number of inhabitants per square kilometer.
 
 ## Draw the choropleth
 
-A quantile classification keeps each colour class roughly equal in size, which
-works well for a skewed variable like density. Neighbourhoods without a value
-(water, parks, industry) are drawn in grey.
+A quantile classification keeps each color class roughly equal in size, which
+works well for a skewed variable like density. Neighborhoods without a value
+(water, parks, industry) are drawn in gray.
 
 ```{r map-static}
 tmap_mode("plot")
@@ -76,11 +76,11 @@ tm_basemap(pdok_basemap("grijs")) +
     fill.legend = tm_legend("Inhabitants per km2"),
     col = "white", lwd = 0.2, fill_alpha = 0.8
   ) +
-  tm_title("Population density by neighbourhood, Amsterdam (CBS 2025)") +
+  tm_title("Population density by neighborhood, Amsterdam (CBS 2025)") +
   tm_credits("Kaartgegevens © Kadaster")
 ```
 
-The same map interactively — hover for the neighbourhood name and click for the
+The same map interactively — hover for the neighborhood name and click for the
 value. A little transparency lets the basemap show through, so you keep your
 bearings:
 
@@ -116,5 +116,5 @@ or two after the boundaries).
   workflow.
 * [Coordinate reference systems](coordinate-reference-systems.html) — working in
   RD New (EPSG:28992), the Dutch national grid.
-* [PDOK basemaps](basemaps.html) — the grey background map used here, and the
+* [PDOK basemaps](basemaps.html) — the gray background map used here, and the
   other styles.
