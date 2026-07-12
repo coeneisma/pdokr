@@ -1,6 +1,29 @@
 # HTTP layer: request construction, error handling, cursor pagination, and
 # GeoJSON -> sf assembly. All internal; built on httr2 and sf.
 
+# Internal: rbind a list of sf objects that may have different attribute
+# columns. GeoJSON can omit a null-valued property, so `sf::read_sf()` drops a
+# column that is null for every feature on a page; two pages of the same layer
+# can then carry different columns and a plain `rbind()` would abort with
+# "names do not match previous names". We take the union of columns, fill the
+# missing ones with NA, and align the order so the bind always succeeds.
+rbind_sf <- function(parts) {
+  if (length(parts) == 0L) {
+    return(NULL)
+  }
+  if (length(parts) == 1L) {
+    return(parts[[1]])
+  }
+  all_cols <- unique(unlist(lapply(parts, names)))
+  aligned <- lapply(parts, function(p) {
+    for (m in setdiff(all_cols, names(p))) {
+      p[[m]] <- NA
+    }
+    p[, all_cols, drop = FALSE]
+  })
+  do.call(rbind, aligned)
+}
+
 #' Build a standard pdokr httr2 request
 #'
 #' @param url The endpoint URL.
@@ -147,7 +170,7 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
   if (length(parts) == 0L) {
     return(sf::st_sf(geometry = sf::st_sfc(crs = content_crs %||% NA_integer_)))
   }
-  out <- if (length(parts) == 1L) parts[[1]] else do.call(rbind, parts)
+  out <- rbind_sf(parts)
   if (!is.null(max_features) && nrow(out) > max_features) {
     out <- out[seq_len(max_features), , drop = FALSE]
   }
@@ -173,7 +196,7 @@ parse_features <- function(pages, content_crs = NULL, call = rlang::caller_env()
     return(sf::st_sf(geometry = sf::st_sfc(crs = content_crs %||% NA_integer_)))
   }
 
-  out <- if (length(sfs) == 1L) sfs[[1]] else do.call(rbind, sfs)
+  out <- rbind_sf(sfs)
 
   if (!is.null(content_crs)) {
     # Relabel, not reproject: PDOK already returns coordinates in this CRS,

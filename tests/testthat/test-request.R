@@ -138,3 +138,21 @@ test_that("parse_features returns a 0-row sf for empty input", {
   expect_s3_class(out, "sf")
   expect_equal(nrow(out), 0L)
 })
+
+test_that("rbind_sf unions pages that carry different columns", {
+  # A page can omit a property that is null for all its features, so two pages
+  # of the same layer may have different columns; the bind must still succeed.
+  p1 <- sf::read_sf(
+    '{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"a":1},"geometry":{"type":"Point","coordinates":[5,52]}}]}'
+  )
+  p2 <- sf::read_sf(
+    '{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"b":2},"geometry":{"type":"Point","coordinates":[6,53]}}]}'
+  )
+  out <- rbind_sf(list(p1, p2))
+  expect_s3_class(out, "sf")
+  expect_equal(nrow(out), 2L)
+  expect_true(all(c("a", "b") %in% names(out)))
+  # each page's missing column is filled with NA
+  expect_true(is.na(out$b[1]))
+  expect_true(is.na(out$a[2]))
+})
