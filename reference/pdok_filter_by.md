@@ -28,7 +28,10 @@ pdok_filter_by(data, filter_geometry, predicate = "intersects")
 
   The spatial relationship to test, one of `"intersects"`, `"within"`,
   `"contains"`, `"overlaps"`, `"touches"`, `"crosses"`, `"covers"`,
-  `"covered_by"`, or `"disjoint"`.
+  `"covered_by"`, or `"disjoint"`. See the *Spatial predicates* section
+  below, and
+  [sf::geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+  for the full definitions.
 
 ## Value
 
@@ -47,8 +50,42 @@ The plain-`sf` equivalent is
 `data[filter_geometry, , op = sf::st_intersects]` (after matching CRS);
 use that if you prefer to drop down to `sf`.
 
+## Spatial predicates
+
+The `predicate` selects *how* a feature must relate to `filter_geometry`
+to be kept. Each value calls the matching `sf` predicate function
+`sf::st_<predicate>()` (so `"within"` uses
+[`sf::st_within()`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html),
+`"intersects"` uses
+[`sf::st_intersects()`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html),
+and so on). The common choices:
+
+- `"intersects"` (default) — the feature touches `filter_geometry` in
+  any way (overlaps, is inside, or shares a boundary). The most
+  permissive; the usual choice for "everything in this area".
+
+- `"within"` — the feature lies *entirely inside* `filter_geometry`. Use
+  this to exclude features that only stick partly into the area.
+
+- `"contains"` — the feature entirely *encloses* `filter_geometry` (the
+  inverse of `"within"`).
+
+- `"disjoint"` — the feature does *not* touch `filter_geometry` at all
+  (everything outside the area).
+
+`"overlaps"`, `"touches"`, `"crosses"`, `"covers"` and `"covered_by"`
+are the remaining, more specialised DE-9IM relationships. For the
+precise definition of each, see the `sf` help page
+[sf::geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+(the topic that documents `st_intersects()`, `st_within()`, and the
+rest).
+
 ## See also
 
+[sf::geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+for the definition of each spatial predicate;
+[`sf::st_filter()`](https://r-spatial.github.io/sf/reference/st_join.html),
+the `sf` filter this wraps; and
 [`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md),
 whose `filter_by` argument applies this filter while loading.
 

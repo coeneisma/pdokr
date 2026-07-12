@@ -184,10 +184,17 @@ reuse the pre-filtered data or apply a different spatial predicate.</p>
 <span><span class="co">#&gt; [1] "Lauwersmeer"        "Schiermonnikoog"    "De Alde Feanen"    </span></span>
 <span><span class="co">#&gt; [4] "Drents-Friese Wold"</span></span></code></pre></div>
 <p><code><a href="../reference/pdok_filter_by.html">pdok_filter_by()</a></code> reconciles coordinate reference systems
-for you and accepts a <code>predicate</code> (<code>"intersects"</code>
-by default, but also <code>"within"</code>, <code>"contains"</code>, and
-more). The plain-<code>sf</code> equivalent, once both objects share a
-CRS, is:</p>
+for you and accepts a <code>predicate</code> that sets <em>how</em> a
+feature must relate to the area to be kept: <code>"intersects"</code>
+(the default — touching the area in any way), <code>"within"</code>
+(lying entirely inside it), <code>"contains"</code>,
+<code>"disjoint"</code> (everything outside), and the more specialised
+<code>"overlaps"</code>, <code>"touches"</code>, <code>"crosses"</code>,
+<code>"covers"</code> and <code>"covered_by"</code>. Each maps to the
+matching <code>sf</code> function
+<code>sf::st_&lt;predicate&gt;()</code>; see <a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link"><code>?sf::geos_binary_pred</code></a>
+for the precise definition of each. The plain-<code>sf</code>
+equivalent, once both objects share a CRS, is:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fryslan_ll</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">fryslan</span>, <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">parks_in_bbox</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">parks_in_bbox</span><span class="op">[</span><span class="va">fryslan_ll</span>, , op <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_intersects</a></span><span class="op">]</span><span class="op">$</span><span class="va">text</span></span>

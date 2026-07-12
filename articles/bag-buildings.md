@@ -51,9 +51,8 @@ pre-filters at the server and clips to the exact shape.
 ``` r
 
 buildings <- pdok_read("kadaster/bag", "pand", filter_by = stadsdriehoek)
-#> ⠙ Downloading PDOK features: 363 fetched
-#> ⠹ Downloading PDOK features: 808 fetched
-#> ⠹ Downloading PDOK features: 1022 fetched
+#> ⠙ Downloading PDOK features: 808 fetched
+#> ⠙ Downloading PDOK features: 1022 fetched
 nrow(buildings)
 #> [1] 1022
 ```
@@ -84,7 +83,9 @@ tmap_mode("plot")
 
 era_scale <- tm_scale_intervals(
   breaks = c(1600, 1900, 1940, 1960, 1980, 2000, 2026),
-  values = c("#1f78b4", "#a6cee3", "#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c")
+  values = c("#1f78b4", "#a6cee3", "#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c"),
+  # Years are not thousands: drop the "." group separator (1.900 -> 1900).
+  label.format = tm_label_format(big.mark = "")
 )
 
 tm_basemap(pdok_basemap("grijs")) +
@@ -109,7 +110,9 @@ tmap_mode("view")
 tm_basemap(pdok_basemap("grijs")) +
   tm_shape(buildings) +
   tm_polygons(fill = "bouwjaar", fill.scale = era_scale, col = NULL,
-              id = "identificatie", popup = tm_popup(vars = c("Built" = "bouwjaar"))) +
+              id = "identificatie",
+              popup = tm_popup(vars = c("Built" = "bouwjaar"),
+                               format = tm_label_format(big.mark = ""))) +
   tm_credits("Kaartgegevens © Kadaster")
 ```
 

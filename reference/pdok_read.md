@@ -52,7 +52,10 @@ pdok_read(
 
   Spatial predicate for `filter_by`, passed to
   [`pdok_filter_by()`](https://coeneisma.github.io/pdokr/reference/pdok_filter_by.md)
-  (default `"intersects"`).
+  (default `"intersects"`). See its *Spatial predicates* section for the
+  available options, and
+  [sf::geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+  for their definitions.
 
 - datetime:
 

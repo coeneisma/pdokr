@@ -85,7 +85,8 @@ area of interest.</p></dd>
 <dt id="arg-predicate">predicate<a class="anchor" aria-label="anchor" href="#arg-predicate"></a></dt>
 <dd><p>The spatial relationship to test, one of <code>"intersects"</code>,
 <code>"within"</code>, <code>"contains"</code>, <code>"overlaps"</code>, <code>"touches"</code>, <code>"crosses"</code>,
-<code>"covers"</code>, <code>"covered_by"</code>, or <code>"disjoint"</code>.</p></dd>
+<code>"covers"</code>, <code>"covered_by"</code>, or <code>"disjoint"</code>. See the <em>Spatial predicates</em>
+section below, and <a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::geos_binary_pred</a> for the full definitions.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -102,9 +103,31 @@ water-authority area, a hand-drawn polygon, or another PDOK layer.</p>
 (after matching CRS); use that if you prefer to drop down to <code>sf</code>.</p>
     </div>
     <div class="section level2">
+    <h2 id="spatial-predicates">Spatial predicates<a class="anchor" aria-label="anchor" href="#spatial-predicates"></a></h2>
+
+
+<p>The <code>predicate</code> selects <em>how</em> a feature must relate to <code>filter_geometry</code> to be
+kept. Each value calls the matching <code>sf</code> predicate function <code>sf::st_&lt;predicate&gt;()</code>
+(so <code>"within"</code> uses <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_within()</a></code>, <code>"intersects"</code> uses <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_intersects()</a></code>,
+and so on). The common choices:</p><ul><li><p><code>"intersects"</code> (default) — the feature touches <code>filter_geometry</code> in any way
+(overlaps, is inside, or shares a boundary). The most permissive; the usual
+choice for "everything in this area".</p></li>
+<li><p><code>"within"</code> — the feature lies <em>entirely inside</em> <code>filter_geometry</code>. Use this
+to exclude features that only stick partly into the area.</p></li>
+<li><p><code>"contains"</code> — the feature entirely <em>encloses</em> <code>filter_geometry</code> (the
+inverse of <code>"within"</code>).</p></li>
+<li><p><code>"disjoint"</code> — the feature does <em>not</em> touch <code>filter_geometry</code> at all
+(everything outside the area).</p></li>
+</ul><p><code>"overlaps"</code>, <code>"touches"</code>, <code>"crosses"</code>, <code>"covers"</code> and <code>"covered_by"</code> are the
+remaining, more specialised DE-9IM relationships. For the precise definition
+of each, see the <code>sf</code> help page <a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::geos_binary_pred</a> (the topic that
+documents <code>st_intersects()</code>, <code>st_within()</code>, and the rest).</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="pdok_read.html">pdok_read()</a></code>, whose <code>filter_by</code> argument applies this filter while
-loading.</p></div>
+    <div class="dont-index"><p><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::geos_binary_pred</a> for the definition of each spatial predicate;
+<code><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">sf::st_filter()</a></code>, the <code>sf</code> filter this wraps; and <code><a href="pdok_read.html">pdok_read()</a></code>, whose
+<code>filter_by</code> argument applies this filter while loading.</p></div>
     </div>
 
     <div class="section level2">

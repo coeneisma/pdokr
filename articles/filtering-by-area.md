@@ -115,9 +115,15 @@ pdok_filter_by(parks_in_bbox, fryslan)$text
 
 [`pdok_filter_by()`](https://coeneisma.github.io/pdokr/reference/pdok_filter_by.md)
 reconciles coordinate reference systems for you and accepts a
-`predicate` (`"intersects"` by default, but also `"within"`,
-`"contains"`, and more). The plain-`sf` equivalent, once both objects
-share a CRS, is:
+`predicate` that sets *how* a feature must relate to the area to be
+kept: `"intersects"` (the default — touching the area in any way),
+`"within"` (lying entirely inside it), `"contains"`, `"disjoint"`
+(everything outside), and the more specialised `"overlaps"`,
+`"touches"`, `"crosses"`, `"covers"` and `"covered_by"`. Each maps to
+the matching `sf` function `sf::st_<predicate>()`; see
+[`?sf::geos_binary_pred`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+for the precise definition of each. The plain-`sf` equivalent, once both
+objects share a CRS, is:
 
 ``` r
 
