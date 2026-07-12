@@ -34,7 +34,9 @@ returns the feature that contains it (for example the municipality an
 address falls in).}
 
 \item{predicate}{Spatial predicate for \code{filter_by}, passed to
-\code{\link[=pdok_filter_by]{pdok_filter_by()}} (default \code{"intersects"}).}
+\code{\link[=pdok_filter_by]{pdok_filter_by()}} (default \code{"intersects"}). See its \emph{Spatial predicates}
+section for the available options, and \link[sf:geos_binary_pred]{sf::geos_binary_pred} for their
+definitions.}
 
 \item{datetime}{Optional temporal filter: a single year (e.g. \code{2026}, mapped
 to a mid-year instant), an OGC datetime string, or an interval such as
