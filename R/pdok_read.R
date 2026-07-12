@@ -72,7 +72,9 @@ read_ogc <- function(ogc, layer, bbox, datetime, max_features,
 #'   returns the feature that contains it (for example the municipality an
 #'   address falls in).
 #' @param predicate Spatial predicate for `filter_by`, passed to
-#'   [pdok_filter_by()] (default `"intersects"`).
+#'   [pdok_filter_by()] (default `"intersects"`). See its *Spatial predicates*
+#'   section for the available options, and [sf::geos_binary_pred] for their
+#'   definitions.
 #' @param datetime Optional temporal filter: a single year (e.g. `2026`, mapped
 #'   to a mid-year instant), an OGC datetime string, or an interval such as
 #'   `"2020-01-01/2025-12-31"`.

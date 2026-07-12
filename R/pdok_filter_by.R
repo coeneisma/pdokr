@@ -30,18 +30,41 @@ filter_predicate <- function(predicate, call = rlang::caller_env()) {
 #' The plain-`sf` equivalent is `data[filter_geometry, , op = sf::st_intersects]`
 #' (after matching CRS); use that if you prefer to drop down to `sf`.
 #'
+#' @section Spatial predicates:
+#' The `predicate` selects *how* a feature must relate to `filter_geometry` to be
+#' kept. Each value calls the matching `sf` predicate function `sf::st_<predicate>()`
+#' (so `"within"` uses [sf::st_within()], `"intersects"` uses [sf::st_intersects()],
+#' and so on). The common choices:
+#'
+#' - `"intersects"` (default) — the feature touches `filter_geometry` in any way
+#'   (overlaps, is inside, or shares a boundary). The most permissive; the usual
+#'   choice for "everything in this area".
+#' - `"within"` — the feature lies *entirely inside* `filter_geometry`. Use this
+#'   to exclude features that only stick partly into the area.
+#' - `"contains"` — the feature entirely *encloses* `filter_geometry` (the
+#'   inverse of `"within"`).
+#' - `"disjoint"` — the feature does *not* touch `filter_geometry` at all
+#'   (everything outside the area).
+#'
+#' `"overlaps"`, `"touches"`, `"crosses"`, `"covers"` and `"covered_by"` are the
+#' remaining, more specialised DE-9IM relationships. For the precise definition
+#' of each, see the `sf` help page [sf::geos_binary_pred] (the topic that
+#' documents `st_intersects()`, `st_within()`, and the rest).
+#'
 #' @param data An [sf][sf::st_sf] object to filter (for example a layer loaded
 #'   with [pdok_read()]).
 #' @param filter_geometry An `sf` or `sfc` object whose geometry defines the
 #'   area of interest.
 #' @param predicate The spatial relationship to test, one of `"intersects"`,
 #'   `"within"`, `"contains"`, `"overlaps"`, `"touches"`, `"crosses"`,
-#'   `"covers"`, `"covered_by"`, or `"disjoint"`.
+#'   `"covers"`, `"covered_by"`, or `"disjoint"`. See the *Spatial predicates*
+#'   section below, and [sf::geos_binary_pred] for the full definitions.
 #'
 #' @return An [sf][sf::st_sf] object: the subset of `data` whose features satisfy
 #'   `predicate` with respect to `filter_geometry`.
-#' @seealso [pdok_read()], whose `filter_by` argument applies this filter while
-#'   loading.
+#' @seealso [sf::geos_binary_pred] for the definition of each spatial predicate;
+#'   [sf::st_filter()], the `sf` filter this wraps; and [pdok_read()], whose
+#'   `filter_by` argument applies this filter while loading.
 #' @examples
 #' \donttest{
 #' # All national parks that intersect the province of Utrecht

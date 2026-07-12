@@ -15,7 +15,8 @@ area of interest.}
 
 \item{predicate}{The spatial relationship to test, one of \code{"intersects"},
 \code{"within"}, \code{"contains"}, \code{"overlaps"}, \code{"touches"}, \code{"crosses"},
-\code{"covers"}, \code{"covered_by"}, or \code{"disjoint"}.}
+\code{"covers"}, \code{"covered_by"}, or \code{"disjoint"}. See the \emph{Spatial predicates}
+section below, and \link[sf:geos_binary_pred]{sf::geos_binary_pred} for the full definitions.}
 }
 \value{
 An \link[sf:st_sf]{sf} object: the subset of \code{data} whose features satisfy
@@ -35,6 +36,30 @@ water-authority area, a hand-drawn polygon, or another PDOK layer.
 The plain-\code{sf} equivalent is \code{data[filter_geometry, , op = sf::st_intersects]}
 (after matching CRS); use that if you prefer to drop down to \code{sf}.
 }
+\section{Spatial predicates}{
+
+The \code{predicate} selects \emph{how} a feature must relate to \code{filter_geometry} to be
+kept. Each value calls the matching \code{sf} predicate function \verb{sf::st_<predicate>()}
+(so \code{"within"} uses \code{\link[sf:st_within]{sf::st_within()}}, \code{"intersects"} uses \code{\link[sf:st_intersects]{sf::st_intersects()}},
+and so on). The common choices:
+\itemize{
+\item \code{"intersects"} (default) — the feature touches \code{filter_geometry} in any way
+(overlaps, is inside, or shares a boundary). The most permissive; the usual
+choice for "everything in this area".
+\item \code{"within"} — the feature lies \emph{entirely inside} \code{filter_geometry}. Use this
+to exclude features that only stick partly into the area.
+\item \code{"contains"} — the feature entirely \emph{encloses} \code{filter_geometry} (the
+inverse of \code{"within"}).
+\item \code{"disjoint"} — the feature does \emph{not} touch \code{filter_geometry} at all
+(everything outside the area).
+}
+
+\code{"overlaps"}, \code{"touches"}, \code{"crosses"}, \code{"covers"} and \code{"covered_by"} are the
+remaining, more specialised DE-9IM relationships. For the precise definition
+of each, see the \code{sf} help page \link[sf:geos_binary_pred]{sf::geos_binary_pred} (the topic that
+documents \code{st_intersects()}, \code{st_within()}, and the rest).
+}
+
 \examples{
 \donttest{
 # All national parks that intersect the province of Utrecht
@@ -48,6 +73,7 @@ pdok_filter_by(parks, utrecht)
 }
 }
 \seealso{
-\code{\link[=pdok_read]{pdok_read()}}, whose \code{filter_by} argument applies this filter while
-loading.
+\link[sf:geos_binary_pred]{sf::geos_binary_pred} for the definition of each spatial predicate;
+\code{\link[sf:st_filter]{sf::st_filter()}}, the \code{sf} filter this wraps; and \code{\link[=pdok_read]{pdok_read()}}, whose
+\code{filter_by} argument applies this filter while loading.
 }
