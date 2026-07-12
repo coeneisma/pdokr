@@ -1,4 +1,4 @@
-# pdokr (development version)
+# pdokr 0.1.0
 
 * First release. `pdokr` provides:
   * Dataset and layer discovery with `pdok_list_datasets()`,
@@ -12,7 +12,11 @@
   * Spatial filtering by any polygon (or point) with `pdok_filter_by()`, also
     available in one call through the `filter_by` argument of `pdok_read()`.
   * Geocoding of addresses and place names with `pdok_geocode()`, returning
-    `sf` points and administrative polygons.
+    `sf` points and administrative polygons. `query` accepts a vector, so many
+    locations can be geocoded in one call; a `query` column maps each result row
+    back to its input.
+  * Reverse geocoding with `pdok_reverse_geocode()`: `sf` points to the nearest
+    address, road or place, with the distance in meters.
   * The official PDOK basemap as a map background with `pdok_basemap()`,
     returning a raster tile URL (`tmap`/`leaflet`) or a vector style URL
     (`maplibre`/`mapgl`).

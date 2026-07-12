@@ -26,6 +26,9 @@ test_that("format_datetime handles years, strings and bad input", {
   expect_equal(format_datetime("2020-01-01/2025-12-31"), "2020-01-01/2025-12-31")
   expect_error(format_datetime(TRUE), "single year")
   expect_error(format_datetime(c(2020, 2021)), "single year")
+  # a fractional or non-positive year is rejected up front, not silently sent
+  expect_error(format_datetime(2024.5), "positive whole number")
+  expect_error(format_datetime(-5), "positive whole number")
 })
 
 test_that("pdok_read returns an sf object from the OGC path", {
@@ -122,5 +125,54 @@ test_that("pdok_read validates layer and max_features", {
   expect_error(
     pdok_read("cbs/gebiedsindelingen", "x", max_features = 2.5),
     "positive whole number"
+  )
+})
+
+test_that("pdok_read validates crs before hitting the network", {
+  expect_error(pdok_read("cbs/gebiedsindelingen", "x", crs = "RD"), "EPSG code")
+  expect_error(pdok_read("cbs/gebiedsindelingen", "x", crs = -1), "EPSG code")
+  expect_error(pdok_read("cbs/gebiedsindelingen", "x", crs = 28992.5), "EPSG code")
+})
+
+test_that("pdok_read sends bbox and datetime in the items query", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) seen <<- req$url
+    mock_pdok_dispatcher(
+      items = items_resp(make_items_body(list(c(5, 52))))
+    )(req)
+  })
+
+  pdok_read(
+    "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+    bbox = c(4.8, 51.9, 5.2, 52.1), datetime = 2024, max_features = 1
+  )
+
+  expect_match(seen, "bbox=")
+  expect_match(seen, "datetime=")
+  expect_match(seen, "2024-07-01")
+})
+
+test_that("pdok_read keeps the original error when Features support is undeterminable", {
+  # items 404s, and /conformance returns an empty body -> support is NA, so the
+  # not-Features message must not hijack the genuine 404.
+  fail_items <- httr2::response(
+    status_code = 404,
+    url = "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/collections/c/items",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw("{}")
+  )
+  empty_conf <- httr2::response(
+    status_code = 200,
+    url = "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/conformance",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw('{"conformsTo":[]}')
+  )
+  httr2::local_mocked_responses(mock_pdok_dispatcher(
+    items = fail_items, conformance = empty_conf
+  ))
+  expect_error(
+    pdok_read("cbs/gebiedsindelingen", "no_such_layer"),
+    "resource not found"
   )
 })

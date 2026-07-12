@@ -47,7 +47,7 @@ filter_predicate <- function(predicate, call = rlang::caller_env()) {
 #'   (everything outside the area).
 #'
 #' `"overlaps"`, `"touches"`, `"crosses"`, `"covers"` and `"covered_by"` are the
-#' remaining, more specialised DE-9IM relationships. For the precise definition
+#' remaining, more specialized DE-9IM relationships. For the precise definition
 #' of each, see the `sf` help page [sf::geos_binary_pred] (the topic that
 #' documents `st_intersects()`, `st_within()`, and the rest).
 #'
@@ -61,7 +61,8 @@ filter_predicate <- function(predicate, call = rlang::caller_env()) {
 #'   section below, and [sf::geos_binary_pred] for the full definitions.
 #'
 #' @return An [sf][sf::st_sf] object: the subset of `data` whose features satisfy
-#'   `predicate` with respect to `filter_geometry`.
+#'   `predicate` with respect to `filter_geometry`. A zero-row `sf` is returned
+#'   (silently) when no feature matches.
 #' @seealso [sf::geos_binary_pred] for the definition of each spatial predicate;
 #'   [sf::st_filter()], the `sf` filter this wraps; and [pdok_read()], whose
 #'   `filter_by` argument applies this filter while loading.

@@ -59,8 +59,9 @@ pdok_basemap <- function(style = "standaard", format = c("raster", "vector")) {
   lookup <- if (format == "raster") pdok_basemap_raster else pdok_basemap_vector
   if (!style %in% names(lookup)) {
     cli::cli_abort(c(
-      "{.val {style}} is not a valid {format} basemap style.",
-      "i" = "Valid {format} styles: {.or {.val {names(lookup)}}}."
+      "{.arg style} must be a valid {format} basemap style.",
+      "i" = "Valid {format} styles: {.or {.val {names(lookup)}}}.",
+      "x" = "You supplied {.val {style}}."
     ))
   }
 

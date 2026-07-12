@@ -2,12 +2,12 @@
 % Please edit documentation in R/locatieserver.R
 \name{pdok_geocode}
 \alias{pdok_geocode}
-\title{Geocode an address or place name with the PDOK Locatieserver}
+\title{Geocode addresses or place names with the PDOK Locatieserver}
 \usage{
 pdok_geocode(query, type = NULL, crs = NULL, limit = 1)
 }
 \arguments{
-\item{query}{A single non-empty search string, e.g.
+\item{query}{A character vector of one or more non-empty search strings, e.g.
 \code{"Park Arenberg 88, De Bilt"}.}
 
 \item{type}{Optional result type to restrict to, one of \code{"adres"},
@@ -21,14 +21,17 @@ disambiguate names that exist in several categories (for example
 \item{crs}{Optional output CRS as an EPSG code (e.g. \code{28992}). \code{NULL} keeps
 the source CRS (CRS84, lon/lat).}
 
-\item{limit}{Maximum number of results to return (default 1).}
+\item{limit}{Maximum number of results to return per query (default 1).}
 }
 \value{
-An \link[sf:st_sf]{sf} object with one row per match. All non-geometry
-fields the service returns are kept as columns (with \code{weergavenaam},
-\code{type}, \code{score}, and the administrative names first); the geometry is a
-point for addresses and places and a polygon for administrative areas. A
-zero-row \code{sf} is returned (with a warning) when nothing matches.
+An \link[sf:st_sf]{sf} object with one row per match and a \code{query} column
+identifying the input each row came from. All non-geometry fields the
+service returns are kept as columns (with \code{query}, \code{weergavenaam}, \code{type},
+\code{score}, and the administrative names first); the geometry is a point for
+addresses and places and a polygon for administrative areas. Queries that
+match nothing are dropped (with a warning), so the result can have fewer
+rows than \code{query} has elements; a zero-row \code{sf} is returned when nothing
+matches at all.
 }
 \description{
 Looks up addresses, place names, postcodes, municipalities, provinces and
@@ -37,6 +40,12 @@ feature collection. Point geometry is returned for addresses and places, and
 boundary polygons for administrative areas such as municipalities — so a
 result drops straight into the \code{filter_by} argument of \code{\link[=pdok_read]{pdok_read()}}.
 }
+\details{
+\code{query} may be a vector, geocoding many locations in one call (for example a
+column of addresses). Each result row carries a \code{query} column with the input
+it came from, so the output maps back to the input even when a query returns
+several candidates or none.
+}
 \examples{
 \donttest{
 # An address: a point
@@ -44,8 +53,13 @@ pdok_geocode("Park Arenberg 88, De Bilt")
 
 # A municipality: a boundary polygon
 pdok_geocode("De Bilt", type = "gemeente")
+
+# Several addresses in one call; the `query` column maps rows to inputs
+pdok_geocode(c("Domplein 1, Utrecht", "Coolsingel 40, Rotterdam"))
 }
 }
 \seealso{
-\code{\link[=pdok_read]{pdok_read()}}, whose \code{filter_by} argument accepts the result.
+\code{\link[=pdok_reverse_geocode]{pdok_reverse_geocode()}} for the reverse lookup (coordinates to the
+nearest address), and \code{\link[=pdok_read]{pdok_read()}}, whose \code{filter_by} argument accepts the
+result.
 }

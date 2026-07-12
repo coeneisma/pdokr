@@ -27,6 +27,8 @@ test_that("an unknown style errors with the valid options", {
   expect_error(pdok_basemap("nope"), "valid raster")
   # 'grijs' is a raster style, not a vector one
   expect_error(pdok_basemap("grijs", format = "vector"), "valid vector")
+  # message echoes the supplied value (house style, like predicate/type)
+  expect_error(pdok_basemap("nope"), "You supplied")
 })
 
 test_that("style must be a single string", {

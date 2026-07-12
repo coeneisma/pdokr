@@ -26,9 +26,9 @@ library(tmap)
 
 | EPSG | Name | Units | Where |
 |------|------|-------|-------|
-| 28992 | Amersfoort / RD New | metres | the Dutch national grid; most data is *stored* in this |
+| 28992 | Amersfoort / RD New | meters | the Dutch national grid; most data is *stored* in this |
 | 4326 | WGS 84 (CRS84, lon/lat) | degrees | the default for web/GeoJSON |
-| 3857 | Web Mercator | metres | web map tiles |
+| 3857 | Web Mercator | meters | web map tiles |
 | 4258 | ETRS89 (lon/lat) | degrees | the European reference frame |
 
 ## What PDOK offers per layer
@@ -71,7 +71,7 @@ gemeenten_rd <- pdok_read(
 sf::st_crs(gemeenten_rd)$epsg
 ```
 
-The coordinates differ accordingly — degrees versus metres:
+The coordinates differ accordingly — degrees versus meters:
 
 ```{r bbox}
 sf::st_bbox(gemeenten)
@@ -104,7 +104,7 @@ tm_shape(gemeenten_rd) +
   tm_title("RD New (EPSG:28992)")
 ```
 
-For analysis in metres (distances, areas, buffers) use RD New; for web maps,
+For analysis in meters (distances, areas, buffers) use RD New; for web maps,
 lon/lat or Web Mercator.
 
 ## Two things `pdokr` handles for you

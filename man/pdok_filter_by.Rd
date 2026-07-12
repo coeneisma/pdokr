@@ -20,7 +20,8 @@ section below, and \link[sf:geos_binary_pred]{sf::geos_binary_pred} for the full
 }
 \value{
 An \link[sf:st_sf]{sf} object: the subset of \code{data} whose features satisfy
-\code{predicate} with respect to \code{filter_geometry}.
+\code{predicate} with respect to \code{filter_geometry}. A zero-row \code{sf} is returned
+(silently) when no feature matches.
 }
 \description{
 Keeps the features of \code{data} that relate to \code{filter_geometry} under a spatial
@@ -55,7 +56,7 @@ inverse of \code{"within"}).
 }
 
 \code{"overlaps"}, \code{"touches"}, \code{"crosses"}, \code{"covers"} and \code{"covered_by"} are the
-remaining, more specialised DE-9IM relationships. For the precise definition
+remaining, more specialized DE-9IM relationships. For the precise definition
 of each, see the \code{sf} help page \link[sf:geos_binary_pred]{sf::geos_binary_pred} (the topic that
 documents \code{st_intersects()}, \code{st_within()}, and the rest).
 }

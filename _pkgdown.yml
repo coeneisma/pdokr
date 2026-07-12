@@ -78,9 +78,10 @@ reference:
   contents:
   - pdok_filter_by
 - title: Geocoding
-  desc: Look up addresses and place names.
+  desc: Look up addresses and place names, or the address nearest a point.
   contents:
   - pdok_geocode
+  - pdok_reverse_geocode
 - title: Basemaps
   desc: The official PDOK basemap as a map background.
   contents:
