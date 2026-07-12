@@ -115,15 +115,15 @@ geocoded `gemeente`, `wijk` or `provincie` polygon drops straight into
 boundary <- pdok_geocode("De Bilt", type = "gemeente")
 
 # read the neighborhoods that meet the boundary, then keep those whose center
-# lies inside it. A geocoded boundary is generalised, so it clips edge
+# lies inside it. A geocoded boundary is generalized, so it clips edge
 # neighborhoods unevenly; `predicate = "within"` alone would drop some, while
-# `"intersects"` pulls in slivers of neighbouring municipalities.
+# `"intersects"` pulls in slivers of neighboring municipalities.
 buurten <- pdok_read(
   "cbs/gebiedsindelingen", "buurt_gegeneraliseerd", datetime = 2025,
   filter_by = boundary, predicate = "intersects"
 )
-centres <- suppressWarnings(sf::st_centroid(buurten))
-buurten <- filter(buurten, lengths(sf::st_within(centres, boundary)) > 0)
+centers <- suppressWarnings(sf::st_centroid(buurten))
+buurten <- filter(buurten, lengths(sf::st_within(centers, boundary)) > 0)
 nrow(buurten)
 ```
 
@@ -151,6 +151,57 @@ tmap_mode("plot")
 
 The same pattern works for any layer: geocode the area you care about, then read
 the buildings, parcels or statistics within it.
+
+## Geocoding a whole column
+
+`pdok_geocode()` takes a *vector* of queries, so you can geocode a column of
+addresses in one call. Every result row carries a `query` column identifying the
+input it came from, which keeps the output aligned with the input — even when a
+query returns several candidates, or none.
+
+Free search ranks matches across *all* levels — the exact address, but also the
+street or place it sits on — and returns the best-ranked one per query. So keep
+an eye on the `type` column: below, two queries resolve to the street (`weg`)
+rather than the house number, which is why their geometry is a line, not a point.
+
+```{r batch}
+addresses <- c("Domplein 1, Utrecht", "Coolsingel 40, Rotterdam",
+               "Vrijthof 1, Maastricht")
+
+pdok_geocode(addresses)[, c("query", "type", "weergavenaam")]
+```
+
+Pin the level with `type` when you know what you want. `type = "adres"` returns
+the exact addresses, all as points:
+
+```{r batch-adres}
+pdok_geocode(addresses, type = "adres")[, c("query", "type", "weergavenaam")]
+```
+
+## The other direction: reverse geocoding
+
+Sometimes you have coordinates — GPS points, sensor locations, a spot on a map —
+and want to know *what is there*. `pdok_reverse_geocode()` takes `sf` points and
+returns the nearest address, road or place, with an `afstand` column giving the
+distance in meters. A `point_id` column maps each match back to its input point.
+
+```{r reverse}
+points <- sf::st_sfc(
+  sf::st_point(c(5.121, 52.090)),   # central Utrecht
+  sf::st_point(c(4.479, 51.923)),   # central Rotterdam
+  crs = 4326
+)
+
+pdok_reverse_geocode(points)[, c("point_id", "type", "weergavenaam", "afstand")]
+```
+
+By default it returns the nearest match of any type — usually an address. Use
+`type` to choose the level: `type = "weg"` for the nearest road, or
+`type = "gemeente"` for the municipality the point falls in (distance 0, since
+the point is inside it).
+
+The input can be in any CRS — RD New points work just as well; they are
+converted to lon/lat for the query automatically.
 
 ## Where to next
 
