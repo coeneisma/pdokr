@@ -27,12 +27,12 @@ background, use `pdok_basemap()`.
 
 ## Installation
 
-You can install the development version of `pdokr` from
-[GitHub](https://github.com/coeneisma/pdokr) with:
+`pdokr` is not yet on CRAN. Install the development version from
+[GitHub](https://github.com/coeneisma/pdokr):
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("coeneisma/pdokr")
+# install.packages("remotes")
+remotes::install_github("coeneisma/pdokr@develop")
 ```
 
 ## Example
