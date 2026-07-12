@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pdokr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -141,16 +141,16 @@ where education <em>may</em> take place, each with coordinates and a
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">locations</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 13605</span></span></code></pre></div>
 <p>There is a catch: these are <em>possible</em> education locations,
-not recognised schools. A conference centre that hosts the odd exam, or
+not recognized schools. A conference center that hosts the odd exam, or
 a commercial training firm, is in here too. Mapping them straight away
 would put dots where no school exists.</p>
 </div>
 <div class="section level2">
-<h2 id="keep-only-the-recognised-schools">Keep only the recognised schools<a class="anchor" aria-label="anchor" href="#keep-only-the-recognised-schools"></a>
+<h2 id="keep-only-the-recognized-schools">Keep only the recognized schools<a class="anchor" aria-label="anchor" href="#keep-only-the-recognized-schools"></a>
 </h2>
-<p>To find the schools recognised in law we combine two more DUO tables.
+<p>To find the schools recognized in law we combine two more DUO tables.
 The <code>relaties...</code> resource links a location
-(<code>ONDERWIJSLOCATIECODE</code>) to a recognised institution
+(<code>ONDERWIJSLOCATIECODE</code>) to a recognized institution
 (<code>VESTIGINGSCODE</code>); the <code>vestigingserkenningen</code>
 resource describes that institution — its name and the education law it
 falls under (<code>WET</code>). Both tables are historical, so a row
@@ -170,14 +170,14 @@ counts only when it has no <code>EINDDATUM</code>.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">sectors</span><span class="op">[</span><span class="va">WET</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">VESTIGINGSCODE</span>, <span class="va">sector</span>, school <span class="op">=</span> <span class="va">VOLLEDIGE_NAAM</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># current location -&gt; recognised institution, one institution per location</span></span>
+<span><span class="co"># current location -&gt; recognized institution, one institution per location</span></span>
 <span><span class="va">link</span> <span class="op">&lt;-</span> <span class="va">relations</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">EINDDATUM</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ONDERWIJSLOCATIECODE</span>, <span class="va">VESTIGINGSCODE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">institutions</span>, by <span class="op">=</span> <span class="st">"VESTIGINGSCODE"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">ONDERWIJSLOCATIECODE</span>, .keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># inner join drops every location without a recognised institution</span></span>
+<span><span class="co"># inner join drops every location without a recognized institution</span></span>
 <span><span class="va">schools</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">locations</span>, <span class="va">link</span>, by <span class="op">=</span> <span class="st">"ONDERWIJSLOCATIECODE"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">schools</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 9675</span></span>
@@ -188,11 +188,11 @@ counts only when it has no <code>EINDDATUM</code>.</p>
 <span><span class="co">#&gt; 3        Secondary 1473</span></span>
 <span><span class="co">#&gt; 4          Special  708</span></span>
 <span><span class="co">#&gt; 5 Vocational (MBO)  203</span></span></code></pre></div>
-<p>Only the locations backed by a recognised institution remain — no
+<p>Only the locations backed by a recognized institution remain — no
 training venues, no exam halls — and each carries its school name and
 education sector.</p>
 <p>One quirk worth knowing: a university or college is registered as a
-<em>single</em> recognised institution, so only its official location
+<em>single</em> recognized institution, so only its official location
 appears here, not its every building. The map below is therefore
 dominated by primary and secondary schools, which register each
 site.</p>
@@ -229,14 +229,14 @@ municipal boundary to zoom in on Utrecht.</p>
 <span>    fill.scale <span class="op">=</span> <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_scale_categorical.html" class="external-link">tm_scale_categorical</a></span><span class="op">(</span>values <span class="op">=</span> <span class="st">"brewer.set2"</span><span class="op">)</span>,</span>
 <span>    fill.legend <span class="op">=</span> <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_legend.html" class="external-link">tm_legend</a></span><span class="op">(</span><span class="st">"Sector"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_title.html" class="external-link">tm_title</a></span><span class="op">(</span><span class="st">"Recognised schools in Utrecht, by sector"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_title.html" class="external-link">tm_title</a></span><span class="op">(</span><span class="st">"Recognized schools in Utrecht, by sector"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="duo-schools_files/figure-html/map-overview-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="map-the-school-buildings">Map the school buildings<a class="anchor" aria-label="anchor" href="#map-the-school-buildings"></a>
 </h2>
 <p>Each school sits in a building from the BAG. We read the
-<code>pand</code> (building) layer for the historic centre, keep the
+<code>pand</code> (building) layer for the historic center, keep the
 footprints that contain a school, and carry the school name and sector
 across with a spatial join.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -248,17 +248,18 @@ across with a spatial join.</p>
 <span><span class="va">centre_schools</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_filter_by.html">pdok_filter_by</a></span><span class="op">(</span><span class="va">utrecht_schools</span>, <span class="va">binnenstad</span>, predicate <span class="op">=</span> <span class="st">"within"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">panden</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span><span class="st">"kadaster/bag"</span>, <span class="st">"pand"</span>, filter_by <span class="op">=</span> <span class="va">binnenstad</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ⠙ Downloading PDOK features: 1558 fetched</span></span>
-<span><span class="co">#&gt; ⠹ Downloading PDOK features: 3027 fetched</span></span>
-<span><span class="co">#&gt; ⠸ Downloading PDOK features: 5131 fetched</span></span>
-<span><span class="co">#&gt; ⠼ Downloading PDOK features: 6026 fetched</span></span>
+<span><span class="co">#&gt; ⠙ Downloading PDOK features: 1058 fetched</span></span>
+<span><span class="co">#&gt; ⠹ Downloading PDOK features: 1558 fetched</span></span>
+<span><span class="co">#&gt; ⠸ Downloading PDOK features: 3027 fetched</span></span>
+<span><span class="co">#&gt; ⠼ Downloading PDOK features: 4842 fetched</span></span>
+<span><span class="co">#&gt; ⠴ Downloading PDOK features: 6026 fetched</span></span>
 <span><span class="va">school_buildings</span> <span class="op">&lt;-</span> <span class="va">panden</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_filter</a></span><span class="op">(</span><span class="va">centre_schools</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">centre_schools</span>, <span class="va">school</span>, <span class="va">sector</span>, <span class="va">STRAATNAAM</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">school_buildings</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 11</span></span></code></pre></div>
-<p>The result is real school buildings, coloured by sector. Click one
-for the school that uses it.</p>
+<p>The result is real school buildings, colored by sector. Click one for
+the school that uses it.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tmap_mode.html" class="external-link">tmap_mode</a></span><span class="op">(</span><span class="st">"view"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> tmap modes <span style="color: #0000BB;">"plot"</span> - <span style="color: #0000BB; font-weight: bold;">"view"</span></span></span>
@@ -290,7 +291,7 @@ on <code><a href="../reference/pdok_filter_by.html">pdok_filter_by()</a></code>.
 year</a> — another BAG example, using the <code>pand</code> (building)
 layer.</li>
 <li>
-<a href="basemaps.html">PDOK basemaps</a> — the grey background map
+<a href="basemaps.html">PDOK basemaps</a> — the gray background map
 used here, and the other styles.</li>
 </ul>
 </div>

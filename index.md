@@ -28,7 +28,7 @@ devtools::install_github("coeneisma/pdokr")
 ## Example
 
 Pick an area from the administrative boundaries, then load another layer
-within it. Here we take the historic centre of Delft and map every
+within it. Here we take the historic center of Delft and map every
 building in it.
 
 ``` r
@@ -36,7 +36,7 @@ building in it.
 library(pdokr)
 library(tmap)
 
-# A municipality, and one of its districts (the historic centre of Delft)
+# A municipality, and one of its districts (the historic center of Delft)
 gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2024
 )
@@ -58,7 +58,7 @@ tm_basemap(pdok_basemap("grijs")) +
   tm_borders(col = "grey40") +
   tm_shape(buildings) +
   tm_polygons(fill = "#d95f02", col = "white", lwd = 0.4) +
-  tm_title("Buildings in the historic centre of Delft") +
+  tm_title("Buildings in the historic center of Delft") +
   tm_credits("Kaartgegevens © Kadaster")
 ```
 

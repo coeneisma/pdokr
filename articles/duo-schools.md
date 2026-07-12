@@ -63,15 +63,15 @@ nrow(locations)
 ```
 
 There is a catch: these are *possible* education locations, not
-recognised schools. A conference centre that hosts the odd exam, or a
+recognized schools. A conference center that hosts the odd exam, or a
 commercial training firm, is in here too. Mapping them straight away
 would put dots where no school exists.
 
-## Keep only the recognised schools
+## Keep only the recognized schools
 
-To find the schools recognised in law we combine two more DUO tables.
+To find the schools recognized in law we combine two more DUO tables.
 The `relaties...` resource links a location (`ONDERWIJSLOCATIECODE`) to
-a recognised institution (`VESTIGINGSCODE`); the `vestigingserkenningen`
+a recognized institution (`VESTIGINGSCODE`); the `vestigingserkenningen`
 resource describes that institution — its name and the education law it
 falls under (`WET`). Both tables are historical, so a row counts only
 when it has no `EINDDATUM`.
@@ -92,14 +92,14 @@ institutions <- institutions |>
   mutate(sector = unname(sectors[WET])) |>
   select(VESTIGINGSCODE, sector, school = VOLLEDIGE_NAAM)
 
-# current location -> recognised institution, one institution per location
+# current location -> recognized institution, one institution per location
 link <- relations |>
   filter(is.na(EINDDATUM)) |>
   select(ONDERWIJSLOCATIECODE, VESTIGINGSCODE) |>
   inner_join(institutions, by = "VESTIGINGSCODE") |>
   distinct(ONDERWIJSLOCATIECODE, .keep_all = TRUE)
 
-# inner join drops every location without a recognised institution
+# inner join drops every location without a recognized institution
 schools <- inner_join(locations, link, by = "ONDERWIJSLOCATIECODE")
 nrow(schools)
 #> [1] 9675
@@ -112,12 +112,12 @@ count(schools, sector)
 #> 5 Vocational (MBO)  203
 ```
 
-Only the locations backed by a recognised institution remain — no
+Only the locations backed by a recognized institution remain — no
 training venues, no exam halls — and each carries its school name and
 education sector.
 
 One quirk worth knowing: a university or college is registered as a
-*single* recognised institution, so only its official location appears
+*single* recognized institution, so only its official location appears
 here, not its every building. The map below is therefore dominated by
 primary and secondary schools, which register each site.
 
@@ -158,7 +158,7 @@ tm_shape(utrecht) +
     fill.scale = tm_scale_categorical(values = "brewer.set2"),
     fill.legend = tm_legend("Sector")
   ) +
-  tm_title("Recognised schools in Utrecht, by sector")
+  tm_title("Recognized schools in Utrecht, by sector")
 ```
 
 ![](duo-schools_files/figure-html/map-overview-1.png)
@@ -166,7 +166,7 @@ tm_shape(utrecht) +
 ## Map the school buildings
 
 Each school sits in a building from the BAG. We read the `pand`
-(building) layer for the historic centre, keep the footprints that
+(building) layer for the historic center, keep the footprints that
 contain a school, and carry the school name and sector across with a
 spatial join.
 
@@ -180,10 +180,11 @@ binnenstad <- filter(wijken, grepl("Binnenstad", statnaam))
 centre_schools <- pdok_filter_by(utrecht_schools, binnenstad, predicate = "within")
 
 panden <- pdok_read("kadaster/bag", "pand", filter_by = binnenstad)
-#> ⠙ Downloading PDOK features: 1558 fetched
-#> ⠹ Downloading PDOK features: 3027 fetched
-#> ⠸ Downloading PDOK features: 5131 fetched
-#> ⠼ Downloading PDOK features: 6026 fetched
+#> ⠙ Downloading PDOK features: 1058 fetched
+#> ⠹ Downloading PDOK features: 1558 fetched
+#> ⠸ Downloading PDOK features: 3027 fetched
+#> ⠼ Downloading PDOK features: 4842 fetched
+#> ⠴ Downloading PDOK features: 6026 fetched
 school_buildings <- panden |>
   st_filter(centre_schools) |>
   st_join(select(centre_schools, school, sector, STRAATNAAM))
@@ -191,7 +192,7 @@ nrow(school_buildings)
 #> [1] 11
 ```
 
-The result is real school buildings, coloured by sector. Click one for
+The result is real school buildings, colored by sector. Click one for
 the school that uses it.
 
 ``` r
@@ -223,4 +224,4 @@ tm_basemap(pdok_basemap("grijs")) +
   another BAG example, using the `pand` (building) layer.
 - [PDOK
   basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
-  the grey background map used here, and the other styles.
+  the gray background map used here, and the other styles.

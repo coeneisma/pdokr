@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pdokr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,8 +94,8 @@
 en Gebouwen) holds every building in the Netherlands, with attributes
 such as the year it was built. It is served over the OGC API Features
 service, so <code><a href="../reference/pdok_read.html">pdok_read()</a></code> reads it like any other layer. This
-article maps the buildings of one neighbourhood, coloured by
-construction year.</p>
+article maps the buildings of one neighborhood, colored by construction
+year.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/coeneisma/pdokr" class="external-link">pdokr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-tmap/tmap" class="external-link">tmap</a></span><span class="op">)</span></span>
@@ -112,7 +112,7 @@ construction year.</p>
 <h2 id="choose-an-area">Choose an area<a class="anchor" aria-label="anchor" href="#choose-an-area"></a>
 </h2>
 <p>We use the administrative boundaries to select the
-<code>Stadsdriehoek</code>, the historic centre of Rotterdam.</p>
+<code>Stadsdriehoek</code>, the historic center of Rotterdam.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gemeenten</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span></span>
 <span>  <span class="st">"cbs/gebiedsindelingen"</span>, <span class="st">"gemeente_gegeneraliseerd"</span>, datetime <span class="op">=</span> <span class="fl">2025</span></span>
@@ -129,12 +129,11 @@ construction year.</p>
 <h2 id="load-every-building-in-it">Load every building in it<a class="anchor" aria-label="anchor" href="#load-every-building-in-it"></a>
 </h2>
 <p>The <code>kadaster/bag</code> dataset has a <code>pand</code>
-(building) layer. We filter it to the neighbourhood;
+(building) layer. We filter it to the neighborhood;
 <code><a href="../reference/pdok_read.html">pdok_read()</a></code> pre-filters at the server and clips to the
 exact shape.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">buildings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span><span class="st">"kadaster/bag"</span>, <span class="st">"pand"</span>, filter_by <span class="op">=</span> <span class="va">stadsdriehoek</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ⠙ Downloading PDOK features: 808 fetched</span></span>
 <span><span class="co">#&gt; ⠙ Downloading PDOK features: 1022 fetched</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">buildings</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1022</span></span></code></pre></div>
@@ -148,9 +147,9 @@ those to <code>NA</code>.</p>
 <div class="section level2">
 <h2 id="map-by-construction-year">Map by construction year<a class="anchor" aria-label="anchor" href="#map-by-construction-year"></a>
 </h2>
-<p>Rotterdam’s historic centre was largely destroyed in the May 1940
+<p>Rotterdam’s historic center was largely destroyed in the May 1940
 bombing and rebuilt afterwards. To make that dividing line jump out, we
-colour the buildings that pre-date the bombing (before 1940) in
+color the buildings that pre-date the bombing (before 1940) in
 <strong>cool blues</strong> and the post-war rebuild in <strong>warm
 tones</strong> — the surviving pre-war buildings stand out against a sea
 of reconstruction.</p>
@@ -202,7 +201,7 @@ load-then-filter workflow used here.</li>
 <a href="duo-schools.html">Combining with external data</a> — join
 <code>pdokr</code> with another open API.</li>
 <li>
-<a href="basemaps.html">PDOK basemaps</a> — the grey background map
+<a href="basemaps.html">PDOK basemaps</a> — the gray background map
 used here, and the other styles.</li>
 </ul>
 </div>

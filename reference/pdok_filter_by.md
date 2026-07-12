@@ -37,7 +37,8 @@ pdok_filter_by(data, filter_geometry, predicate = "intersects")
 
 An [sf](https://r-spatial.github.io/sf/reference/sf.html) object: the
 subset of `data` whose features satisfy `predicate` with respect to
-`filter_geometry`.
+`filter_geometry`. A zero-row `sf` is returned (silently) when no
+feature matches.
 
 ## Details
 
@@ -74,7 +75,7 @@ and so on). The common choices:
   (everything outside the area).
 
 `"overlaps"`, `"touches"`, `"crosses"`, `"covers"` and `"covered_by"`
-are the remaining, more specialised DE-9IM relationships. For the
+are the remaining, more specialized DE-9IM relationships. For the
 precise definition of each, see the `sf` help page
 [sf::geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
 (the topic that documents `st_intersects()`, `st_within()`, and the

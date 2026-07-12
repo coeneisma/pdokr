@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pdokr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,12 +50,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="pdokr-development-version">pdokr (development version)<a class="anchor" aria-label="anchor" href="#pdokr-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.0" id="pdokr-010">pdokr 0.1.0<a class="anchor" aria-label="anchor" href="#pdokr-010"></a></h2>
 <ul><li>First release. <code>pdokr</code> provides:
 <ul><li>Dataset and layer discovery with <code><a href="../reference/pdok_list_datasets.html">pdok_list_datasets()</a></code>, <code><a href="../reference/pdok_search_datasets.html">pdok_search_datasets()</a></code>, <code><a href="../reference/pdok_list_layers.html">pdok_list_layers()</a></code> and <code><a href="../reference/pdok_search_layers.html">pdok_search_layers()</a></code>, fetched live from the PDOK index.</li>
 <li>Loading layers as <code>sf</code> objects with <code><a href="../reference/pdok_read.html">pdok_read()</a></code>, with automatic pagination, server-side bounding-box and temporal pre-filtering, and client-side CRS transformation. <code>pdokr</code> is an OGC API Features client and reads vector features only; a dataset that serves tiles or coverages instead is reported with a clear error.</li>
 <li>Spatial filtering by any polygon (or point) with <code><a href="../reference/pdok_filter_by.html">pdok_filter_by()</a></code>, also available in one call through the <code>filter_by</code> argument of <code><a href="../reference/pdok_read.html">pdok_read()</a></code>.</li>
-<li>Geocoding of addresses and place names with <code><a href="../reference/pdok_geocode.html">pdok_geocode()</a></code>, returning <code>sf</code> points and administrative polygons.</li>
+<li>Geocoding of addresses and place names with <code><a href="../reference/pdok_geocode.html">pdok_geocode()</a></code>, returning <code>sf</code> points and administrative polygons. <code>query</code> accepts a vector, so many locations can be geocoded in one call; a <code>query</code> column maps each result row back to its input.</li>
+<li>Reverse geocoding with <code><a href="../reference/pdok_reverse_geocode.html">pdok_reverse_geocode()</a></code>: <code>sf</code> points to the nearest address, road or place, with the distance in meters.</li>
 <li>The official PDOK basemap as a map background with <code><a href="../reference/pdok_basemap.html">pdok_basemap()</a></code>, returning a raster tile URL (<code>tmap</code>/<code>leaflet</code>) or a vector style URL (<code>maplibre</code>/<code>mapgl</code>).</li>
 </ul></li>
 </ul></div>

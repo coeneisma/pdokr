@@ -5,7 +5,7 @@ holds every building in the Netherlands, with attributes such as the
 year it was built. It is served over the OGC API Features service, so
 [`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md)
 reads it like any other layer. This article maps the buildings of one
-neighbourhood, coloured by construction year.
+neighborhood, colored by construction year.
 
 ``` r
 
@@ -25,7 +25,7 @@ library(dplyr)
 ## Choose an area
 
 We use the administrative boundaries to select the `Stadsdriehoek`, the
-historic centre of Rotterdam.
+historic center of Rotterdam.
 
 ``` r
 
@@ -44,14 +44,13 @@ stadsdriehoek <- filter(buurten, statnaam == "Stadsdriehoek")
 ## Load every building in it
 
 The `kadaster/bag` dataset has a `pand` (building) layer. We filter it
-to the neighbourhood;
+to the neighborhood;
 [`pdok_read()`](https://coeneisma.github.io/pdokr/reference/pdok_read.md)
 pre-filters at the server and clips to the exact shape.
 
 ``` r
 
 buildings <- pdok_read("kadaster/bag", "pand", filter_by = stadsdriehoek)
-#> ⠙ Downloading PDOK features: 808 fetched
 #> ⠙ Downloading PDOK features: 1022 fetched
 nrow(buildings)
 #> [1] 1022
@@ -69,9 +68,9 @@ range(buildings$bouwjaar, na.rm = TRUE)
 
 ## Map by construction year
 
-Rotterdam’s historic centre was largely destroyed in the May 1940
+Rotterdam’s historic center was largely destroyed in the May 1940
 bombing and rebuilt afterwards. To make that dividing line jump out, we
-colour the buildings that pre-date the bombing (before 1940) in **cool
+color the buildings that pre-date the bombing (before 1940) in **cool
 blues** and the post-war rebuild in **warm tones** — the surviving
 pre-war buildings stand out against a sea of reconstruction.
 
@@ -126,4 +125,4 @@ tm_basemap(pdok_basemap("grijs")) +
   join `pdokr` with another open API.
 - [PDOK
   basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
-  the grey background map used here, and the other styles.
+  the gray background map used here, and the other styles.

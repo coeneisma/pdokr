@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pdokr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,11 +91,11 @@
     
     
 <p>Statistics Netherlands (<a href="https://www.cbs.nl/" class="external-link">CBS</a>)
-publishes a yearly dataset with hundreds of figures per neighbourhood —
+publishes a yearly dataset with hundreds of figures per neighborhood —
 population, income, housing, energy use, distance to amenities, and much
 more. Because PDOK serves it with geometry, a single
 <code><a href="../reference/pdok_read.html">pdok_read()</a></code> gives you everything you need for a choropleth.
-This article maps the population density across the neighbourhoods of
+This article maps the population density across the neighborhoods of
 Amsterdam.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/coeneisma/pdokr" class="external-link">pdokr</a></span><span class="op">)</span></span>
@@ -110,13 +110,13 @@ Amsterdam.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="read-the-neighbourhoods-of-one-municipality">Read the neighbourhoods of one municipality<a class="anchor" aria-label="anchor" href="#read-the-neighbourhoods-of-one-municipality"></a>
+<h2 id="read-the-neighborhoods-of-one-municipality">Read the neighborhoods of one municipality<a class="anchor" aria-label="anchor" href="#read-the-neighborhoods-of-one-municipality"></a>
 </h2>
 <p>The <code>cbs/wijken-en-buurten-2025</code> dataset has
 <code>gemeenten</code>, <code>wijken</code> and <code>buurten</code>
 layers. We take the boundary of Amsterdam from the
 <code>gemeenten</code> layer, then read the <code>buurten</code>
-(neighbourhoods) inside it.</p>
+(neighborhoods) inside it.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gemeenten</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span><span class="st">"cbs/wijken-en-buurten-2025"</span>, <span class="st">"gemeenten"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ⠙ Downloading PDOK features: 424 fetched</span></span>
@@ -145,15 +145,14 @@ distort the map.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">buurten</span><span class="op">$</span><span class="va">bevolkingsdichtheid_inwoners_per_km2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs </span></span>
 <span><span class="co">#&gt;       3    5689   10396   11815   17892   34968      44</span></span></code></pre></div>
-<p>The value is the number of inhabitants per square kilometre.</p>
+<p>The value is the number of inhabitants per square kilometer.</p>
 </div>
 <div class="section level2">
 <h2 id="draw-the-choropleth">Draw the choropleth<a class="anchor" aria-label="anchor" href="#draw-the-choropleth"></a>
 </h2>
-<p>A quantile classification keeps each colour class roughly equal in
-size, which works well for a skewed variable like density.
-Neighbourhoods without a value (water, parks, industry) are drawn in
-grey.</p>
+<p>A quantile classification keeps each color class roughly equal in
+size, which works well for a skewed variable like density. Neighborhoods
+without a value (water, parks, industry) are drawn in gray.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tmap_mode.html" class="external-link">tmap_mode</a></span><span class="op">(</span><span class="st">"plot"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> tmap modes <span style="color: #0000BB; font-weight: bold;">"plot"</span> - <span style="color: #0000BB;">"view"</span></span></span>
@@ -168,13 +167,13 @@ grey.</p>
 <span>    fill.legend <span class="op">=</span> <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_legend.html" class="external-link">tm_legend</a></span><span class="op">(</span><span class="st">"Inhabitants per km2"</span><span class="op">)</span>,</span>
 <span>    col <span class="op">=</span> <span class="st">"white"</span>, lwd <span class="op">=</span> <span class="fl">0.2</span>, fill_alpha <span class="op">=</span> <span class="fl">0.8</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_title.html" class="external-link">tm_title</a></span><span class="op">(</span><span class="st">"Population density by neighbourhood, Amsterdam (CBS 2025)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_title.html" class="external-link">tm_title</a></span><span class="op">(</span><span class="st">"Population density by neighborhood, Amsterdam (CBS 2025)"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_credits.html" class="external-link">tm_credits</a></span><span class="op">(</span><span class="st">"Kaartgegevens © Kadaster"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">[plot mode]</span> fit legend/component: Some legend items or map compoments do not</span></span>
 <span><span class="co">#&gt; fit well, and are therefore rescaled.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Set the tmap option `component.autoscale = FALSE` to disable rescaling.</span></span></code></pre></div>
 <p><img src="cbs-statistics_files/figure-html/map-static-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
-<p>The same map interactively — hover for the neighbourhood name and
+<p>The same map interactively — hover for the neighborhood name and
 click for the value. A little transparency lets the basemap show
 through, so you keep your bearings:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -214,7 +213,7 @@ load-then-filter workflow.</li>
 systems</a> — working in RD New (EPSG:28992), the Dutch national
 grid.</li>
 <li>
-<a href="basemaps.html">PDOK basemaps</a> — the grey background map
+<a href="basemaps.html">PDOK basemaps</a> — the gray background map
 used here, and the other styles.</li>
 </ul>
 </div>

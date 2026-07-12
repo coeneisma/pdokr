@@ -118,7 +118,7 @@ reconciles coordinate reference systems for you and accepts a
 `predicate` that sets *how* a feature must relate to the area to be
 kept: `"intersects"` (the default — touching the area in any way),
 `"within"` (lying entirely inside it), `"contains"`, `"disjoint"`
-(everything outside), and the more specialised `"overlaps"`,
+(everything outside), and the more specialized `"overlaps"`,
 `"touches"`, `"crosses"`, `"covers"` and `"covered_by"`. Each maps to
 the matching `sf` function `sf::st_<predicate>()`; see
 [`?sf::geos_binary_pred`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
@@ -164,7 +164,7 @@ The same idea scales up: geocode a place as a polygon (for example
   read a BAG layer inside an area.
 - [Thematic maps from CBS
   statistics](https://coeneisma.github.io/pdokr/articles/cbs-statistics.md)
-  — a choropleth for one municipality’s neighbourhoods.
+  — a choropleth for one municipality’s neighborhoods.
 - [PDOK
   basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
-  the grey background map used here, and the other styles.
+  the gray background map used here, and the other styles.

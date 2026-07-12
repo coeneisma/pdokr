@@ -63,18 +63,18 @@ The Locatieserver does not only know addresses. Every result has a
 `type`, and the geometry you get back depends on it — a point for
 pinpoint locations, a line for a road, a polygon for an area.
 
-| `type`              | Geometry | What it is                  |
-|---------------------|----------|-----------------------------|
-| `adres`             | point    | a specific address          |
-| `postcode`          | point    | the centre of a postcode    |
-| `hectometerpaal`    | point    | a motorway distance marker  |
-| `appartementsrecht` | point    | an apartment right          |
-| `weg`               | line     | a (named) road              |
-| `buurt`, `wijk`     | polygon  | a neighbourhood or district |
-| `woonplaats`        | polygon  | a town or city              |
-| `gemeente`          | polygon  | a municipality              |
-| `provincie`         | polygon  | a province                  |
-| `perceel`           | polygon  | a cadastral parcel          |
+| `type`              | Geometry | What it is                 |
+|---------------------|----------|----------------------------|
+| `adres`             | point    | a specific address         |
+| `postcode`          | point    | the center of a postcode   |
+| `hectometerpaal`    | point    | a motorway distance marker |
+| `appartementsrecht` | point    | an apartment right         |
+| `weg`               | line     | a (named) road             |
+| `buurt`, `wijk`     | polygon  | a neighborhood or district |
+| `woonplaats`        | polygon  | a town or city             |
+| `gemeente`          | polygon  | a municipality             |
+| `provincie`         | polygon  | a province                 |
+| `perceel`           | polygon  | a cadastral parcel         |
 
 By default
 [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
@@ -150,23 +150,23 @@ polygon drops straight into `filter_by`.
 
 boundary <- pdok_geocode("De Bilt", type = "gemeente")
 
-# read the neighbourhoods that meet the boundary, then keep those whose centre
-# lies inside it. A geocoded boundary is generalised, so it clips edge
-# neighbourhoods unevenly; `predicate = "within"` alone would drop some, while
-# `"intersects"` pulls in slivers of neighbouring municipalities.
+# read the neighborhoods that meet the boundary, then keep those whose center
+# lies inside it. A geocoded boundary is generalized, so it clips edge
+# neighborhoods unevenly; `predicate = "within"` alone would drop some, while
+# `"intersects"` pulls in slivers of neighboring municipalities.
 buurten <- pdok_read(
   "cbs/gebiedsindelingen", "buurt_gegeneraliseerd", datetime = 2025,
   filter_by = boundary, predicate = "intersects"
 )
-centres <- suppressWarnings(sf::st_centroid(buurten))
-buurten <- filter(buurten, lengths(sf::st_within(centres, boundary)) > 0)
+centers <- suppressWarnings(sf::st_centroid(buurten))
+buurten <- filter(buurten, lengths(sf::st_within(centers, boundary)) > 0)
 nrow(buurten)
 #> [1] 24
 ```
 
 The geocoded boundary did the filtering; the result is every
-neighbourhood inside the municipality of De Bilt. On an interactive map
-you can see where that is and hover for the neighbourhood names:
+neighborhood inside the municipality of De Bilt. On an interactive map
+you can see where that is and hover for the neighborhood names:
 
 ``` r
 
@@ -187,6 +187,96 @@ tm_basemap(pdok_basemap("grijs")) +
 The same pattern works for any layer: geocode the area you care about,
 then read the buildings, parcels or statistics within it.
 
+## Geocoding a whole column
+
+[`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
+takes a *vector* of queries, so you can geocode a column of addresses in
+one call. Every result row carries a `query` column identifying the
+input it came from, which keeps the output aligned with the input — even
+when a query returns several candidates, or none.
+
+Free search ranks matches across *all* levels — the exact address, but
+also the street or place it sits on — and returns the best-ranked one
+per query. So keep an eye on the `type` column: below, two queries
+resolve to the street (`weg`) rather than the house number, which is why
+their geometry is a line, not a point.
+
+``` r
+
+addresses <- c("Domplein 1, Utrecht", "Coolsingel 40, Rotterdam",
+               "Vrijthof 1, Maastricht")
+
+pdok_geocode(addresses)[, c("query", "type", "weergavenaam")]
+#> Simple feature collection with 3 features and 3 fields
+#> Geometry type: GEOMETRY
+#> Dimension:     XY
+#> Bounding box:  xmin: 4.479201 ymin: 50.84827 xmax: 5.68912 ymax: 52.09118
+#> Geodetic CRS:  WGS 84
+#> # A tibble: 3 × 4
+#>   query                    type  weergavenaam                           geometry
+#>   <chr>                    <chr> <chr>                            <GEOMETRY [°]>
+#> 1 Domplein 1, Utrecht      weg   Domplein, Utrecht     MULTILINESTRING ((5.1219…
+#> 2 Coolsingel 40, Rotterdam adres Coolsingel 40, 3011A… POINT (4.479201 51.92272)
+#> 3 Vrijthof 1, Maastricht   weg   Vrijthof, Maastricht  MULTILINESTRING ((5.6877…
+```
+
+Pin the level with `type` when you know what you want. `type = "adres"`
+returns the exact addresses, all as points:
+
+``` r
+
+pdok_geocode(addresses, type = "adres")[, c("query", "type", "weergavenaam")]
+#> Simple feature collection with 3 features and 3 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: 4.479201 ymin: 50.84967 xmax: 5.689297 ymax: 52.09119
+#> Geodetic CRS:  WGS 84
+#> # A tibble: 3 × 4
+#>   query                    type  weergavenaam                     geometry
+#>   <chr>                    <chr> <chr>                         <POINT [°]>
+#> 1 Domplein 1, Utrecht      adres Domplein 1, 3512JC U… (5.122029 52.09119)
+#> 2 Coolsingel 40, Rotterdam adres Coolsingel 40, 3011A… (4.479201 51.92272)
+#> 3 Vrijthof 1, Maastricht   adres Vrijthof 1, 6211LC M… (5.689297 50.84967)
+```
+
+## The other direction: reverse geocoding
+
+Sometimes you have coordinates — GPS points, sensor locations, a spot on
+a map — and want to know *what is there*.
+[`pdok_reverse_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_reverse_geocode.md)
+takes `sf` points and returns the nearest address, road or place, with
+an `afstand` column giving the distance in meters. A `point_id` column
+maps each match back to its input point.
+
+``` r
+
+points <- sf::st_sfc(
+  sf::st_point(c(5.121, 52.090)),   # central Utrecht
+  sf::st_point(c(4.479, 51.923)),   # central Rotterdam
+  crs = 4326
+)
+
+pdok_reverse_geocode(points)[, c("point_id", "type", "weergavenaam", "afstand")]
+#> Simple feature collection with 2 features and 4 fields
+#> Geometry type: POINT
+#> Dimension:     XY
+#> Bounding box:  xmin: 4.478736 ymin: 51.92322 xmax: 5.120999 ymax: 52.09001
+#> Geodetic CRS:  WGS 84
+#> # A tibble: 2 × 5
+#>   point_id type  weergavenaam                  afstand            geometry
+#>      <int> <chr> <chr>                           <dbl>         <POINT [°]>
+#> 1        1 adres Donkeregaard 4, 3511KW Utrec…    0.68 (5.120999 52.09001)
+#> 2        2 adres Coolsingel 30, 3011AD Rotter…   30.2  (4.478736 51.92322)
+```
+
+By default it returns the nearest match of any type — usually an
+address. Use `type` to choose the level: `type = "weg"` for the nearest
+road, or `type = "gemeente"` for the municipality the point falls in
+(distance 0, since the point is inside it).
+
+The input can be in any CRS — RD New points work just as well; they are
+converted to lon/lat for the query automatically.
+
 ## Where to next
 
 - [Filtering data by
@@ -198,4 +288,4 @@ then read the buildings, parcels or statistics within it.
   read a BAG layer inside an area.
 - [PDOK
   basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
-  the grey background map used here, and the other styles.
+  the gray background map used here, and the other styles.

@@ -149,4 +149,4 @@ tm_basemap(pdok_basemap("grijs")) +
   the raw OGC API and WFS requests the package automates.
 - [PDOK
   basemaps](https://coeneisma.github.io/pdokr/articles/basemaps.md) —
-  the grey background map used here, and the other styles.
+  the gray background map used here, and the other styles.

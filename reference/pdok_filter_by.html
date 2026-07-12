@@ -13,7 +13,7 @@ CRS of data before filtering."><meta property="og:image" content="https://coenei
 
     <a class="navbar-brand me-2" href="../index.html">pdokr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,8 @@ section below, and <a href="https://r-spatial.github.io/sf/reference/geos_binary
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An <a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf</a> object: the subset of <code>data</code> whose features satisfy
-<code>predicate</code> with respect to <code>filter_geometry</code>.</p>
+<code>predicate</code> with respect to <code>filter_geometry</code>. A zero-row <code>sf</code> is returned
+(silently) when no feature matches.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -119,7 +120,7 @@ inverse of <code>"within"</code>).</p></li>
 <li><p><code>"disjoint"</code> — the feature does <em>not</em> touch <code>filter_geometry</code> at all
 (everything outside the area).</p></li>
 </ul><p><code>"overlaps"</code>, <code>"touches"</code>, <code>"crosses"</code>, <code>"covers"</code> and <code>"covered_by"</code> are the
-remaining, more specialised DE-9IM relationships. For the precise definition
+remaining, more specialized DE-9IM relationships. For the precise definition
 of each, see the <code>sf</code> help page <a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::geos_binary_pred</a> (the topic that
 documents <code>st_intersects()</code>, <code>st_within()</code>, and the rest).</p>
     </div>

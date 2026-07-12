@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pdokr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -114,7 +114,7 @@ explains which ones you will meet, how PDOK serves them, and how
 <tr class="odd">
 <td>28992</td>
 <td>Amersfoort / RD New</td>
-<td>metres</td>
+<td>meters</td>
 <td>the Dutch national grid; most data is <em>stored</em> in this</td>
 </tr>
 <tr class="even">
@@ -126,7 +126,7 @@ explains which ones you will meet, how PDOK serves them, and how
 <tr class="odd">
 <td>3857</td>
 <td>Web Mercator</td>
-<td>metres</td>
+<td>meters</td>
 <td>web map tiles</td>
 </tr>
 <tr class="even">
@@ -178,7 +178,7 @@ one the service does not offer.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">gemeenten_rd</span><span class="op">)</span><span class="op">$</span><span class="va">epsg</span></span>
 <span><span class="co">#&gt; [1] 28992</span></span></code></pre></div>
-<p>The coordinates differ accordingly — degrees versus metres:</p>
+<p>The coordinates differ accordingly — degrees versus meters:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">gemeenten</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      xmin      ymin      xmax      ymax </span></span>
@@ -213,7 +213,7 @@ projection is gently rotated relative to north.</p>
 <span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_grid.html" class="external-link">tm_graticules</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"steelblue"</span>, lwd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_title.html" class="external-link">tm_title</a></span><span class="op">(</span><span class="st">"RD New (EPSG:28992)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="coordinate-reference-systems_files/figure-html/map-rdnew-1.png" class="r-plt" alt="" width="100%" style="display: block; margin: auto;"></p>
-<p>For analysis in metres (distances, areas, buffers) use RD New; for
+<p>For analysis in meters (distances, areas, buffers) use RD New; for
 web maps, lon/lat or Web Mercator.</p>
 </div>
 <div class="section level2">

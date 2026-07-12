@@ -29,10 +29,13 @@ Filter a layer by any polygon area.
 
 ## Geocoding
 
-Look up addresses and place names.
+Look up addresses and place names, or the address nearest a point.
 
 - [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
-  : Geocode an address or place name with the PDOK Locatieserver
+  : Geocode addresses or place names with the PDOK Locatieserver
+- [`pdok_reverse_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_reverse_geocode.md)
+  : Reverse geocode coordinates to the nearest address with the PDOK
+  Locatieserver
 
 ## Basemaps
 

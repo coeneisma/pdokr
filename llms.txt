@@ -28,7 +28,7 @@ devtools::install_github("coeneisma/pdokr")
 ## Example
 
 Pick an area from the administrative boundaries, then load another layer
-within it. Here we take the historic centre of Delft and map every
+within it. Here we take the historic center of Delft and map every
 building in it.
 
 ``` r
@@ -36,7 +36,7 @@ building in it.
 library(pdokr)
 library(tmap)
 
-# A municipality, and one of its districts (the historic centre of Delft)
+# A municipality, and one of its districts (the historic center of Delft)
 gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2024
 )
@@ -58,7 +58,7 @@ tm_basemap(pdok_basemap("grijs")) +
   tm_borders(col = "grey40") +
   tm_shape(buildings) +
   tm_polygons(fill = "#d95f02", col = "white", lwd = 0.4) +
-  tm_title("Buildings in the historic centre of Delft") +
+  tm_title("Buildings in the historic center of Delft") +
   tm_credits("Kaartgegevens © Kadaster")
 ```
 
@@ -106,10 +106,13 @@ Filter a layer by any polygon area.
 
 ## Geocoding
 
-Look up addresses and place names.
+Look up addresses and place names, or the address nearest a point.
 
 - [`pdok_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_geocode.md)
-  : Geocode an address or place name with the PDOK Locatieserver
+  : Geocode addresses or place names with the PDOK Locatieserver
+- [`pdok_reverse_geocode()`](https://coeneisma.github.io/pdokr/reference/pdok_reverse_geocode.md)
+  : Reverse geocode coordinates to the nearest address with the PDOK
+  Locatieserver
 
 ## Basemaps
 
