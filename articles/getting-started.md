@@ -76,6 +76,7 @@ gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
   datetime = 2025
 )
+#> ⠙ Downloading PDOK features: 342 fetched
 gemeenten
 #> Simple feature collection with 342 features and 8 fields
 #> Geometry type: MULTIPOLYGON
