@@ -4,9 +4,15 @@
 
 * This is a new submission.
 
+* The CRAN incoming check flags possibly misspelled words in DESCRIPTION.
+  These are spelled correctly: "Publieke Dienstverlening Op de Kaart" is the
+  official Dutch name of the PDOK platform, and "geodata" / "geocoded" are
+  standard geospatial terms.
+
 ## Test environments
 
 * Local: Arch Linux, R 4.6.1
+* win-builder: Windows, R-devel (0 errors, 0 warnings)
 
 ## Submission notes
 
