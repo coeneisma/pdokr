@@ -84,7 +84,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Geocoding: from names to locations</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/coeneisma/pdokr/blob/main/vignettes/articles/geocoding.Rmd" class="external-link"><code>vignettes/articles/geocoding.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/coeneisma/pdokr/blob/v0.1.0/vignettes/articles/geocoding.Rmd" class="external-link"><code>vignettes/articles/geocoding.Rmd</code></a></small>
       <div class="d-none name"><code>geocoding.Rmd</code></div>
     </div>
 
@@ -221,11 +221,11 @@ That is convenient, but a single name often exists at several levels —
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   weergavenaam                  type       score                        geometry</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;MULTIPOLYGON [°]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Gemeente Utrecht              gemeente    9.78 (((5.01801 52.06222, 5.01707 5…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Utrecht, Utrecht, Utrecht     woonplaats  8.82 (((5.01514 52.11395, 5.01553 5…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Haarzuilens, Utrecht, Utrecht woonplaats  8.59 (((4.97775 52.13057, 4.97394 5…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Vleuten, Utrecht, Utrecht     woonplaats  8.59 (((4.98085 52.10015, 4.98933 5…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> De Meern, Utrecht, Utrecht    woonplaats  8.52 (((5.0429 52.08946, 5.04283 52…</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Gemeente Utrecht              gemeente   10.2  (((5.01801 52.06222, 5.01707 5…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Utrecht, Utrecht, Utrecht     woonplaats  9.24 (((5.01514 52.11395, 5.01553 5…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Haarzuilens, Utrecht, Utrecht woonplaats  9.02 (((4.97775 52.13057, 4.97394 5…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Vleuten, Utrecht, Utrecht     woonplaats  9.02 (((4.98085 52.10015, 4.98933 5…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> De Meern, Utrecht, Utrecht    woonplaats  8.95 (((5.0429 52.08946, 5.04283 52…</span></span></code></pre></div>
 <p>Pass <code>type</code> to pin down exactly which level you mean. The
 same query then returns very different geometry:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">

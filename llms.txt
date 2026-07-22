@@ -16,15 +16,7 @@ background, use
 
 ## Installation
 
-Install the released version of `pdokr` from
-[CRAN](https://CRAN.R-project.org/package=pdokr):
-
-``` r
-
-install.packages("pdokr")
-```
-
-Or the development version from
+`pdokr` is not yet on CRAN. Install the development version from
 [GitHub](https://github.com/coeneisma/pdokr):
 
 ``` r
