@@ -99,7 +99,7 @@ pdok_geocode("De Bilt", type = "gemeente")
 #> # A tibble: 1 × 17
 #>   query  weergavenaam type  score gemeentenaam provincienaam bron  identificatie
 #>   <chr>  <chr>        <chr> <dbl> <chr>        <chr>         <chr> <chr>        
-#> 1 De Bi… Gemeente De… geme…  13.4 De Bilt      Utrecht       Best… 0310         
+#> 1 De Bi… Gemeente De… geme…  13.9 De Bilt      Utrecht       Best… 0310         
 #> # ℹ 9 more variables: provinciecode <chr>, gemeentecode <chr>, suggest <chr>,
 #> #   provincieafkorting <chr>, id <chr>, shards <chr>, typesortering <chr>,
 #> #   shard <chr>, geometry <MULTIPOLYGON [°]>
@@ -114,7 +114,7 @@ pdok_geocode(c("Domplein 1, Utrecht", "Coolsingel 40, Rotterdam"))
 #> # A tibble: 2 × 39
 #>   query weergavenaam type  score gemeentenaam woonplaatsnaam provincienaam bron 
 #>   <chr> <chr>        <chr> <dbl> <chr>        <chr>          <chr>         <chr>
-#> 1 Domp… Domplein, U… weg    15.8 Utrecht      Utrecht        Utrecht       BAG/…
+#> 1 Domp… Domplein, U… weg    15.4 Utrecht      Utrecht        Utrecht       BAG/…
 #> 2 Cool… Coolsingel … adres  14.8 Rotterdam    Rotterdam      Zuid-Holland  BAG  
 #> # ℹ 31 more variables: woonplaatscode <chr>, nwb_id <chr>,
 #> #   openbareruimtetype <chr>, gemeentecode <chr>, rdf_seealso <chr>,

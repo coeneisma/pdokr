@@ -2,6 +2,8 @@
 
 ## pdokr 0.1.0
 
+CRAN release: 2026-07-22
+
 - First release. `pdokr` provides:
   - Dataset and layer discovery with
     [`pdok_list_datasets()`](https://coeneisma.github.io/pdokr/reference/pdok_list_datasets.md),
