@@ -181,13 +181,12 @@ centre_schools <- pdok_filter_by(utrecht_schools, binnenstad, predicate = "withi
 
 panden <- pdok_read("kadaster/bag", "pand", filter_by = binnenstad)
 #> ⠙ Downloading PDOK features: 532 fetched
-#> ⠹ Downloading PDOK features: 1058 fetched
-#> ⠸ Downloading PDOK features: 1558 fetched
-#> ⠼ Downloading PDOK features: 2555 fetched
-#> ⠴ Downloading PDOK features: 3030 fetched
-#> ⠦ Downloading PDOK features: 3521 fetched
-#> ⠧ Downloading PDOK features: 4478 fetched
-#> ⠇ Downloading PDOK features: 6026 fetched
+#> ⠹ Downloading PDOK features: 1558 fetched
+#> ⠸ Downloading PDOK features: 2060 fetched
+#> ⠼ Downloading PDOK features: 3030 fetched
+#> ⠴ Downloading PDOK features: 4013 fetched
+#> ⠦ Downloading PDOK features: 5569 fetched
+#> ⠧ Downloading PDOK features: 6026 fetched
 school_buildings <- panden |>
   st_filter(centre_schools) |>
   st_join(select(centre_schools, school, sector, STRAATNAAM))

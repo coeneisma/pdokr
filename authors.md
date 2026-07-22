@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/coeneisma/pdokr/blob/v0.1.0/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/coeneisma/pdokr/blob/main/DESCRIPTION)
 
 Eisma C (2026). *pdokr: Access Open Geodata from the Dutch 'PDOK'
 Platform*. R package version 0.1.0,

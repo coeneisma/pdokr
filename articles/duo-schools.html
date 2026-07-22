@@ -84,7 +84,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Combining with external data: school locations (DUO)</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/coeneisma/pdokr/blob/v0.1.0/vignettes/articles/duo-schools.Rmd" class="external-link"><code>vignettes/articles/duo-schools.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/coeneisma/pdokr/blob/main/vignettes/articles/duo-schools.Rmd" class="external-link"><code>vignettes/articles/duo-schools.Rmd</code></a></small>
       <div class="d-none name"><code>duo-schools.Rmd</code></div>
     </div>
 
@@ -249,13 +249,12 @@ across with a spatial join.</p>
 <span></span>
 <span><span class="va">panden</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pdok_read.html">pdok_read</a></span><span class="op">(</span><span class="st">"kadaster/bag"</span>, <span class="st">"pand"</span>, filter_by <span class="op">=</span> <span class="va">binnenstad</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ⠙ Downloading PDOK features: 532 fetched</span></span>
-<span><span class="co">#&gt; ⠹ Downloading PDOK features: 1058 fetched</span></span>
-<span><span class="co">#&gt; ⠸ Downloading PDOK features: 1558 fetched</span></span>
-<span><span class="co">#&gt; ⠼ Downloading PDOK features: 2555 fetched</span></span>
-<span><span class="co">#&gt; ⠴ Downloading PDOK features: 3030 fetched</span></span>
-<span><span class="co">#&gt; ⠦ Downloading PDOK features: 3521 fetched</span></span>
-<span><span class="co">#&gt; ⠧ Downloading PDOK features: 4478 fetched</span></span>
-<span><span class="co">#&gt; ⠇ Downloading PDOK features: 6026 fetched</span></span>
+<span><span class="co">#&gt; ⠹ Downloading PDOK features: 1558 fetched</span></span>
+<span><span class="co">#&gt; ⠸ Downloading PDOK features: 2060 fetched</span></span>
+<span><span class="co">#&gt; ⠼ Downloading PDOK features: 3030 fetched</span></span>
+<span><span class="co">#&gt; ⠴ Downloading PDOK features: 4013 fetched</span></span>
+<span><span class="co">#&gt; ⠦ Downloading PDOK features: 5569 fetched</span></span>
+<span><span class="co">#&gt; ⠧ Downloading PDOK features: 6026 fetched</span></span>
 <span><span class="va">school_buildings</span> <span class="op">&lt;-</span> <span class="va">panden</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_filter</a></span><span class="op">(</span><span class="va">centre_schools</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">centre_schools</span>, <span class="va">school</span>, <span class="va">sector</span>, <span class="va">STRAATNAAM</span><span class="op">)</span><span class="op">)</span></span>
