@@ -53,7 +53,7 @@ pre-filters at the server and clips to the exact shape.
 buildings <- pdok_read("kadaster/bag", "pand", filter_by = stadsdriehoek)
 #> ⠙ Downloading PDOK features: 363 fetched
 #> ⠹ Downloading PDOK features: 808 fetched
-#> ⠹ Downloading PDOK features: 1022 fetched
+#> ⠸ Downloading PDOK features: 1022 fetched
 nrow(buildings)
 #> [1] 1022
 ```

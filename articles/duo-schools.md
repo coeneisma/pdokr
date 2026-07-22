@@ -59,7 +59,7 @@ The `onderwijslocaties` resource lists every location where education
 
 locations <- read_duo("a7e3f323-6e46-4dca-a834-369d9d520aa8")
 nrow(locations)
-#> [1] 13607
+#> [1] 13610
 ```
 
 There is a catch: these are *possible* education locations, not
@@ -102,12 +102,12 @@ link <- relations |>
 # inner join drops every location without a recognized institution
 schools <- inner_join(locations, link, by = "ONDERWIJSLOCATIECODE")
 nrow(schools)
-#> [1] 9676
+#> [1] 9679
 count(schools, sector)
 #>             sector    n
 #> 1 Higher education   62
-#> 2          Primary 7229
-#> 3        Secondary 1474
+#> 2          Primary 7230
+#> 3        Secondary 1476
 #> 4          Special  708
 #> 5 Vocational (MBO)  203
 ```
@@ -137,7 +137,6 @@ schools <- schools |>
 gemeenten <- pdok_read(
   "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2025
 )
-#> ⠙ Downloading PDOK features: 342 fetched
 utrecht <- filter(gemeenten, statnaam == "Utrecht")
 
 utrecht_schools <- pdok_filter_by(schools, utrecht, predicate = "within")
@@ -181,15 +180,18 @@ binnenstad <- filter(wijken, grepl("Binnenstad", statnaam))
 centre_schools <- pdok_filter_by(utrecht_schools, binnenstad, predicate = "within")
 
 panden <- pdok_read("kadaster/bag", "pand", filter_by = binnenstad)
-#> ⠙ Downloading PDOK features: 503 fetched
-#> ⠹ Downloading PDOK features: 956 fetched
-#> ⠸ Downloading PDOK features: 1631 fetched
-#> ⠼ Downloading PDOK features: 2175 fetched
-#> ⠴ Downloading PDOK features: 3194 fetched
-#> ⠦ Downloading PDOK features: 4163 fetched
-#> ⠧ Downloading PDOK features: 5131 fetched
-#> ⠇ Downloading PDOK features: 5612 fetched
-#> ⠏ Downloading PDOK features: 6026 fetched
+#> ⠙ Downloading PDOK features: 532 fetched
+#> ⠹ Downloading PDOK features: 1058 fetched
+#> ⠸ Downloading PDOK features: 1558 fetched
+#> ⠼ Downloading PDOK features: 2060 fetched
+#> ⠴ Downloading PDOK features: 2555 fetched
+#> ⠦ Downloading PDOK features: 3030 fetched
+#> ⠧ Downloading PDOK features: 3521 fetched
+#> ⠇ Downloading PDOK features: 4013 fetched
+#> ⠏ Downloading PDOK features: 4478 fetched
+#> ⠋ Downloading PDOK features: 5051 fetched
+#> ⠙ Downloading PDOK features: 5569 fetched
+#> ⠹ Downloading PDOK features: 6026 fetched
 school_buildings <- panden |>
   st_filter(centre_schools) |>
   st_join(select(centre_schools, school, sector, STRAATNAAM))
