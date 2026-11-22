@@ -73,6 +73,7 @@ reference:
   desc: Read a layer as an sf object.
   contents:
   - pdok_read
+  - pdok_read_href
 - title: Spatial filtering
   desc: Filter a layer by any polygon area.
   contents:
