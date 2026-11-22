@@ -77,6 +77,11 @@ reference:
   desc: Filter a layer by any polygon area.
   contents:
   - pdok_filter_by
+- title: Server-side filtering
+  desc: Filter on attribute values on the server, so only matching features are downloaded.
+  contents:
+  - pdok_where
+  - pdok_list_queryables
 - title: Geocoding
   desc: Look up addresses and place names, or the address nearest a point.
   contents:

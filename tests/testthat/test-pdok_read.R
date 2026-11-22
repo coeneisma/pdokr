@@ -72,6 +72,90 @@ test_that("pdok_read clips the result to filter_by", {
   expect_equal(nrow(out), 2L)
 })
 
+test_that("pdok_read sends a point filter_by to the server as S_INTERSECTS", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) seen <<- req$url
+    mock_pdok_dispatcher(
+      items = items_resp(make_items_body(list(c(5, 52), c(6, 53))))
+    )(req)
+  })
+  pts <- sf::st_sfc(sf::st_point(c(5, 52)), sf::st_point(c(5.1, 52.05)), crs = 4326)
+
+  out <- pdok_read("cbs/gebiedsindelingen", "x", filter_by = pts)
+  expect_match(seen, "S_INTERSECTS")
+  expect_match(seen, "MULTIPOINT")
+  expect_match(seen, "bbox=")
+  expect_equal(nrow(out), 1L) # the exact clip still applies to the page
+
+  # projected points are sent in lon/lat
+  pts_rd <- sf::st_transform(pts, 28992)
+  suppressWarnings(pdok_read("cbs/gebiedsindelingen", "x", filter_by = pts_rd))
+  expect_match(utils::URLdecode(seen), "MULTIPOINT \\(\\(5 52\\)")
+})
+
+test_that("pdok_read combines a point filter_by with an attribute filter", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) seen <<- req$url
+    mock_pdok_dispatcher(items = items_resp(make_items_body(list(c(5, 52)))))(req)
+  })
+  pt <- sf::st_sfc(sf::st_point(c(5, 52)), crs = 4326)
+
+  suppressWarnings(pdok_read(
+    "cbs/gebiedsindelingen", "x",
+    filter_by = pt, filter = pdok_where(statnaam == "Utrecht")
+  ))
+  expect_match(utils::URLdecode(seen), "(statnaam = 'Utrecht') AND S_INTERSECTS", fixed = TRUE)
+})
+
+test_that("pdok_read keeps the plain bbox request for polygons, large point sets and disjoint", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) seen <<- req$url
+    mock_pdok_dispatcher(items = items_resp(make_items_body(list(c(5, 52)))))(req)
+  })
+  poly <- sf::st_as_sfc(sf::st_bbox(c(xmin = 4.9, ymin = 51.9, xmax = 5.3, ymax = 52.2), crs = 4326))
+  pdok_read("cbs/gebiedsindelingen", "x", filter_by = poly)
+  expect_false(grepl("S_INTERSECTS", seen))
+
+  many <- sf::st_sfc(lapply(seq_len(201), function(i) sf::st_point(c(5 + i / 1e4, 52))), crs = 4326)
+  suppressWarnings(pdok_read("cbs/gebiedsindelingen", "x", filter_by = many))
+  expect_false(grepl("S_INTERSECTS", seen))
+
+  wide <- sf::st_sfc(sf::st_point(c(4, 52)), sf::st_point(c(6, 52)), crs = 4326)
+  suppressWarnings(pdok_read("cbs/gebiedsindelingen", "x", filter_by = wide))
+  expect_false(grepl("S_INTERSECTS", seen))
+
+  pt <- sf::st_sfc(sf::st_point(c(5, 52)), crs = 4326)
+  suppressWarnings(pdok_read("cbs/gebiedsindelingen", "x", filter_by = pt, predicate = "disjoint"))
+  expect_false(grepl("S_INTERSECTS", seen))
+})
+
+test_that("pdok_read falls back to the bbox request when the server rejects the spatial clause", {
+  urls <- character()
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) {
+      urls <<- c(urls, req$url)
+      if (grepl("S_INTERSECTS", req$url)) {
+        return(httr2::response(
+          status_code = 400, url = req$url,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw('{"detail":"CQL support is not enabled for this API","status":400}')
+        ))
+      }
+    }
+    mock_pdok_dispatcher(items = items_resp(make_items_body(list(c(5, 52)))))(req)
+  })
+  pt <- sf::st_sfc(sf::st_point(c(5, 52)), crs = 4326)
+
+  out <- pdok_read("cbs/gebiedsindelingen", "x", filter_by = pt)
+  expect_equal(nrow(out), 1L)
+  expect_equal(length(urls), 2L)
+  expect_true(grepl("S_INTERSECTS", urls[[1]]))
+  expect_false(grepl("S_INTERSECTS", urls[[2]]))
+})
+
 test_that("pdok_read rejects a non-spatial filter_by", {
   expect_error(
     pdok_read("cbs/gebiedsindelingen", "x", filter_by = "nope"),
@@ -174,5 +258,106 @@ test_that("pdok_read keeps the original error when Features support is undetermi
   expect_error(
     pdok_read("cbs/gebiedsindelingen", "no_such_layer"),
     "resource not found"
+  )
+})
+
+test_that("pdok_read sends a raw CQL2 filter string in the items query", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) seen <<- req$url
+    mock_pdok_dispatcher(
+      items = items_resp(make_items_body(list(c(5, 52))))
+    )(req)
+  })
+
+  pdok_read(
+    "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+    filter = "statnaam = 'Utrecht'"
+  )
+
+  expect_match(seen, "filter=")
+  expect_match(seen, "statnaam")
+})
+
+test_that("pdok_read accepts a pdok_where filter", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) seen <<- req$url
+    mock_pdok_dispatcher(
+      items = items_resp(make_items_body(list(c(5, 52))))
+    )(req)
+  })
+
+  pdok_read(
+    "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+    filter = pdok_where(statnaam == "Utrecht")
+  )
+
+  expect_match(seen, "filter=statnaam")
+  expect_match(seen, "Utrecht")
+})
+
+test_that("pdok_read unions the batches of a long %in% filter", {
+  ids <- sprintf("id%04d", seq_len(650)) # 3 batches: 300 + 300 + 50
+  urls <- character()
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) urls <<- c(urls, req$url)
+    mock_pdok_dispatcher(
+      items = items_resp(make_items_body(list(c(5, 52))))
+    )(req)
+  })
+
+  out <- pdok_read(
+    "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+    filter = pdok_where(identificatie %in% ids)
+  )
+
+  expect_equal(length(urls), 3L)
+  expect_equal(nrow(out), 3L) # one mocked feature per batch
+  # different batches carry different values
+  expect_match(urls[[1]], "id0001")
+  expect_false(grepl("id0001", urls[[3]]))
+  expect_match(urls[[3]], "id0650")
+})
+
+test_that("pdok_read stops batching once max_features is reached", {
+  ids <- sprintf("id%04d", seq_len(650))
+  n_requests <- 0L
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/collections/[^/]+/items", req$url)) n_requests <<- n_requests + 1L
+    mock_pdok_dispatcher(
+      items = items_resp(make_items_body(list(c(5, 52))))
+    )(req)
+  })
+
+  out <- pdok_read(
+    "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+    filter = pdok_where(identificatie %in% ids), max_features = 1
+  )
+
+  expect_equal(n_requests, 1L)
+  expect_equal(nrow(out), 1L)
+})
+
+test_that("pdok_read validates filter", {
+  expect_error(
+    pdok_read("cbs/gebiedsindelingen", "x", filter = 1),
+    "CQL2 string"
+  )
+  expect_error(
+    pdok_read("cbs/gebiedsindelingen", "x", filter = c("a", "b")),
+    "CQL2 string"
+  )
+})
+
+test_that("pdok_read rejects an over-long raw filter string up front", {
+  httr2::local_mocked_responses(mock_pdok_dispatcher())
+  long_filter <- sprintf(
+    "identificatie IN (%s)",
+    paste(sprintf("'%032d'", seq_len(1200)), collapse = ",")
+  )
+  expect_error(
+    pdok_read("cbs/gebiedsindelingen", "x", filter = long_filter),
+    "too long"
   )
 })

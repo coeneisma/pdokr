@@ -11,6 +11,7 @@ pdok_read(
   filter_by = NULL,
   predicate = "intersects",
   datetime = NULL,
+  filter = NULL,
   crs = NULL,
   max_features = NULL
 )
@@ -29,9 +30,12 @@ whose extent is used.}
 bounding box is used as a cheap server-side pre-filter, and the result is
 then filtered exactly with \code{\link[=pdok_filter_by]{pdok_filter_by()}}. This is the one-call form of
 the load-then-filter workflow. It is usually a polygon (e.g. a
-municipality), but a point works too: filtering an area layer by a point
-returns the feature that contains it (for example the municipality an
-address falls in).}
+municipality), but points work too: filtering an area layer by points
+returns the features that contain them (for example the municipality or
+building each address falls in). A small set of points (up to 200, within
+roughly 20 km of each other) is also sent to the server as a spatial
+CQL2 filter, so only the features touching those points are downloaded
+rather than everything in their bounding box.}
 
 \item{predicate}{Spatial predicate for \code{filter_by}, passed to
 \code{\link[=pdok_filter_by]{pdok_filter_by()}} (default \code{"intersects"}). See its \emph{Spatial predicates}
@@ -41,6 +45,15 @@ definitions.}
 \item{datetime}{Optional temporal filter: a single year (e.g. \code{2026}, mapped
 to a mid-year instant), an OGC datetime string, or an interval such as
 \code{"2020-01-01/2025-12-31"}.}
+
+\item{filter}{Optional server-side attribute filter: a
+\code{\link[=pdok_where]{pdok_where()}} expression (R syntax, translated for you), or a single
+\href{https://www.ogc.org/standards/cql2/}{CQL2} text string passed to the
+service unchanged, e.g. \code{"postcode = '3811MZ'"}. Every PDOK dataset with
+OGC API Features supports CQL2, but each layer only allows filtering on
+a selected set of fields: see \code{\link[=pdok_list_queryables]{pdok_list_queryables()}}. A filter on any
+other field is rejected by the server with a clear error, never silently
+ignored.}
 
 \item{crs}{Optional output CRS as an EPSG code (e.g. \code{28992} for RD New).
 \code{NULL} keeps the source CRS.}
@@ -85,5 +98,6 @@ parks_utrecht <- pdok_read(
 }
 }
 \seealso{
-\code{\link[=pdok_list_layers]{pdok_list_layers()}} to find layer ids.
+\code{\link[=pdok_list_layers]{pdok_list_layers()}} to find layer ids, \code{\link[=pdok_list_queryables]{pdok_list_queryables()}}
+for the fields a \code{filter} expression can use.
 }
