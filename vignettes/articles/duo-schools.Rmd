@@ -213,7 +213,7 @@ select(school_buildings, school, pand.identificatie, bouwjaar) |>
   head(3)
 ```
 
-For the map we zoom in on the historic centre, using the CBS districts:
+For the map we zoom in on the historic center, using the CBS districts:
 
 ```{r footprints}
 wijken <- pdok_read(
@@ -221,8 +221,8 @@ wijken <- pdok_read(
   filter_by = utrecht, predicate = "within"
 )
 binnenstad <- filter(wijken, grepl("Binnenstad", statnaam))
-centre_buildings <- pdok_filter_by(school_buildings, binnenstad)
-nrow(centre_buildings)
+center_buildings <- pdok_filter_by(school_buildings, binnenstad)
+nrow(center_buildings)
 ```
 
 The result is real school buildings, colored by sector. Click one for the
@@ -232,7 +232,7 @@ school that uses it.
 tmap_mode("view")
 
 tm_basemap(pdok_basemap("grijs")) +
-  tm_shape(centre_buildings) +
+  tm_shape(center_buildings) +
   tm_polygons(
     fill = "sector",
     fill.scale = tm_scale_categorical(values = "brewer.set2"),

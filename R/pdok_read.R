@@ -22,7 +22,7 @@ format_datetime <- function(x, call = rlang::caller_env()) {
 }
 
 # Internal: limits within which a point `filter_by` is also sent to the server
-# as a CQL2 S_INTERSECTS. Measured on the BAG: 11 points in a city-centre
+# as a CQL2 S_INTERSECTS. Measured on the BAG: 11 points in a city-center
 # bbox answer in ~1.5 s and 162 points in a city bbox in ~16 s, but 758
 # points in a province bbox time out, because the server tests every point
 # against every candidate in the bbox. Beyond these limits the plain bbox

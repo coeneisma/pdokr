@@ -5,7 +5,7 @@
   selected set of filterable fields):
   * `pdok_read()` gains a `filter` argument: a `pdok_where()` expression or a
     raw CQL2 text string, executed by the server so only matching features are
-    downloaded. It combines with `bbox`/`filter_by` (conditions are ANDed).
+    downloaded. It combines with `bbox`/`filter_by` (conditions are combined with AND).
   * `pdok_where()` translates R syntax (`==`, `%in%`, `&`, `has()`, `like()`,
     `casei()`, ...) to CQL2. A `%in%` over more than 300 values is split over
     multiple requests automatically (with a progress bar), so filtering on

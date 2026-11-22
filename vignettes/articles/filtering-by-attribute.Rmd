@@ -80,9 +80,9 @@ pdok_read(
 )
 ```
 
-The same works on every dataset. The CBS neighbourhoods, for instance, are
+The same works on every dataset. The CBS neighborhoods, for instance, are
 queryable by municipality name, which fetches exactly one municipality's
-neighbourhoods without any spatial filtering:
+neighborhoods without any spatial filtering:
 
 ```{r where-cbs}
 buurten <- pdok_read(
@@ -273,7 +273,7 @@ First, always combine them with a `bbox`: without one the server tests the
 geometry against the whole country and a single point takes 15 seconds,
 while with a bounding box the same request answers in about a second.
 Second, the server's cost grows with the number of points *and* the size of
-the box, so this is a tool for a neighbourhood or a city, not a province.
+the box, so this is a tool for a neighborhood or a city, not a province.
 For polygons the plain `filter_by` is faster than a server-side
 `S_INTERSECTS`, and for a small set of points `pdok_read()` already adds the
 spatial filter for you (see the `filter_by` argument), so writing
