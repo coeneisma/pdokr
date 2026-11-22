@@ -131,12 +131,21 @@ pdok_read(
 )$statnaam
 ```
 
+Behind the scenes this is cheap: for a small set of points `pdok_read()`
+asks the server for only the features that touch those points, so it does
+not download every municipality in the bounding box first. The same works
+for several addresses at once, as long as they lie within roughly 20 km of
+each other.
+
 The same idea scales up: geocode a place as a polygon (for example
 `pdok_geocode("Fryslân", type = "provincie")`) and use it directly as
 `filter_by`.
 
 ## Where to next
 
+* [Filtering data by attribute](filtering-by-attribute.html) — the other
+  half: select on field values on the server with `pdok_where()`, alone or
+  combined with an area.
 * [Geocoding](geocoding.html) — turn a place name into the boundary you filter
   by.
 * [Mapping buildings by construction year](bag-buildings.html) — read a BAG

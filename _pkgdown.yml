@@ -21,6 +21,8 @@ navbar:
       menu:
       - text: Filtering data by area
         href: articles/filtering-by-area.html
+      - text: Filtering data by attribute
+        href: articles/filtering-by-attribute.html
       - text: Geocoding
         href: articles/geocoding.html
       - text: PDOK basemaps
@@ -49,6 +51,7 @@ articles:
 - title: Essentials
   contents:
   - '`articles/filtering-by-area`'
+  - '`articles/filtering-by-attribute`'
   - '`articles/geocoding`'
   - '`articles/basemaps`'
   - '`articles/coordinate-reference-systems`'

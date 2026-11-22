@@ -18,7 +18,8 @@ national geodata platform of the Netherlands. It helps you discover
 datasets and their layers, load a layer as an
 [`sf`](https://r-spatial.github.io/sf/) object (with automatic
 pagination and explicit coordinate reference system handling), filter
-data by any polygon area, and geocode addresses and place names.
+data by any polygon area or by attribute values on the server, and
+geocode addresses and place names.
 
 `pdokr` is a client for PDOK’s **OGC API Features** services: it reads
 *vector* feature data (points, lines, polygons) as `sf`. Raster, tile,
@@ -87,5 +88,5 @@ workflows, with interactive, zoomable maps.
 
 See the [package website](https://coeneisma.github.io/pdokr/) for the
 reference documentation and articles on getting started, filtering data
-by area, working with coordinate reference systems, and querying PDOK by
-hand.
+by area or by attribute, working with coordinate reference systems, and
+querying PDOK by hand.

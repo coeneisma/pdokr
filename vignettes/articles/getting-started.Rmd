@@ -96,6 +96,9 @@ tmap_mode("plot")
 * [Filtering data by area](filtering-by-area.html) — filter a layer to a
   municipality, province, or any polygon, including the address-to-area workflow
   with `pdok_geocode()`.
+* [Filtering data by attribute](filtering-by-attribute.html) — let the server
+  select on field values with `pdok_where()`, so only matching features are
+  downloaded.
 * [Coordinate reference systems](coordinate-reference-systems.html) — how
   `pdokr` handles RD New and lon/lat.
 * [Working with PDOK by hand](pdok-by-hand.html) — the raw OGC API and WFS
