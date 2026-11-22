@@ -11,3 +11,5 @@
 ^Meta$
 ^vignettes/articles$
 ^\.github$
+^\.[^/]+$
+^cl_analysis$
