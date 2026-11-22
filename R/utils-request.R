@@ -75,22 +75,47 @@ pdok_perform <- function(req, call = rlang::caller_env()) {
     httr2_http = function(cnd) {
       status <- httr2::resp_status(cnd$resp)
       url <- cnd$request$url %||% req$url
+      # PDOK's JSON error bodies carry the useful explanation (e.g. a CQL2
+      # parse error, or a filter on a field that is not queryable) in
+      # `detail`; surface it instead of only the status code.
+      detail <- tryCatch(
+        {
+          d <- httr2::resp_body_json(cnd$resp)$detail
+          if (rlang::is_string(d) && nzchar(d)) gsub("[\r\n]+", " ", d) else NULL
+        },
+        error = function(e) NULL
+      )
+      detail_bullet <- if (!is.null(detail)) c("x" = "Server message: {detail}")
+      # Each layer allows filtering on a selected set of fields only; point
+      # to where that set can be found.
+      if (!is.null(detail) && grepl("not a queryable property", detail, fixed = TRUE)) {
+        detail_bullet <- c(
+          detail_bullet,
+          "i" = "See {.fn pdok_list_queryables} for the fields this layer can be filtered on."
+        )
+      }
       if (status == 404L) {
         cli::cli_abort(
           c(
             "PDOK request failed: resource not found (HTTP 404).",
+            detail_bullet,
             "i" = "Check the dataset or layer id from {.fn pdok_search_datasets} / {.fn pdok_list_layers}.",
             "i" = "URL: {.url {url}}"
           ),
-          call = call
+          call = call,
+          class = "pdokr_http_error",
+          status = status
         )
       }
       cli::cli_abort(
         c(
           "PDOK request failed (HTTP {status}).",
+          detail_bullet,
           "i" = "URL: {.url {url}}"
         ),
-        call = call
+        call = call,
+        class = "pdokr_http_error",
+        status = status
       )
     },
     httr2_failure = function(cnd) {

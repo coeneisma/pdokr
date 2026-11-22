@@ -156,3 +156,38 @@ test_that("rbind_sf unions pages that carry different columns", {
   expect_true(is.na(out$b[1]))
   expect_true(is.na(out$a[2]))
 })
+
+test_that("pdok_perform surfaces the server's JSON error detail", {
+  bad <- httr2::response(
+    status_code = 400,
+    url = "https://api.pdok.nl/kadaster/bag/ogc/v2/collections/adres/items",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw('{"detail":"failed to parse CQL filter: syntax error","status":400}')
+  )
+  httr2::local_mocked_responses(list(bad))
+  cnd <- expect_error(
+    pdok_perform(pdok_request("https://api.pdok.nl/kadaster/bag/ogc/v2/collections/adres/items")),
+    "syntax error",
+    class = "pdokr_http_error"
+  )
+  expect_equal(cnd$status, 400L)
+})
+
+test_that("pdok_perform points to pdok_list_queryables for a non-queryable field", {
+  bad <- httr2::response(
+    status_code = 400,
+    url = "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/collections/gemeente_gegeneraliseerd/items",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw(paste0(
+      '{"detail":"failed to parse CQL filter: error: property \'statnaam\' ',
+      'cannot be used in CQL filter, is not a queryable property","status":400}'
+    ))
+  )
+  httr2::local_mocked_responses(list(bad))
+  expect_error(
+    pdok_perform(pdok_request(
+      "https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1/collections/gemeente_gegeneraliseerd/items"
+    )),
+    "pdok_list_queryables"
+  )
+})
