@@ -21,6 +21,8 @@ navbar:
       menu:
       - text: Filtering data by area
         href: articles/filtering-by-area.html
+      - text: Filtering data by attribute
+        href: articles/filtering-by-attribute.html
       - text: Geocoding
         href: articles/geocoding.html
       - text: PDOK basemaps
@@ -49,6 +51,7 @@ articles:
 - title: Essentials
   contents:
   - '`articles/filtering-by-area`'
+  - '`articles/filtering-by-attribute`'
   - '`articles/geocoding`'
   - '`articles/basemaps`'
   - '`articles/coordinate-reference-systems`'
@@ -73,10 +76,16 @@ reference:
   desc: Read a layer as an sf object.
   contents:
   - pdok_read
+  - pdok_read_href
 - title: Spatial filtering
   desc: Filter a layer by any polygon area.
   contents:
   - pdok_filter_by
+- title: Server-side filtering
+  desc: Filter on attribute values on the server, so only matching features are downloaded.
+  contents:
+  - pdok_where
+  - pdok_list_queryables
 - title: Geocoding
   desc: Look up addresses and place names, or the address nearest a point.
   contents:

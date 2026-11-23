@@ -82,6 +82,10 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 #'
 #' @param dataset A dataset id from [pdok_list_datasets()] (e.g.
 #'   `"cbs/gebiedsindelingen"`), or a raw OGC API base URL.
+#' @param queryables If `TRUE`, also retrieve the fields each layer allows a
+#'   server-side `filter` on (see [pdok_list_queryables()]), added as a
+#'   list-column `queryables`. This costs one extra request per layer, so it
+#'   is off by default.
 #'
 #' @return A [tibble][tibble::tibble] with one row per layer and the columns
 #'   `dataset` (the dataset id, echoing the input so each row works directly
@@ -90,15 +94,25 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 #'   covers, as `Date`s; `end_date` is `NA` when the layer is ongoing), `crs` (a
 #'   list-column of available EPSG codes), `storage_crs` (the EPSG code the data
 #'   is stored in), and `bbox` (a list-column of named numeric extents
-#'   `c(xmin, ymin, xmax, ymax)` in CRS84).
+#'   `c(xmin, ymin, xmax, ymax)` in CRS84). With `queryables = TRUE`, a
+#'   list-column `queryables` (a character vector of filterable field names
+#'   per layer) follows `description`.
 #' @seealso [pdok_search_layers()] to filter this list,
-#'   [pdok_list_datasets()] for the datasets.
+#'   [pdok_list_datasets()] for the datasets, [pdok_list_queryables()] for
+#'   the queryables of one layer with their types.
 #' @examples
 #' \donttest{
 #' pdok_list_layers("cbs/gebiedsindelingen")
+#'
+#' # Which fields can each layer be filtered on?
+#' layers <- pdok_list_layers("cbs/gebiedsindelingen", queryables = TRUE)
+#' layers[, c("layer", "queryables")]
 #' }
 #' @export
-pdok_list_layers <- function(dataset) {
+pdok_list_layers <- function(dataset, queryables = FALSE) {
+  if (!rlang::is_bool(queryables)) {
+    cli::cli_abort("{.arg queryables} must be {.code TRUE} or {.code FALSE}.")
+  }
   resolved <- resolve_dataset(dataset)
   ogc <- resolved$ogc
   layers <- tryCatch(
@@ -110,6 +124,16 @@ pdok_list_layers <- function(dataset) {
     },
     error = function(cnd) abort_not_features(resolved$id, ogc, cnd)
   )
+  if (queryables) {
+    # One request per layer; a layer without queryables gets character(0).
+    fields <- lapply(layers$layer, function(l) {
+      q <- fetch_queryables(ogc, l)
+      if (is.null(q)) character() else q$queryable
+    })
+    layers <- tibble::add_column(
+      layers, queryables = fields, .after = "description"
+    )
+  }
   # Echo the dataset so each row is self-contained for pdok_read(dataset, layer).
   tibble::add_column(
     layers,

@@ -16,7 +16,8 @@ knitr::opts_chunk$set(
 `pdokr` helps you work with open geographic data from
 [PDOK](https://www.pdok.nl/), the national geodata platform of the Netherlands.
 A typical session has three steps: find a dataset and its layers, load a layer
-as an [`sf`](https://r-spatial.github.io/sf/) object, and take it from there.
+(or the part of it you need) as an [`sf`](https://r-spatial.github.io/sf/)
+object, and take it from there.
 
 ```{r setup}
 library(pdokr)
@@ -60,6 +61,28 @@ gemeenten <- pdok_read(
 gemeenten
 ```
 
+## Load only what you need
+
+Many layers are far too large to download whole: the BAG alone holds millions
+of addresses. `pdok_read()` therefore has two arguments that make the PDOK
+server do the selecting, so only the matching features are transferred.
+`filter_by` restricts a layer to an area, and `filter` restricts it to the
+features with certain attribute values, written as an R expression inside
+`pdok_where()`. Here we fetch the neighborhoods of one municipality by name,
+instead of every neighborhood in the country:
+
+```{r filter}
+buurten <- pdok_read(
+  "cbs/wijken-en-buurten-2025", "buurten",
+  filter = pdok_where(gemeentenaam == "Delft")
+)
+nrow(buurten)
+```
+
+Not every field can be filtered on: PDOK publishes a set of filterable
+fields per layer, and `pdok_list_queryables()` lists them. The two filtering
+articles linked below cover both arguments in depth.
+
 ## Make a map
 
 The result is a plain `sf` object, so any mapping package works. We use
@@ -71,7 +94,7 @@ tmap_mode("plot")
 
 tm_shape(gemeenten) +
   tm_polygons(fill = "grey95", col = "grey40", lwd = 0.4) +
-  tm_title("Dutch municipalities, 2024")
+  tm_title("Dutch municipalities, 2025")
 ```
 
 The same code in `tmap`'s interactive mode gives a zoomable, pannable map you
@@ -96,6 +119,9 @@ tmap_mode("plot")
 * [Filtering data by area](filtering-by-area.html) — filter a layer to a
   municipality, province, or any polygon, including the address-to-area workflow
   with `pdok_geocode()`.
+* [Filtering data by attribute](filtering-by-attribute.html) — let the server
+  select on field values with `pdok_where()`, so only matching features are
+  downloaded.
 * [Coordinate reference systems](coordinate-reference-systems.html) — how
   `pdokr` handles RD New and lon/lat.
 * [Working with PDOK by hand](pdok-by-hand.html) — the raw OGC API and WFS

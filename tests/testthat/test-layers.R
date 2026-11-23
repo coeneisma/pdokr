@@ -63,6 +63,44 @@ test_that("pdok_list_layers returns the layer tibble", {
   expect_true(all(layers$dataset == "cbs/gebiedsindelingen"))
 })
 
+test_that("pdok_list_layers adds a queryables column on request", {
+  n_q <- 0L
+  httr2::local_mocked_responses(function(req) {
+    if (grepl("/queryables", req$url)) n_q <<- n_q + 1L
+    mock_pdok_dispatcher(
+      collections = mock_collections_resp(), queryables = queryables_resp()
+    )(req)
+  })
+
+  layers <- pdok_list_layers("cbs/gebiedsindelingen", queryables = TRUE)
+  expect_equal(n_q, 2L) # one request per layer
+  expect_true(is.list(layers$queryables))
+  expect_equal(layers$queryables[[1]], c("geometry", "postcode", "huisnummer"))
+  # placed right after description, dataset still first
+  expect_equal(names(layers)[1:5], c("dataset", "layer", "title", "description", "queryables"))
+
+  # off by default: no column, no extra requests
+  n_q <- 0L
+  plain <- pdok_list_layers("cbs/gebiedsindelingen")
+  expect_equal(n_q, 0L)
+  expect_false("queryables" %in% names(plain))
+})
+
+test_that("pdok_list_layers gives character(0) for a layer without queryables", {
+  httr2::local_mocked_responses(
+    mock_pdok_dispatcher(
+      collections = mock_collections_resp(),
+      queryables = queryables_resp(status = 404, body = "{}")
+    )
+  )
+  layers <- pdok_list_layers("cbs/gebiedsindelingen", queryables = TRUE)
+  expect_equal(layers$queryables[[1]], character())
+})
+
+test_that("pdok_list_layers validates queryables", {
+  expect_error(pdok_list_layers("cbs/gebiedsindelingen", queryables = "yes"), "TRUE")
+})
+
 test_that("pdok_search_layers filters case-insensitively", {
   httr2::local_mocked_responses(
     mock_pdok_dispatcher(collections = mock_collections_resp())

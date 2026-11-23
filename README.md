@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/pdokr)](https://CRAN.R-project.org/package=pdokr)
 [![R-CMD-check](https://github.com/coeneisma/pdokr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/coeneisma/pdokr/actions/workflows/R-CMD-check.yaml)
@@ -18,7 +18,8 @@ national geodata platform of the Netherlands. It helps you discover
 datasets and their layers, load a layer as an
 [`sf`](https://r-spatial.github.io/sf/) object (with automatic
 pagination and explicit coordinate reference system handling), filter
-data by any polygon area, and geocode addresses and place names.
+data by any polygon area or by attribute values on the server, and
+geocode addresses and place names.
 
 `pdokr` is a client for PDOK’s **OGC API Features** services: it reads
 *vector* feature data (points, lines, polygons) as `sf`. Raster, tile,
@@ -34,7 +35,8 @@ Install the released version of `pdokr` from
 install.packages("pdokr")
 ```
 
-Or the development version from [GitHub](https://github.com/coeneisma/pdokr):
+Or the development version from
+[GitHub](https://github.com/coeneisma/pdokr):
 
 ``` r
 # install.packages("remotes")
@@ -44,8 +46,8 @@ remotes::install_github("coeneisma/pdokr@develop")
 ## Example
 
 Pick an area from the administrative boundaries, then load another layer
-within it. Here we take the historic center of Delft and map every
-building in it.
+within it, filtered on the server by an attribute. Here we take the
+historic center of Delft and map every building from before 1800.
 
 ``` r
 library(pdokr)
@@ -53,18 +55,23 @@ library(tmap)
 
 # A municipality, and one of its districts (the historic center of Delft)
 gemeenten <- pdok_read(
-  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2024
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd", datetime = 2025
 )
 delft <- gemeenten[gemeenten$statnaam == "Delft", ]
 
 wijken <- pdok_read(
-  "cbs/gebiedsindelingen", "wijk_gegeneraliseerd", datetime = 2024,
+  "cbs/gebiedsindelingen", "wijk_gegeneraliseerd", datetime = 2025,
   filter_by = delft, predicate = "within"
 )
 binnenstad <- wijken[wijken$statnaam == "Wijk 11 Binnenstad", ]
 
-# Every building in that district, from the TOP10NL topography
-buildings <- pdok_read("brt/top10nl", "gebouw_vlak", filter_by = binnenstad)
+# Every building in that district built before 1800, from the BAG.
+# The construction-year filter runs on the PDOK server.
+buildings <- pdok_read(
+  "kadaster/bag", "pand",
+  filter_by = binnenstad,
+  filter = pdok_where(bouwjaar < 1800)
+)
 
 # Map it
 tmap_mode("plot")
@@ -73,7 +80,7 @@ tm_basemap(pdok_basemap("grijs")) +
   tm_borders(col = "grey40") +
   tm_shape(buildings) +
   tm_polygons(fill = "#d95f02", col = "white", lwd = 0.4) +
-  tm_title("Buildings in the historic center of Delft") +
+  tm_title("Buildings from before 1800 in the historic center of Delft") +
   tm_credits("Kaartgegevens © Kadaster")
 ```
 
@@ -87,5 +94,5 @@ workflows, with interactive, zoomable maps.
 
 See the [package website](https://coeneisma.github.io/pdokr/) for the
 reference documentation and articles on getting started, filtering data
-by area, working with coordinate reference systems, and querying PDOK by
-hand.
+by area or by attribute, working with coordinate reference systems, and
+querying PDOK by hand.

@@ -139,5 +139,8 @@ and the GeoJSON-to-`sf` conversion, behind a handful of `pdok_*()` functions.
 
 * [Getting started](getting-started.html) — the same tasks with the `pdok_*()`
   functions.
+* [Filtering data by attribute](filtering-by-attribute.html) — the `filter`
+  parameter of the same endpoints, and the CQL2 text `pdok_where()` writes
+  for you.
 * [Coordinate reference systems](coordinate-reference-systems.html) — more on
   CRS84, RD New and axis order.

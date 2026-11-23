@@ -56,14 +56,39 @@ mock_conformance_resp <- function(features = TRUE) {
 # URL. Pass the canned responses you expect this test to need.
 mock_pdok_dispatcher <- function(index = mock_index_resp(),
                                  collections = NULL, items = NULL,
-                                 conformance = NULL, locatieserver = NULL) {
+                                 conformance = NULL, locatieserver = NULL,
+                                 queryables = NULL) {
   function(req) {
     url <- req$url
     if (grepl("index\\.json", url)) return(index)
     if (grepl("/conformance", url)) return(conformance)
     if (grepl("/collections/[^/]+/items", url)) return(items)
+    if (grepl("/collections/[^/]+/queryables", url)) return(queryables)
     if (grepl("/collections", url)) return(collections)
     if (grepl("locatieserver", url)) return(locatieserver)
     cli::cli_abort("Unexpected mock request: {url}")
   }
+}
+
+# Canned queryables document (BAG adres), for pdok_list_queryables() and
+# pdok_list_layers(queryables = TRUE).
+queryables_body <- '{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Adres",
+  "type": "object",
+  "properties": {
+    "geometry": {"x-ogc-role": "primary-geometry", "format": "geometry-point"},
+    "postcode": {"description": "Filter features by this property", "type": "string"},
+    "huisnummer": {"description": "Filter features by this property", "type": "string"}
+  },
+  "additionalProperties": false
+}'
+
+queryables_resp <- function(status = 200, body = queryables_body) {
+  httr2::response(
+    status_code = status,
+    url = "https://api.pdok.nl/kadaster/bag/ogc/v2/collections/adres/queryables",
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw(body)
+  )
 }
