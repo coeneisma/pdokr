@@ -114,6 +114,9 @@ or two after the boundaries).
 
 * [Filtering data by area](filtering-by-area.html) — the load-then-filter
   workflow.
+* [Filtering data by attribute](filtering-by-attribute.html) — select one
+  municipality's neighborhoods by name with `pdok_where()` instead of by
+  polygon.
 * [Coordinate reference systems](coordinate-reference-systems.html) — working in
   RD New (EPSG:28992), the Dutch national grid.
 * [PDOK basemaps](basemaps.html) — the gray background map used here, and the

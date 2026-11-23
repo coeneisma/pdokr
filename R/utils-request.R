@@ -24,6 +24,13 @@ rbind_sf <- function(parts) {
   do.call(rbind, aligned)
 }
 
+# Internal: show progress bars? Only in an interactive session, so they stay
+# out of knitted documents and logs. All progress indicators in the package
+# go through this one switch.
+show_progress <- function() {
+  rlang::is_interactive()
+}
+
 #' Build a standard pdokr httr2 request
 #'
 #' @param url The endpoint URL.
@@ -68,22 +75,47 @@ pdok_perform <- function(req, call = rlang::caller_env()) {
     httr2_http = function(cnd) {
       status <- httr2::resp_status(cnd$resp)
       url <- cnd$request$url %||% req$url
+      # PDOK's JSON error bodies carry the useful explanation (e.g. a CQL2
+      # parse error, or a filter on a field that is not queryable) in
+      # `detail`; surface it instead of only the status code.
+      detail <- tryCatch(
+        {
+          d <- httr2::resp_body_json(cnd$resp)$detail
+          if (rlang::is_string(d) && nzchar(d)) gsub("[\r\n]+", " ", d) else NULL
+        },
+        error = function(e) NULL
+      )
+      detail_bullet <- if (!is.null(detail)) c("x" = "Server message: {detail}")
+      # Each layer allows filtering on a selected set of fields only; point
+      # to where that set can be found.
+      if (!is.null(detail) && grepl("not a queryable property", detail, fixed = TRUE)) {
+        detail_bullet <- c(
+          detail_bullet,
+          "i" = "See {.fn pdok_list_queryables} for the fields this layer can be filtered on."
+        )
+      }
       if (status == 404L) {
         cli::cli_abort(
           c(
             "PDOK request failed: resource not found (HTTP 404).",
+            detail_bullet,
             "i" = "Check the dataset or layer id from {.fn pdok_search_datasets} / {.fn pdok_list_layers}.",
             "i" = "URL: {.url {url}}"
           ),
-          call = call
+          call = call,
+          class = "pdokr_http_error",
+          status = status
         )
       }
       cli::cli_abort(
         c(
           "PDOK request failed (HTTP {status}).",
+          detail_bullet,
           "i" = "URL: {.url {url}}"
         ),
-        call = call
+        call = call,
+        class = "pdokr_http_error",
+        status = status
       )
     },
     httr2_failure = function(cnd) {
@@ -113,12 +145,15 @@ pdok_perform <- function(req, call = rlang::caller_env()) {
 #'   collected; `NULL` for all.
 #' @param process Optional function applied to each page's `sf` (e.g. a spatial
 #'   clip). Returns the features to keep from that page.
+#' @param progress Show a spinner with the running feature count? Off when
+#'   the caller reports progress itself (batched filters).
 #' @param call Calling environment, for error messages.
 #'
 #' @return An `sf` object with the (kept) features, trimmed to `max_features`.
 #' @noRd
 paginate_ogc <- function(url, query = NULL, max_features = NULL,
-                         process = NULL, call = rlang::caller_env()) {
+                         process = NULL, progress = TRUE,
+                         call = rlang::caller_env()) {
   parts <- list()
   n_kept <- 0L
   content_crs <- NULL
@@ -126,12 +161,14 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
   next_query <- query
 
   # Total is unknown (the API does not return numberMatched), so this is a
-  # spinner that reports the running feature count. cli keeps it quiet in
-  # non-interactive sessions.
-  cli::cli_progress_bar(
-    format = "{cli::pb_spin} Downloading PDOK features: {n_kept} fetched",
-    clear = TRUE
-  )
+  # spinner that reports the running feature count.
+  progress <- progress && show_progress()
+  if (progress) {
+    cli::cli_progress_bar(
+      format = "{cli::pb_spin} Downloading PDOK features: {n_kept} fetched",
+      clear = TRUE
+    )
+  }
 
   repeat {
     resp <- pdok_perform(pdok_request(next_url, query = next_query), call = call)
@@ -149,7 +186,7 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
       parts[[length(parts) + 1L]] <- page
     }
     n_kept <- n_kept + nrow(page)
-    cli::cli_progress_update()
+    if (progress) cli::cli_progress_update()
 
     next_href <- NULL
     for (lnk in parsed$links %||% list()) {
@@ -165,7 +202,7 @@ paginate_ogc <- function(url, query = NULL, max_features = NULL,
     next_url <- next_href
     next_query <- NULL
   }
-  cli::cli_progress_done()
+  if (progress) cli::cli_progress_done()
 
   if (length(parts) == 0L) {
     return(sf::st_sf(geometry = sf::st_sfc(crs = content_crs %||% NA_integer_)))

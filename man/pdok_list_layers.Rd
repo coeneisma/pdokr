@@ -4,11 +4,16 @@
 \alias{pdok_list_layers}
 \title{List the layers within a PDOK dataset}
 \usage{
-pdok_list_layers(dataset)
+pdok_list_layers(dataset, queryables = FALSE)
 }
 \arguments{
 \item{dataset}{A dataset id from \code{\link[=pdok_list_datasets]{pdok_list_datasets()}} (e.g.
 \code{"cbs/gebiedsindelingen"}), or a raw OGC API base URL.}
+
+\item{queryables}{If \code{TRUE}, also retrieve the fields each layer allows a
+server-side \code{filter} on (see \code{\link[=pdok_list_queryables]{pdok_list_queryables()}}), added as a
+list-column \code{queryables}. This costs one extra request per layer, so it
+is off by default.}
 }
 \value{
 A \link[tibble:tibble]{tibble} with one row per layer and the columns
@@ -18,7 +23,9 @@ with \code{\link[=pdok_read]{pdok_read()}}), \code{layer} (the layer identifier)
 covers, as \code{Date}s; \code{end_date} is \code{NA} when the layer is ongoing), \code{crs} (a
 list-column of available EPSG codes), \code{storage_crs} (the EPSG code the data
 is stored in), and \code{bbox} (a list-column of named numeric extents
-\code{c(xmin, ymin, xmax, ymax)} in CRS84).
+\code{c(xmin, ymin, xmax, ymax)} in CRS84). With \code{queryables = TRUE}, a
+list-column \code{queryables} (a character vector of filterable field names
+per layer) follows \code{description}.
 }
 \description{
 Lists the layers (OGC API Features collections) offered by a dataset.
@@ -26,9 +33,14 @@ Lists the layers (OGC API Features collections) offered by a dataset.
 \examples{
 \donttest{
 pdok_list_layers("cbs/gebiedsindelingen")
+
+# Which fields can each layer be filtered on?
+layers <- pdok_list_layers("cbs/gebiedsindelingen", queryables = TRUE)
+layers[, c("layer", "queryables")]
 }
 }
 \seealso{
 \code{\link[=pdok_search_layers]{pdok_search_layers()}} to filter this list,
-\code{\link[=pdok_list_datasets]{pdok_list_datasets()}} for the datasets.
+\code{\link[=pdok_list_datasets]{pdok_list_datasets()}} for the datasets, \code{\link[=pdok_list_queryables]{pdok_list_queryables()}} for
+the queryables of one layer with their types.
 }

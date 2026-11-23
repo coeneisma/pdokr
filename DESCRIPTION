@@ -18,10 +18,9 @@ Description: Tools to discover, download, and spatially filter open
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.0.0
 Imports:
     cli,
-    httr2,
+    httr2 (>= 1.1.1),
     rlang,
     sf,
     tibble
@@ -36,3 +35,4 @@ URL: https://github.com/coeneisma/pdokr, https://coeneisma.github.io/pdokr/
 BugReports: https://github.com/coeneisma/pdokr/issues
 Language: en-US
 Config/Needs/website: rmarkdown, tmap, dplyr, mapgl, leaflet
+Config/roxygen2/version: 8.1.0

@@ -1,0 +1,297 @@
+---
+title: "Filtering data by attribute"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+[Filtering by area](filtering-by-area.html) answers *"give me this layer, but
+only within that area"*. This article is about the other kind of question:
+*"give me only the features **with these properties**"* — the addresses with
+one postal code, the streets whose name starts with "Lange", the thousands of
+buildings whose id appears in your own data. Attribute filters run **on the
+PDOK server**, so only the matching features are downloaded — often the
+difference between transferring a few rows and a few hundred thousand.
+
+Server-side filtering follows the OGC
+[CQL2](https://www.ogc.org/standards/cql2/) standard, which PDOK offers on
+every dataset with an OGC API Features service. It was introduced on the BAG
+first (announced [on the PDOK
+Geoforum](https://geoforum.nl/t/bag-ogc-api-uitgebreid-met-nieuwe-filterfunctionaliteit-demo-beschikbaar/11778))
+and has since been enabled across the platform. The server rejects a filter
+it cannot handle with a clear error — it never silently returns unfiltered
+data.
+
+```{r setup}
+library(pdokr)
+library(tmap)
+```
+
+## Which fields can you filter on?
+
+Each layer publishes its *queryables*: the fields a server-side filter may
+reference. `pdok_list_queryables()` retrieves them for one layer;
+`pdok_list_layers(dataset, queryables = TRUE)` adds them as a column for
+every layer of a dataset at once.
+
+```{r queryables}
+pdok_list_queryables("kadaster/bag", "adres")
+```
+
+The queryables are chosen per layer and are often a small subset of the
+layer's attributes. The generalized municipalities of CBS, for example, can
+be filtered on the year but not on the municipality name:
+
+```{r queryables-cbs}
+pdok_list_queryables("cbs/gebiedsindelingen", "gemeente_gegeneraliseerd")
+```
+
+A filter on any other field is rejected, with the server's explanation and a
+pointer back to the queryables:
+
+```{r queryables-error, error = TRUE}
+pdok_read(
+  "cbs/gebiedsindelingen", "gemeente_gegeneraliseerd",
+  filter = pdok_where(statnaam == "Utrecht")
+)
+```
+
+So check the queryables first. For a field that is not queryable, load the
+layer (within an area, if it is large) and subset the `sf` in R as usual.
+
+## Filter with R syntax: `pdok_where()`
+
+`pdok_where()` translates a familiar R expression into the CQL2 filter
+language for you. Field names are written as bare names; values come from
+your R session, so variables and vectors work as usual.
+
+```{r where-simple}
+pdok_read(
+  "kadaster/bag", "adres",
+  filter = pdok_where(postcode == "3811MZ")
+)
+```
+
+The same works on every dataset. The CBS neighborhoods, for instance, are
+queryable by municipality name, which fetches exactly one municipality's
+neighborhoods without any spatial filtering:
+
+```{r where-cbs}
+buurten <- pdok_read(
+  "cbs/wijken-en-buurten-2025", "buurten",
+  filter = pdok_where(gemeentenaam == "Amersfoort")
+)
+nrow(buurten)
+```
+
+Conditions combine with `&`, `|` and `!`, and `%in%` matches against a
+vector:
+
+```{r where-combine}
+codes <- c("3811MZ", "3811MS")
+
+addresses <- pdok_read(
+  "kadaster/bag", "adres",
+  filter = pdok_where(postcode %in% codes & huisnummer != "1")
+)
+nrow(addresses)
+```
+
+`like()` matches string patterns (`%` is the wildcard), and `casei()` makes a
+comparison case-insensitive:
+
+```{r where-like}
+lange <- pdok_read(
+  "kadaster/bag", "adres",
+  filter = pdok_where(
+    casei(woonplaats_naam) == "amersfoort" &
+      like(openbare_ruimte_naam, "Lange%")
+  )
+)
+sort(unique(lange$openbare_ruimte_naam))
+```
+
+```{r map-interactive}
+tmap_mode("view")
+
+tm_basemap(pdok_basemap("grijs")) +
+  tm_shape(lange) +
+  tm_dots(fill = "openbare_ruimte_naam", size = 0.5, id = "openbare_ruimte_naam",
+          fill.legend = tm_legend("Street")) +
+  tm_credits("Kaartgegevens © Kadaster")
+```
+
+```{r reset, include = FALSE}
+tmap_mode("plot")
+```
+
+The full translation table — including `between()`, `is.na()` and the
+accent-insensitive `accenti()` — is in `?pdok_where`. A `pdok_where` object
+prints the CQL2 it stands for, which is a handy way to learn the language:
+
+```{r where-print}
+pdok_where(casei(woonplaats_naam) == "amersfoort" & huisnummer >= 10)
+```
+
+## Combining with an area filter
+
+An attribute filter and a spatial filter answer different halves of one
+question, and they work together in a single call: the server applies the
+attribute filter (and the bounding box), and `pdok_read()` then clips the
+result to the exact shape.
+
+Without the attribute filter this would download every address in the
+municipality's bounding box — hundreds of thousands of features. With it, the
+server sends only the "Lange…" addresses, and the exact clip to the boundary
+happens locally as usual.
+
+```{r combine-area}
+amersfoort <- pdok_geocode("Amersfoort", type = "gemeente")
+
+pdok_read(
+  "kadaster/bag", "adres",
+  filter_by = amersfoort, # spatial: within this boundary
+  filter = pdok_where(like(openbare_ruimte_naam, "Lange%")) # attribute: on the server
+) |>
+  nrow()
+```
+
+## Which values can a field take?
+
+The queryables tell you which fields exist, not which values they hold. For
+the BAG the authoritative source is the official [Catalogus
+BAG](https://imbag.github.io/catalogus/), whose [domain values
+chapter](https://imbag.github.io/catalogus/hoofdstukken/domeinwaarden) defines
+the permitted values — for `gebruiksdoel`, for example, the eleven fixed uses
+(`woonfunctie`, `onderwijsfunctie`, `winkelfunctie`, ...). Other datasets have
+their own documentation.
+
+You can also just look at the data: read a modest sample and inspect the
+column.
+
+```{r values}
+buildings <- pdok_read("kadaster/bag", "pand", bbox = amersfoort, max_features = 500)
+sort(unique(unlist(strsplit(buildings$gebruiksdoel, ","))))
+```
+
+The `strsplit()` is there because of a BAG subtlety that matters for
+filtering, covered next.
+
+## Multi-value fields: `has()`
+
+As the sample shows, `gebruiksdoel` often holds *several* comma-joined
+values: a building inherits the use of every unit in it, so a school with a
+gym and a caretaker's flat is registered as, say,
+`"onderwijsfunctie,sportfunctie,woonfunctie"`. An equality test only matches
+buildings whose *entire* value is `"onderwijsfunctie"` and silently misses
+the rest. `has()` expresses what you usually mean — *the field contains this
+value*:
+
+```{r has}
+schools <- pdok_read(
+  "kadaster/bag", "pand",
+  filter_by = amersfoort,
+  filter = pdok_where(has(gebruiksdoel, "onderwijsfunctie"))
+)
+nrow(schools)
+
+# with == instead of has() we would have missed the combined-use buildings:
+nrow(pdok_read(
+  "kadaster/bag", "pand",
+  filter_by = amersfoort,
+  filter = pdok_where(gebruiksdoel == "onderwijsfunctie")
+))
+```
+
+## Thousands of ids at once
+
+A common pattern is a table from another source that carries BAG ids — for
+example DUO's school locations, which have a `BAG_ID` column (see [Combining
+with external data](duo-schools.html)). With `%in%` you can fetch exactly
+those features, whatever their number: PDOK limits how long a request URL may
+be, so `pdok_where()` automatically spreads a long value list over multiple
+requests (300 values each) and `pdok_read()` combines the results.
+
+```{r batching}
+# Stand-in for ids from your own data: 700 addresses around the center
+ids <- pdok_read(
+  "kadaster/bag", "adres",
+  filter = pdok_where(like(postcode, "3811%")),
+  max_features = 700
+)$identificatie
+
+# 700 ids -> three requests behind the scenes, one sf back
+mine <- pdok_read(
+  "kadaster/bag", "adres",
+  filter = pdok_where(identificatie %in% ids)
+)
+nrow(mine)
+```
+
+Row order follows the service, not your id vector, so join on the id column
+rather than relying on position.
+
+## Writing CQL2 yourself
+
+`pdok_where()` covers the common cases, but `filter` also accepts a raw CQL2
+text string, passed to the server unchanged — useful for CQL2 features the
+translation does not expose.
+
+```{r raw-cql}
+wijersstraat <- pdok_read(
+  "kadaster/bag", "adres",
+  filter = "postcode = '3811MZ' AND huisnummer = '1'"
+)
+paste(wijersstraat$openbare_ruimte_naam, wijersstraat$huisnummer)
+```
+
+A quick tour of the language (the [CQL2
+standard](https://docs.ogc.org/is/21-065r2/21-065r2.html) has the full
+grammar):
+
+| CQL2 | Meaning |
+|---|---|
+| `postcode = '3811MZ'`, `<>`, `<`, `<=`, `>`, `>=` | comparisons; strings in single quotes |
+| `a AND b`, `a OR b`, `NOT (a)` | logic (AND binds tighter than OR) |
+| `postcode IN ('3811MZ', '3811MS')` | value lists |
+| `openbare_ruimte_naam LIKE 'Lange%'` | patterns; `%` = any characters |
+| `huisnummer BETWEEN 1 AND 9` | ranges |
+| `casei(...)`, `accenti(...)` | case-/accent-insensitive, applied to both sides |
+| `huisletter IS NULL` | missing values |
+| `S_INTERSECTS(geometry, POINT(5.387 52.156))` | spatial predicates, coordinates in lon/lat |
+
+Spatial CQL2 functions such as `S_INTERSECTS` work, with two things to know.
+First, always combine them with a `bbox`: without one the server tests the
+geometry against the whole country and a single point takes 15 seconds,
+while with a bounding box the same request answers in about a second.
+Second, the server's cost grows with the number of points *and* the size of
+the box, so this is a tool for a neighborhood or a city, not a province.
+For polygons the plain `filter_by` is faster than a server-side
+`S_INTERSECTS`, and for a small set of points `pdok_read()` already adds the
+spatial filter for you (see the `filter_by` argument), so writing
+`S_INTERSECTS` by hand is rarely needed.
+
+The server validates every filter and pdokr passes its explanation on, so a
+mistake is easy to diagnose:
+
+```{r raw-error, error = TRUE}
+pdok_read("kadaster/bag", "adres", filter = "postcode == '3811MZ'")
+```
+
+## Where to next
+
+* [Filtering data by area](filtering-by-area.html) — the spatial counterpart:
+  clip any layer to any polygon.
+* [Combining with external data](duo-schools.html) — the DUO school table
+  whose `BAG_ID` column pairs naturally with an `identificatie %in% ids`
+  filter.
+* [Mapping buildings by construction year](bag-buildings.html) — reading BAG
+  geometry inside an area.

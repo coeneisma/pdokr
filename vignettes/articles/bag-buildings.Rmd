@@ -108,6 +108,8 @@ tmap_mode("plot")
 
 * [Filtering data by area](filtering-by-area.html) — the load-then-filter
   workflow used here.
+* [Filtering data by attribute](filtering-by-attribute.html) — have the server
+  select buildings on `bouwjaar`, `status` or `gebruiksdoel` before download.
 * [Combining with external data](duo-schools.html) — join `pdokr` with another
   open API.
 * [PDOK basemaps](basemaps.html) — the gray background map used here, and the
