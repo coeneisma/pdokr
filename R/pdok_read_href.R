@@ -236,7 +236,7 @@ attach_hrefs <- function(x, col, keep, feats, call = rlang::caller_env()) {
 #'   row per distinct link, with the link as the first column, `href`.
 #' @seealso [pdok_read()] to read a layer, whose result may carry link
 #'   columns.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable("kadaster/bag/ogc/v2/collections/adres/items?limit=1&filter=postcode='3811MZ'")
 #' \donttest{
 #' # The units of use at one postal code, with the building each one is in
 #' units <- pdok_read(

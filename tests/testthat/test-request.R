@@ -191,3 +191,25 @@ test_that("pdok_perform points to pdok_list_queryables for a non-queryable field
     "pdok_list_queryables"
   )
 })
+
+test_that("pdok_reachable reports FALSE without raising when the probe fails", {
+  # A closed local port: the connection is refused at once.
+  expect_false(pdok_reachable("http://127.0.0.1:9/", timeout = 2))
+  # An HTTP error status is not "reachable" either.
+  httr2::local_mocked_responses(function(req) {
+    httr2::response(status_code = 503, url = req$url)
+  })
+  expect_false(pdok_reachable("index.json"))
+})
+
+test_that("pdok_reachable builds the probe URL on api.pdok.nl", {
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    seen <<- req$url
+    httr2::response(status_code = 200, url = req$url)
+  })
+  expect_true(pdok_reachable("index.json"))
+  expect_equal(seen, "https://api.pdok.nl/index.json")
+  expect_true(pdok_reachable("https://example.org/x"))
+  expect_equal(seen, "https://example.org/x")
+})

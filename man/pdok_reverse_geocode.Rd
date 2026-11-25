@@ -34,11 +34,13 @@ points (in any CRS); it returns the nearest match(es) as an \code{sf}, including
 \code{afstand} column with the distance in meters.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable("bzk/locatieserver/search/v3_1/free?q=Utrecht&rows=1")) withAutoprint(\{ # examplesIf}
 \donttest{
 # A point in the center of Utrecht: the nearest address
 pt <- sf::st_sfc(sf::st_point(c(5.121, 52.090)), crs = 4326)
 pdok_reverse_geocode(pt)
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_geocode]{pdok_geocode()}} for the forward lookup (address to coordinates).

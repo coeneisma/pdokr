@@ -20,9 +20,11 @@ case-insensitive partial match. The query is matched against each dataset's
 identifier, name, description, and keywords.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable()) withAutoprint(\{ # examplesIf}
 \donttest{
 pdok_search_datasets("gemeente")
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_list_datasets]{pdok_list_datasets()}} for the full list.

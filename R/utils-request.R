@@ -242,3 +242,31 @@ parse_features <- function(pages, content_crs = NULL, call = rlang::caller_env()
   }
   out
 }
+
+#' Can a PDOK resource be fetched quickly right now?
+#'
+#' A probe for the examples: the network-using examples are wrapped in
+#' `@examplesIf pdokr:::pdok_reachable(...)`, so they are skipped, rather
+#' than failing, when there is no internet connection, when PDOK is down,
+#' or when the service is so slow that the example would run into a timeout.
+#' That is what the CRAN policy on internet resources asks for. The probe
+#' makes a single small request with a short timeout and never raises.
+#'
+#' @param path A path on `https://api.pdok.nl/` to probe, or a full URL. The
+#'   default fetches the dataset index that every registry lookup needs. An
+#'   example on a dataset that is prone to slowness (the BAG) probes a
+#'   request of the same kind it is about to make.
+#' @param timeout Seconds before the probe gives up and reports `FALSE`.
+#'
+#' @return `TRUE` when the resource answered with a 2xx or 3xx status within
+#'   the timeout, `FALSE` otherwise.
+#' @noRd
+pdok_reachable <- function(path = "index.json", timeout = 5) {
+  url <- if (grepl("^https?://", path)) path else paste0("https://api.pdok.nl/", path)
+  req <- httr2::request(url)
+  req <- httr2::req_user_agent(req, "pdokr (https://github.com/coeneisma/pdokr)")
+  req <- httr2::req_timeout(req, timeout)
+  req <- httr2::req_error(req, is_error = function(resp) FALSE)
+  resp <- tryCatch(httr2::req_perform(req), error = function(e) NULL)
+  !is.null(resp) && httr2::resp_status(resp) < 400L
+}

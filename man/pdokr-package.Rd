@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Tools to discover, download, and spatially filter open geographic data from 'PDOK' (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as vector simple feature ('sf') objects through 'OGC' API Features endpoints, with automatic pagination and explicit coordinate reference system handling. Loaded layers can be filtered by any polygon area, and addresses or place names can be geocoded through the 'PDOK' location server. The focus is on vector feature data; raster, tile, and coverage services are out of scope. See \url{https://www.pdok.nl/} for more information about the platform and its services.
+Tools to discover, download, and spatially filter open geographic data from 'PDOK' (Publieke Dienstverlening Op de Kaart), the national geodata platform of the Netherlands. Datasets and their layers are searched and loaded as vector simple feature ('sf') objects through 'OGC' API Features endpoints, with automatic pagination and explicit coordinate reference system handling. Features can be filtered on the server by attribute values, with R expressions translated to the 'OGC' 'CQL2' filter language, and loaded layers can be filtered by any polygon area. Addresses or place names can be geocoded through the 'PDOK' location server. The focus is on vector feature data; raster, tile, and coverage services are out of scope. See \url{https://www.pdok.nl/} for more information about the platform and its services.
 }
 \details{
 \code{pdokr} is a client for PDOK's \strong{OGC API Features} services. It reads

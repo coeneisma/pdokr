@@ -18,9 +18,11 @@
 
 * pdokr is a client for the Dutch national geodata platform PDOK
   (<https://www.pdok.nl/>). Some examples and tests query the live PDOK web
-  services. All network-using examples are wrapped in `\donttest{}`, and
-  the integration tests are guarded with `skip_on_cran()` and
-  `skip_if_offline()`, so `R CMD check` runs without network access on CRAN.
+  services. All network-using examples are wrapped in `\donttest{}` and
+  guarded by a short reachability probe (`@examplesIf`), so they are skipped
+  with no error when PDOK is unavailable or slow. The integration tests are
+  guarded with `skip_on_cran()` and `skip_if_offline()`, so `R CMD check`
+  runs without network access on CRAN.
 
 * The package writes only to `tempdir()` in its examples and tests.
 

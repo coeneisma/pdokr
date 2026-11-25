@@ -62,6 +62,7 @@ documents \code{st_intersects()}, \code{st_within()}, and the rest).
 }
 
 \examples{
+\dontshow{if (pdokr:::pdok_reachable()) withAutoprint(\{ # examplesIf}
 \donttest{
 # All national parks that intersect the province of Utrecht
 utrecht <- pdok_read(
@@ -72,6 +73,7 @@ utrecht <- utrecht[utrecht$statnaam == "Utrecht", ]
 parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")
 pdok_filter_by(parks, utrecht)
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link[sf:geos_binary_pred]{sf::geos_binary_pred} for the definition of each spatial predicate;

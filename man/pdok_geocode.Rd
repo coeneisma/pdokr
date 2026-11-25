@@ -47,6 +47,7 @@ it came from, so the output maps back to the input even when a query returns
 several candidates or none.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable("bzk/locatieserver/search/v3_1/free?q=Utrecht&rows=1")) withAutoprint(\{ # examplesIf}
 \donttest{
 # An address: a point
 pdok_geocode("Park Arenberg 88, De Bilt")
@@ -57,6 +58,7 @@ pdok_geocode("De Bilt", type = "gemeente")
 # Several addresses in one call; the `query` column maps rows to inputs
 pdok_geocode(c("Domplein 1, Utrecht", "Coolsingel 40, Rotterdam"))
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_reverse_geocode]{pdok_reverse_geocode()}} for the reverse lookup (coordinates to the

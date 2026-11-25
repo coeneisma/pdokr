@@ -70,7 +70,7 @@ fetch_queryables <- function(ogc, layer, call = rlang::caller_env()) {
 #' @seealso [pdok_read()] and [pdok_where()] to use these fields in a filter;
 #'   `pdok_list_layers(dataset, queryables = TRUE)` for the queryables of
 #'   every layer of a dataset at once.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable()
 #' \donttest{
 #' pdok_list_queryables("kadaster/bag", "adres")
 #'

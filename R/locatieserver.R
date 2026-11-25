@@ -175,7 +175,7 @@ combine_geocode <- function(results, id_col, crs, call = rlang::caller_env()) {
 #' @seealso [pdok_reverse_geocode()] for the reverse lookup (coordinates to the
 #'   nearest address), and [pdok_read()], whose `filter_by` argument accepts the
 #'   result.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable("bzk/locatieserver/search/v3_1/free?q=Utrecht&rows=1")
 #' \donttest{
 #' # An address: a point
 #' pdok_geocode("Park Arenberg 88, De Bilt")
@@ -231,7 +231,7 @@ pdok_geocode <- function(query, type = NULL, crs = NULL, limit = 1) {
 #'   dropped (with a warning); a zero-row `sf` is returned when nothing matches
 #'   at all.
 #' @seealso [pdok_geocode()] for the forward lookup (address to coordinates).
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable("bzk/locatieserver/search/v3_1/free?q=Utrecht&rows=1")
 #' \donttest{
 #' # A point in the center of Utrecht: the nearest address
 #' pt <- sf::st_sfc(sf::st_point(c(5.121, 52.090)), crs = 4326)

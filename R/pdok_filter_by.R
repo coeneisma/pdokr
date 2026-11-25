@@ -66,7 +66,7 @@ filter_predicate <- function(predicate, call = rlang::caller_env()) {
 #' @seealso [sf::geos_binary_pred] for the definition of each spatial predicate;
 #'   [sf::st_filter()], the `sf` filter this wraps; and [pdok_read()], whose
 #'   `filter_by` argument applies this filter while loading.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable()
 #' \donttest{
 #' # All national parks that intersect the province of Utrecht
 #' utrecht <- pdok_read(

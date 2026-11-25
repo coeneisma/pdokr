@@ -31,6 +31,7 @@ per layer) follows \code{description}.
 Lists the layers (OGC API Features collections) offered by a dataset.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable()) withAutoprint(\{ # examplesIf}
 \donttest{
 pdok_list_layers("cbs/gebiedsindelingen")
 
@@ -38,6 +39,7 @@ pdok_list_layers("cbs/gebiedsindelingen")
 layers <- pdok_list_layers("cbs/gebiedsindelingen", queryables = TRUE)
 layers[, c("layer", "queryables")]
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_search_layers]{pdok_search_layers()}} to filter this list,
