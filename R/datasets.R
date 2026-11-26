@@ -9,7 +9,7 @@
 #'   `name`, `description`, `keywords` (a list-column of character vectors),
 #'   `services`, `owner`, and `ogc_url`.
 #' @seealso [pdok_search_datasets()] to filter this list.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable()
 #' \donttest{
 #' pdok_list_datasets()
 #' }
@@ -30,7 +30,7 @@ pdok_list_datasets <- function() {
 #'   [pdok_list_datasets()], containing only the matching rows (zero rows when
 #'   nothing matches).
 #' @seealso [pdok_list_datasets()] for the full list.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable()
 #' \donttest{
 #' pdok_search_datasets("gemeente")
 #' }

@@ -100,7 +100,7 @@ parse_collections <- function(parsed, call = rlang::caller_env()) {
 #' @seealso [pdok_search_layers()] to filter this list,
 #'   [pdok_list_datasets()] for the datasets, [pdok_list_queryables()] for
 #'   the queryables of one layer with their types.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable()
 #' \donttest{
 #' pdok_list_layers("cbs/gebiedsindelingen")
 #'
@@ -155,7 +155,7 @@ pdok_list_layers <- function(dataset, queryables = FALSE) {
 #'   [pdok_list_layers()], containing only the matching rows (zero rows when
 #'   nothing matches).
 #' @seealso [pdok_list_layers()] for the full list.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable()
 #' \donttest{
 #' pdok_search_layers("cbs/gebiedsindelingen", "gemeente")
 #' }

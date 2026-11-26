@@ -240,7 +240,7 @@ read_ogc_filters <- function(url, query, filters, max_features, process,
 #'   a warning) when nothing matches.
 #' @seealso [pdok_list_layers()] to find layer ids, [pdok_list_queryables()]
 #'   for the fields a `filter` expression can use.
-#' @examples
+#' @examplesIf pdokr:::pdok_reachable()
 #' \donttest{
 #' # A whole layer: the Dutch national parks
 #' parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")

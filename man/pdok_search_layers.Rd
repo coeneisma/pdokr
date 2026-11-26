@@ -22,9 +22,11 @@ Filters the layers from \code{\link[=pdok_list_layers]{pdok_list_layers()}} by a
 match against each layer's identifier, title, and description.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable()) withAutoprint(\{ # examplesIf}
 \donttest{
 pdok_search_layers("cbs/gebiedsindelingen", "gemeente")
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_list_layers]{pdok_list_layers()}} for the full list.

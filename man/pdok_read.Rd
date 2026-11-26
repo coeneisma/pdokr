@@ -76,6 +76,7 @@ data in another CRS; the transformation is done client-side with
 \code{\link[sf:st_transform]{sf::st_transform()}}.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable()) withAutoprint(\{ # examplesIf}
 \donttest{
 # A whole layer: the Dutch national parks
 parks <- pdok_read("rvo/nationale-parken-geharmoniseerd", "protectedsite")
@@ -96,6 +97,7 @@ parks_utrecht <- pdok_read(
   filter_by = utrecht
 )
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_list_layers]{pdok_list_layers()}} to find layer ids, \code{\link[=pdok_list_queryables]{pdok_list_queryables()}}

@@ -18,9 +18,11 @@ OGC API Features platform, fetched live from
 \url{https://api.pdok.nl/index.json}.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable()) withAutoprint(\{ # examplesIf}
 \donttest{
 pdok_list_datasets()
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_search_datasets]{pdok_search_datasets()}} to filter this list.

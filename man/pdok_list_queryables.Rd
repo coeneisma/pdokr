@@ -25,12 +25,14 @@ chosen per layer and is often a small subset of the layer's attributes, so
 check it before writing a filter.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable()) withAutoprint(\{ # examplesIf}
 \donttest{
 pdok_list_queryables("kadaster/bag", "adres")
 
 # Often only a few of a layer's fields are filterable
 pdok_list_queryables("cbs/gebiedsindelingen", "gemeente_gegeneraliseerd")
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_read]{pdok_read()}} and \code{\link[=pdok_where]{pdok_where()}} to use these fields in a filter;

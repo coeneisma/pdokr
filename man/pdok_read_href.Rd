@@ -72,6 +72,7 @@ small and are sent with bounded concurrency and a rate limit
 can comfortably serve; a few thousand links take about a minute.
 }
 \examples{
+\dontshow{if (pdokr:::pdok_reachable("kadaster/bag/ogc/v2/collections/adres/items?limit=1&filter=postcode='3811MZ'")) withAutoprint(\{ # examplesIf}
 \donttest{
 # The units of use at one postal code, with the building each one is in
 units <- pdok_read(
@@ -85,6 +86,7 @@ with_buildings[, c("identificatie", "pand.identificatie", "bouwjaar")]
 buildings <- pdok_read_href(units, "pand", keep = FALSE)
 nrow(buildings)
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=pdok_read]{pdok_read()}} to read a layer, whose result may carry link
