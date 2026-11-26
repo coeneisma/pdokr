@@ -1,3 +1,5 @@
+# pdokr (development version)
+
 # pdokr 0.2.0
 
 * Support for server-side attribute filtering with CQL2, which
