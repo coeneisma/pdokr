@@ -256,12 +256,14 @@ parse_features <- function(pages, content_crs = NULL, call = rlang::caller_env()
 #'   default fetches the dataset index that every registry lookup needs. An
 #'   example on a dataset that is prone to slowness (the BAG) probes a
 #'   request of the same kind it is about to make.
-#' @param timeout Seconds before the probe gives up and reports `FALSE`.
+#' @param timeout Seconds before the probe gives up and reports `FALSE`. Kept
+#'   well under the 5 seconds CRAN allows an example, so a skipped example
+#'   never shows up as slow.
 #'
 #' @return `TRUE` when the resource answered with a 2xx or 3xx status within
 #'   the timeout, `FALSE` otherwise.
 #' @noRd
-pdok_reachable <- function(path = "index.json", timeout = 5) {
+pdok_reachable <- function(path = "index.json", timeout = 2) {
   url <- if (grepl("^https?://", path)) path else paste0("https://api.pdok.nl/", path)
   req <- httr2::request(url)
   req <- httr2::req_user_agent(req, "pdokr (https://github.com/coeneisma/pdokr)")
