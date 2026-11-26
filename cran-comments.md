@@ -11,6 +11,11 @@
 
 ## Submission notes
 
+* This is a resubmission. The previous submission got a NOTE on Debian for
+  the `pdok_read_href()` example taking 5.0 s: the reachability probe that
+  guards the network examples waited its full 5 s timeout while the PDOK
+  BAG service was slow. The probe now gives up after 2 s.
+
 * This is a feature release (0.1.0 -> 0.2.0). It adds server-side
   attribute filtering (`pdok_where()`, the `filter` argument of
   `pdok_read()`, `pdok_list_queryables()`) and `pdok_read_href()` for
